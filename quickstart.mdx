@@ -1,47 +1,124 @@
 ---
 title: "Quickstart"
-description: "Begin with a guide on the fastest path to a successful outcome"
+description: "From zero to a generated asset in a few minutes. Pick a transport, authenticate, generate, poll."
 ---
 
-Describe how someone begins using your product. What is the first thing they need to do? Are there any prerequisites?
+This gets you from nothing to a generated image. Pick the transport that matches how you work: an agent host with MCP, a shell with the CLI, or raw HTTP.
 
-A quickstart should take someone from zero to using your product. They'll get a quick win and a sense of what they can accomplish.
+## 1. Get an API key
 
-## Prerequisites
+Create a key in the ContentHero app under **Settings, API Keys**. Keys are scope-gated; for generation, grant the generate scopes. Treat the key like a password.
 
-Before you begin, you must have:
+<Warning>
+Never paste an API key into an agent chat. The CLI and MCP handle keys for you. See [Authentication](/authentication/api-keys).
+</Warning>
 
-- Requirement one (for example, Node.js 18+, a free account, an API key)
-- Requirement two (for example, a compatible device, a compatible browser, a compatible operating system)
+## 2. Connect a transport
 
-## Get started
+<Tabs>
+  <Tab title="MCP">
+    Add the hosted server to your agent host. It authenticates over OAuth, so there is no key to manage.
 
-<Steps>
-  <Step title="Install">
-    Describe how to install your product or sign up.
-
-    ```bash
-    npm install your-package
+    ```json
+    {
+      "mcpServers": {
+        "contenthero": {
+          "url": "https://mcp.contenthero.ai"
+        }
+      }
+    }
     ```
-  </Step>
-  <Step title="Configure">
-    Describe any setup or configuration needed before first use.
 
+    Your host walks you through the OAuth consent once. After that, the ContentHero tools appear as `mcp__contenthero__*`. See [MCP setup](/tools/mcp) for per-host instructions.
+  </Tab>
+  <Tab title="CLI">
     ```bash
-    your-cli init
+    npm install -g @contenthero/cli
+    contenthero login        # browser-assisted, provisions and stores a key
+    contenthero auth status  # exits 0 when authenticated
     ```
-  </Step>
-  <Step title="Run it">
-    Show the first thing a user does to see it working.
 
+    The CLI stores the key at `~/.contenthero/credentials` (mode 0600). You can also set `CONTENTHERO_API_KEY` in the environment. See [CLI setup](/tools/cli).
+  </Tab>
+  <Tab title="Raw API">
     ```bash
-    your-cli start
+    export CONTENTHERO_API_KEY="ch_live_..."
+    curl https://app.contenthero.ai/api/v1/balance \
+      -H "Authorization: Bearer $CONTENTHERO_API_KEY"
     ```
-  </Step>
-</Steps>
 
-<Tip>
-  Give people a way to get help. This could be a link to a support page, a chat with a customer support agent, or a forum for your product.
+    A `200` with your credit balance confirms the key works.
+  </Tab>
+</Tabs>
 
-  Example: Need help? Reach out to us at [support@yourcompany.com](mailto:support@yourcompany.com).
-</Tip>
+## 3. Preview the cost
+
+Every spend can be previewed for free before you commit.
+
+<Tabs>
+  <Tab title="MCP">
+    Call `generate_image` with `getCost: true`. It returns the price and charges nothing.
+  </Tab>
+  <Tab title="CLI">
+    ```bash
+    contenthero generate image --prompt "a marble bust of an owl, studio light" --cost
+    ```
+  </Tab>
+</Tabs>
+
+## 4. Generate
+
+<Tabs>
+  <Tab title="MCP">
+    Call `generate_image` with a `prompt` and a `modelId`. The available models are the `modelId` enum on the generate tools, resolved live from the registry. The call smart-waits about 50s, then returns the asset or an `outputId` to poll.
+  </Tab>
+  <Tab title="CLI">
+    ```bash
+    contenthero generate image \
+      --prompt "a marble bust of an owl, studio light" \
+      --model nano-banana-2
+    ```
+
+    Run `contenthero model list` to see the live roster.
+  </Tab>
+  <Tab title="Raw API">
+    ```bash
+    curl https://app.contenthero.ai/api/v1/studio/generate \
+      -H "Authorization: Bearer $CONTENTHERO_API_KEY" \
+      -H "Content-Type: application/json" \
+      -d '{"type":"image","prompt":"a marble bust of an owl, studio light","modelId":"nano-banana-2"}'
+    ```
+  </Tab>
+</Tabs>
+
+## 5. Poll if it is still rendering
+
+If the render outlasts the smart-wait, you get an `outputId`. Poll it.
+
+<Tabs>
+  <Tab title="MCP">
+    Call `get_generation_status` with the `outputId` for a snapshot, or `wait_for_generation` to block until it is done.
+  </Tab>
+  <Tab title="CLI">
+    ```bash
+    contenthero generation wait <outputId>
+    ```
+  </Tab>
+</Tabs>
+
+## Next steps
+
+<CardGroup cols={2}>
+  <Card title="Chain into video" icon="film" href="/guides/generate">
+    Feed the image's output id straight into `generate_video` as a start frame.
+  </Card>
+  <Card title="Run the full pipeline" icon="diagram-project" href="/guides/pipeline">
+    Ground a post in your voice, produce the media, and schedule it.
+  </Card>
+  <Card title="Install the skills" icon="robot" href="/for-ai-agents">
+    Let your agent drive the whole surface with the official workflows.
+  </Card>
+  <Card title="Browse the recipes" icon="book-open" href="/cookbook">
+    End-to-end chains you can copy.
+  </Card>
+</CardGroup>

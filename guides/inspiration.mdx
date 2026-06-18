@@ -1,0 +1,37 @@
+---
+title: "Inspiration"
+description: "Read tracked accounts, outliers, and brand-account performance to ground every decision."
+---
+
+Inspiration is the research surface. It reads the accounts you track, the outliers (top-performing content) from them, and your own brand-account performance. It is the grounding the [pipeline](/guides/pipeline) draws on before any draft.
+
+## Operations
+
+| What | MCP tool |
+| --- | --- |
+| Tracked inspiration accounts | `list_inspiration_accounts`, `get_inspiration_account` |
+| Content from a tracked account | `get_inspiration_content` |
+| Outliers (top performers) | `list_outliers` |
+| Your own brand accounts | `list_brand_accounts` |
+| Your own account performance | `get_brand_account_performance` |
+
+All reads need `brandkit:read`.
+
+## Scoping to a brand kit
+
+Most reads accept a `brandKitId` so you see only the accounts and outliers linked to one brand. `list_outliers --brand-kit <id>` (CLI) or the `brandKitId` argument (MCP) narrows the pool. If a scoped read comes back empty, the brand kit may have no linked accounts; check `get_brand_kit` for its `inspirationAccounts` and `brandAccounts`. Accounts are linked to a brand kit in the app.
+
+## Mining outliers (the two-step)
+
+Outliers carry the signal that makes a draft perform. Surface them, then go deep on the best.
+
+<Steps>
+  <Step title="List">
+    `list_outliers` (scoped with `brandKitId`) to find the top performers. Each carries performance signals.
+  </Step>
+  <Step title="Get content">
+    `get_inspiration_content` on the top few for the full detail: transcript, hashtags, and the structure you want to learn from (hook archetype, pacing, CTA).
+  </Step>
+</Steps>
+
+This two-step is the Ground phase of the pipeline. The patterns you extract here are what the host LLM emulates, in the user's own voice, when it drafts.

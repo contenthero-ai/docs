@@ -1,0 +1,30 @@
+---
+title: "OAuth (MCP)"
+description: "How the hosted MCP server authenticates over OAuth, so agents never handle a raw key."
+---
+
+The hosted MCP server at `https://mcp.contenthero.ai` authenticates over **OAuth 2.1**. Your agent host runs the consent flow once, and from then on the ContentHero tools are available with no key in the prompt. This is the preferred transport for agents.
+
+## How it works
+
+<Steps>
+  <Step title="Add the server">
+    Point your agent host at `https://mcp.contenthero.ai`. See [MCP setup](/tools/mcp) for per-host config.
+  </Step>
+  <Step title="Consent once">
+    On first use, the host opens a consent page. Sign in with your ContentHero account and approve. The host receives a token; you never see or paste a key.
+  </Step>
+  <Step title="Use the tools">
+    The ContentHero tools appear as `mcp__contenthero__*`. The token is scoped to your account and refreshed by the host.
+  </Step>
+</Steps>
+
+## Why OAuth for MCP
+
+- **No key handling.** The agent never asks you to paste a secret. The token lives in the host, not the conversation.
+- **Account-scoped.** Every call runs as you, against your own brand kits, media, and connected accounts.
+- **Revocable.** Disconnect the server in your host, or revoke the session from the ContentHero app, and access stops.
+
+## For human integrators
+
+If you are building your own app that acts on a user's behalf and want the same browser-consent model rather than handing out API keys, contact us about OAuth client registration. For server-to-server automation, an [API key](/authentication/api-keys) is usually the simpler fit.

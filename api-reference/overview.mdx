@@ -1,0 +1,45 @@
+---
+title: "API Reference"
+description: "The /api/v1 REST surface, the TypeScript SDK, and how the transports relate."
+---
+
+ContentHero exposes one backend surface three ways. They are the same operations under different skins.
+
+| Layer | What it is | Auth |
+| --- | --- | --- |
+| **`/api/v1`** | The REST surface, base `https://app.contenthero.ai/api/v1` | [API key](/authentication/api-keys), bearer token |
+| **`@contenthero/sdk`** | A typed TypeScript kernel over `/api/v1` | API key |
+| **`@contenthero/mcp`** / hosted MCP | The same surface as agent tools | [OAuth](/authentication/oauth) or key |
+| **`@contenthero/cli`** | The same surface as shell commands | `contenthero login` or key |
+
+## TypeScript SDK
+
+```bash
+npm install @contenthero/sdk
+```
+
+```ts
+import { ContentHero } from "@contenthero/sdk";
+
+const ch = new ContentHero({ apiKey: process.env.CONTENTHERO_API_KEY });
+
+const balance = await ch.getBalance();
+const result = await ch.generateImageAndWait({
+  prompt: "a marble bust of an owl, studio light",
+  modelId: "nano-banana-2",
+});
+```
+
+The SDK is a hand-written kernel: typed inputs and outputs, idempotency keys, and smart-wait plus polling helpers built in. The MCP server and the CLI both ride it.
+
+## Conventions
+
+- **Async:** generation endpoints smart-wait, then return an `outputId` to poll. Use the wait helpers or `get_generation_status`.
+- **Chaining:** references accept a raw URL or an output-id token `<uuid>-<N>`.
+- **Cost preflight:** every generate call has a cost-only mode that charges nothing.
+- **Scopes:** keys are scope-gated; a `403` names the missing scope.
+- **Rate limits:** per-key, returning `429` when exceeded.
+
+<Note>
+A full per-endpoint reference is in progress. For now, the [SDK types](https://www.npmjs.com/package/@contenthero/sdk) are the authoritative contract for request and response shapes, and `contenthero schema` dumps every command's input schema from the CLI.
+</Note>

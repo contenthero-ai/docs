@@ -1,0 +1,55 @@
+---
+title: "Pipeline"
+description: "Research to published post. Ground a draft in your voice, produce the media, assemble the post, schedule or publish."
+---
+
+The pipeline is the hero surface. It takes a post from research to publication: ground it in your inspiration outliers and brand voice, have the host LLM draft on-brand copy in your own voice, produce the media, assemble the post, and schedule or publish.
+
+<Note>
+The host LLM does the drafting. ContentHero never writes copy server-side. The draft is grounded in your real context and approved by you before anything ships. See [the thesis](/#the-thesis).
+</Note>
+
+## The five phases
+
+<Steps>
+  <Step title="Ground">
+    Pull the context that makes a draft on-brand instead of generic:
+    - `list_outliers` (scope with `brandKitId`) then `get_inspiration_content` on the top few, for hook archetype, structure, pacing, and CTA style.
+    - `get_brand_kit` for tone, vocabulary, and banned words.
+    - `get_brand_account_performance` for the user's own top-performing posts.
+    - `search_brand_knowledge` for the brand's stance on the topic.
+  </Step>
+  <Step title="Draft (host LLM)">
+    Synthesize a concept, hook, and caption that emulate the user's proven patterns in the user's own voice. The user's own top posts win over a stated profile. Present the draft for approval. Do not invent copy that is not grounded.
+  </Step>
+  <Step title="Produce">
+    Generate the media with the [generate](/guides/generate) surface. A common chain is `generate_image` for the key frame, then its output id into `generate_video` as the start frame, grounded in the brand's visual style.
+  </Step>
+  <Step title="Assemble">
+    `create_post` with the approved caption, then `add_post_asset` for the media, then `add_post_destination` for each platform (format and connected account).
+  </Step>
+  <Step title="Ship">
+    `schedule_post` for a future slot, or `publish_post` to go now, only after the user confirms destinations and timing.
+  </Step>
+</Steps>
+
+## Operations
+
+| What | MCP tool |
+| --- | --- |
+| Create, read, update, archive a post | `create_post`, `get_post`, `update_post`, `archive_post`, `list_posts` |
+| Attach media | `add_post_asset` |
+| Configure platforms | `add_post_destination`, `update_post_destination` |
+| Schedule or publish | `schedule_post`, `publish_post` |
+| Pipeline stages | `list_pipeline_stages` |
+| Connected accounts | `list_connected_accounts`, `get_connected_account` |
+
+## Connected accounts
+
+Posts publish to connected social accounts. List them with `list_connected_accounts` and pass the account into a destination. The encrypted credentials behind a connection are never exposed through the API; you reference an account by id.
+
+## Approval is mandatory
+
+<Warning>
+Never schedule or publish without explicit user approval of the final content. Reads and drafts are free; shipping is gated on a yes.
+</Warning>

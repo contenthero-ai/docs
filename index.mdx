@@ -1,20 +1,56 @@
 ---
-title: "Introduction"
-description: "Welcome to your project"
+title: "ContentHero for Developers"
+description: "The context and execution layer for AI content creation. Your agent is the brain. ContentHero supplies the grounding and does the work."
 ---
 
-Write a short description of your product here. What it does, who it's for, and what they can accomplish with it.
+ContentHero is the **context and execution layer** for AI content creation. Your own LLM is the **brain**. ContentHero feeds it grounding (your brand voice, your inspiration outliers, your past posts) and executes the work (generate media, assemble posts, schedule, publish).
 
-<Tip>
-  Ready to make this your own? Start by editing this page. Update your `docs.json` file to customize your site. Then fill out the [Quickstart](/quickstart) page.
-</Tip>
+The developer platform exposes that whole surface three ways, so whichever agent you use can drive it.
 
-<Card title="Quickstart" icon="rocket" href="/quickstart">
-  This card links to the quickstart page in your project.
-</Card>
-<Card title="Components" icon="puzzle-piece" href="https://mintlify.com/docs/components">
-  Add cards, callouts, steps, tabs, and more to design and structure your pages.
-</Card>
-<Card title="Settings" icon="gear" href="https://mintlify.com/docs/organize/settings">
-  Set your site name, branding, and navigation in the `docs.json` file.
-</Card>
+<CardGroup cols={2}>
+  <Card title="MCP server" icon="plug" href="/tools/mcp">
+    Hosted at `mcp.contenthero.ai` over OAuth. The full tool surface, no key handling.
+  </Card>
+  <Card title="CLI" icon="terminal" href="/tools/cli">
+    `npm install -g @contenthero/cli`. Shell-native, scriptable, browser-assisted login.
+  </Card>
+  <Card title="TypeScript SDK" icon="code" href="/api-reference/overview">
+    `@contenthero/sdk`. A typed kernel for the `/api/v1` REST surface.
+  </Card>
+  <Card title="Agent skills" icon="robot" href="/for-ai-agents">
+    Installable workflows for Claude, Codex, and Cursor that drive all of the above.
+  </Card>
+</CardGroup>
+
+## The thesis
+
+There are two different things, and only one is the anti-pattern.
+
+<Warning>
+**Anti-pattern:** treating ContentHero as a black box that writes your copy. ContentHero's servers never generate copy. There is no "write my post for me" endpoint.
+</Warning>
+
+<Note>
+**The feature:** your agent may draft copy, but only when it is grounded in your real context. Pull your outliers to learn the patterns that actually perform for you. Pull your brand kit for tone and vocabulary. Pull your own top posts. Then synthesize a draft in your own proven voice, present it for approval, and only then execute. The brain writes the words. ContentHero supplies the grounding and the method.
+</Note>
+
+## What you can do
+
+<CardGroup cols={2}>
+  <Card title="Generate" icon="wand-magic-sparkles" href="/guides/generate">
+    Image, video, audio, reference boards, and lip-sync, with output-id chaining and cost preflight.
+  </Card>
+  <Card title="Run the pipeline" icon="diagram-project" href="/guides/pipeline">
+    Research outliers, ground a draft in your voice, produce the media, assemble the post, schedule or publish.
+  </Card>
+  <Card title="Read and grow your brand" icon="book" href="/guides/brand">
+    Read and edit your brand kit, and search, add to, and grow a semantic knowledge base.
+  </Card>
+  <Card title="Mine inspiration" icon="magnifying-glass-chart" href="/guides/inspiration">
+    Read tracked accounts, outliers, and brand-account performance to ground every decision.
+  </Card>
+</CardGroup>
+
+## Start here
+
+If you are an AI coding agent acting on a user's behalf, read [For AI Agents](/for-ai-agents) **before** anything else. It defines the auth-detection ladder you must follow and the failure mode to avoid. If you are a human integrating ContentHero, go straight to the [Quickstart](/quickstart).

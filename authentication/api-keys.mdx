@@ -1,0 +1,62 @@
+---
+title: "API Keys"
+description: "Create, scope, and secure ContentHero API keys for the CLI and the raw /api/v1 surface."
+---
+
+API keys authenticate the **CLI** and the **raw `/api/v1`** surface. The hosted MCP server uses [OAuth](/authentication/oauth) instead, so you do not need a key for it.
+
+## Create a key
+
+In the ContentHero app, go to **Settings, API Keys** and create a key. You see the full secret once, at creation time. Copy it then; it is stored hashed and cannot be revealed again later through the same view.
+
+Keys are prefixed `ch_live_`. Treat a key like a password.
+
+## Scopes
+
+Every key is scope-gated. Grant only what the integration needs.
+
+| Scope | Grants |
+| --- | --- |
+| `generate:*` | Image, video, audio, board, and lip-sync generation |
+| `pipeline:write` | Create and assemble posts |
+| `publish:write` | Schedule and publish posts |
+| `brandkit:read` | Read brand kits, knowledge, inspiration, and performance |
+| `brandkit:write` | Edit brand kits and add or remove knowledge |
+| `assets:write` | Upload and attach media |
+
+If a call fails on a missing scope, the response tells you which scope to grant. Add it in the same API Keys view. Do not work around a missing scope.
+
+## Use a key
+
+<Tabs>
+  <Tab title="CLI">
+    The recommended path is `contenthero login`, which provisions and stores a key for you. To use an existing key, set it in the environment:
+
+    ```bash
+    export CONTENTHERO_API_KEY="ch_live_..."
+    ```
+
+    Resolution order is `--api-key` flag, then `CONTENTHERO_API_KEY`, then the stored credential at `~/.contenthero/credentials` (mode 0600).
+  </Tab>
+  <Tab title="Raw API">
+    Send the key as a bearer token.
+
+    ```bash
+    curl https://app.contenthero.ai/api/v1/balance \
+      -H "Authorization: Bearer $CONTENTHERO_API_KEY"
+    ```
+  </Tab>
+</Tabs>
+
+## Rate limits and idempotency
+
+- Requests are rate-limited per key. Over the limit returns `429`. Back off and retry.
+- Generation accepts an idempotency key so a retried request does not double-charge. The SDK and CLI handle this for you.
+
+## Rotate and revoke
+
+Rotate keys periodically and whenever one may be exposed. Revoking a key is immediate and is a soft delete; in-flight requests using it stop authenticating. Issue a fresh key before revoking the old one to avoid downtime.
+
+<Warning>
+Never paste a key into an agent chat, a commit, or a log. The CLI and MCP exist so the key never has to appear in a prompt.
+</Warning>

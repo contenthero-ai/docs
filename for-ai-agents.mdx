@@ -1,0 +1,57 @@
+---
+title: "For AI Agents"
+description: "Read this first. The auth-detection ladder you must follow, the hard rules, and the failure mode to avoid."
+---
+
+If you are an AI coding agent (Claude Code, Codex, Cursor, Gemini CLI, or similar) acting on a user's behalf, read this page **before** the API reference. It defines how to detect which ContentHero surface is wired up, and the one failure mode to avoid: writing raw HTTP scripts that cannot run because auth was never verified.
+
+## The auth ladder (detect in this order)
+
+Pick one transport at the start of a session. Never mix, never switch mid-session, never narrate the choice.
+
+<Steps>
+  <Step title="MCP (preferred)">
+    If ContentHero MCP tools are visible in your toolset, use them. Match loosely across namespaces: `mcp__contenthero__*` (hosted OAuth at `https://mcp.contenthero.ai`), `mcp__contenthero-local__*` (a local stdio build), or any `mcp__*contenthero*__*` variant your host assigns. OAuth or a configured key handles auth. No key handling in chat.
+  </Step>
+  <Step title="CLI">
+    If no MCP is visible, use the `contenthero` CLI when `contenthero auth status` exits `0`, or when `CONTENTHERO_API_KEY` is set in the environment. The pattern is `contenthero <noun> <verb>`, JSON on stdout by default. Add `--cost` to preflight a spend and `--no-wait` plus `contenthero generation wait <id>` for non-blocking polling.
+  </Step>
+  <Step title="Raw /api/v1">
+    Last resort, only when neither MCP nor the CLI is available but the user has an API key and an HTTP client. Bearer the key against `https://app.contenthero.ai/api/v1`.
+  </Step>
+  <Step title="Neither">
+    Tell the user once: "To use ContentHero, connect the MCP server (`https://mcp.contenthero.ai`) or install the CLI: `npm install -g @contenthero/cli` then `contenthero login`."
+  </Step>
+</Steps>
+
+## Hard rules
+
+<Warning>
+**Never ask the user to paste an API key into chat.** Keys go through `contenthero login` (browser-assisted), the `CONTENTHERO_API_KEY` environment variable, or the MCP OAuth flow. Never log or echo a key.
+</Warning>
+
+1. **Never generate copy as a black box.** ContentHero's servers do not write copy. You may draft, but only grounded in the user's real context (outliers plus brand voice plus past posts), never generic, and never published without explicit approval. See [the thesis](/#the-thesis).
+2. **One transport per session.** Detect once. If an operation is not exposed in your detected transport, tell the user. Do not switch transports to reach it.
+3. **Never publish or schedule without explicit approval** of the final content.
+4. **Preview cost before a large or batched spend** and surface it. MCP passes `getCost: true` on the generate call. CLI uses `--cost`. It charges nothing.
+5. **Be concise.** Report the result (the media, the post link, the cost), not the plumbing (output ids, raw payloads, transport choice).
+
+## The failure mode to avoid
+
+Do not hand the user a `curl` script as a substitute for doing the work. If you can see MCP tools, call them. If the CLI is installed and authed, run it. A script that the user cannot run because no key was ever provisioned is not a deliverable. Verify auth, then execute.
+
+## Install the agent skills
+
+The fastest way to drive ContentHero well is to install the official skills, which encode the workflows and our model-specific prompt craft.
+
+```
+Read https://raw.githubusercontent.com/contenthero-ai/skills/main/INSTALL_FOR_AGENTS.md and follow it. Ask me for any API keys you need.
+```
+
+The skills repo is [`contenthero-ai/skills`](https://github.com/contenthero-ai/skills). It ships three skills: `contenthero-generate` (execution), `contenthero-pipeline` (research to published, the hero), and `contenthero-brand` (your context).
+
+## Async, chaining, and scopes
+
+- **Async generation:** `generate_*` runs a smart-wait (about 50s) then hands back an `outputId` if the render is still going. Poll with `get_generation_status`, or block with `wait_for_generation`. The `outputId` is always returned, so keep polling.
+- **Chaining:** a reference (start frame, image input) accepts a raw URL **or** a ContentHero output-id token `<uuid>-<N>` (the Nth variation of a prior output). The server resolves either, type-checks it, and scopes it to the owner. Prefer passing the output-id straight through rather than re-uploading.
+- **Scopes:** keys are scope-gated (generation, `publish:write`, `pipeline:write`, `brandkit:read`/`brandkit:write`). If a call fails on scope, tell the user which scope to grant in API Keys settings. Do not work around it.

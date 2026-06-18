@@ -1,0 +1,51 @@
+---
+title: "Generate"
+description: "Image, video, audio, reference boards, and lip-sync, with output-id chaining and cost preflight."
+---
+
+The generate surface turns an idea into media. It is **execution only**: you bring the prompt, ContentHero produces the asset. Drafting the prompt in the user's voice is the [pipeline](/guides/pipeline)'s job, not this one.
+
+## Models
+
+The roster is live, resolved from the registry. It is exposed as the `modelId` enum on each generate tool (MCP), or via `contenthero model list` (CLI). There is no static model list to memorize; ask the surface.
+
+## Core operations
+
+| What | MCP tool | CLI |
+| --- | --- | --- |
+| Image | `generate_image` | `contenthero generate image` |
+| Video | `generate_video` | `contenthero generate video` |
+| Audio (TTS) | `generate_audio` | `contenthero generate audio` |
+| Reference board | `generate_board` | `contenthero generate board` |
+| Lip-sync | `generate_lip_sync` | `contenthero generate lip-sync` |
+| Upscale | `upscale` | `contenthero upscale` |
+| Transcribe | `transcribe` | `contenthero transcribe` |
+
+Reads: `list_media` / `get_media` (spanning creations, boards, and looks via the `kind` filter), `list_avatars` / `get_avatar`, `list_voices` / `get_voice`.
+
+## Async
+
+`generate_*` runs a smart-wait of about 50s, then returns the finished asset or an `outputId` if the render is still going. Poll a snapshot with `get_generation_status`, or block with `wait_for_generation` (CLI `contenthero generation wait <id>`). The `outputId` is always returned, so you can always keep polling.
+
+## Chaining outputs
+
+A reference input (start frame, image input, audio for lip-sync) accepts a raw URL **or** a ContentHero output-id token `<uuid>-<N>`, the Nth variation of a prior output. The server resolves either, type-checks it, and scopes it to the owner.
+
+The common chain: generate a key frame, then feed its output id straight into a video as the start frame.
+
+<Steps>
+  <Step title="Generate the image">
+    `generate_image` with your prompt and `modelId`. Capture the returned output id.
+  </Step>
+  <Step title="Feed it into video">
+    `generate_video` with the image's output-id token as the start frame. No re-upload needed.
+  </Step>
+</Steps>
+
+## Cost preflight
+
+Preview any spend for free with `getCost: true` (MCP) or `--cost` (CLI). The preflight takes the same parameters as the real call, so the quote matches the charge.
+
+## Identity and references
+
+For consistent characters across generations, ContentHero supports avatars and reference boards as reusable identity. Browse them with `list_avatars` and the board media reads, and pass them as typed references. The [pipeline](/guides/pipeline) and the `contenthero-generate` skill cover the full reference model.

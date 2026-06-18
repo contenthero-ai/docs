@@ -1,0 +1,55 @@
+---
+title: "Brand"
+description: "Read and edit your brand kit, and search, add to, and grow a semantic knowledge base."
+---
+
+Your brand kit is the context that makes everything else on-brand. This surface reads and edits it, and reads and grows a semantic **knowledge base** that holds everything you have taught ContentHero about your brand.
+
+## The brand kit
+
+A brand kit has structured sections covering positioning, audience, voice, visual identity, and content strategy.
+
+| What | MCP tool |
+| --- | --- |
+| List and read | `list_brand_kits`, `get_brand_kit` |
+| Edit identity | `update_brand_kit` |
+| Add or edit a section | `add_brand_kit_section`, `update_brand_kit_section` |
+| Archive (reversible) | `archive_brand_kit`, `archive_brand_kit_section` |
+
+Edits need `brandkit:write`. Read the current value, modify it, and write the whole object back rather than sending a partial that would drop fields. Archiving is a soft delete; there is no hard delete.
+
+## The knowledge base
+
+Everything you have uploaded about your brand: notes, decisions, lessons, documents, articles, video transcripts. It is stored with embeddings, so it is semantically searchable, and it grows as you work. This is the deepest grounding ContentHero has.
+
+### Three reads
+
+- **`search_brand_knowledge`** (the workhorse): semantic retrieval. Give it a natural-language query, get the most relevant passages ranked by similarity. Reach for this first whenever you need what the brand has said or decided about a topic.
+- **`list_brand_knowledge`**: the complete index (titles and metadata, no bodies). Browse what exists or find an item's id.
+- **`get_brand_knowledge`**: one item's stored body by id.
+
+Browse to see what exists, search to find what is relevant, get to open one item.
+
+### Grow it (where the value compounds)
+
+The knowledge base is most valuable when it grows as you work. When the user learns something, decides something, or shares a resource, offer to remember it with `add_brand_knowledge` (needs `brandkit:write`).
+
+| Source | How |
+| --- | --- |
+| A note, lesson, or decision | `sourceType: text` (CLI `--text`) |
+| A web page | `sourceType: url` (CLI `--url`) |
+| A video transcript | `sourceType: youtube` (CLI `--youtube`) |
+| A document or image | `sourceType: file` (CLI `--file` for small files, base64) |
+| A large file, video, or audio | a hosted URL (CLI `--file-url`, MCP `fileUrl`); video and audio are chunked and embedded automatically |
+
+Confirm before adding, give it a clear title, and tell the user it is now searchable. Remove an item with `remove_brand_knowledge` on user request only.
+
+<Note>
+When grounding any on-brand decision, a knowledge search is often the single highest-leverage read. Do not skip it because the structured fields looked sufficient; the knowledge base holds what the fields do not.
+</Note>
+
+## The hard line
+
+<Warning>
+Never silently change the brand document or knowledge base. Reads and summaries are free. Any write (an identity edit, a new section, a knowledge add or remove) is confirmed with the user first.
+</Warning>

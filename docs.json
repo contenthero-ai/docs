@@ -1,37 +1,76 @@
 {
   "$schema": "https://mintlify.com/docs.json",
   "theme": "mint",
-  "name": "Mintlify Starter Kit",
+  "name": "ContentHero",
+  "description": "The context and execution layer for AI content creation. Generate media, ground posts in your brand voice, and publish, all driven by your own agent.",
   "colors": {
-    "primary": "#16A34A",
-    "light": "#07C983",
-    "dark": "#15803D"
+    "primary": "#d4af37",
+    "light": "#e0c25a",
+    "dark": "#b89a30"
   },
   "favicon": "/favicon.svg",
   "navigation": {
-    "pages": [
+    "tabs": [
       {
-        "group": "Getting Started",
-        "pages": [
-          "index",
-          "quickstart"
+        "tab": "Documentation",
+        "groups": [
+          {
+            "group": "Get Started",
+            "pages": [
+              "index",
+              "for-ai-agents",
+              "quickstart"
+            ]
+          },
+          {
+            "group": "Authentication",
+            "pages": [
+              "authentication/api-keys",
+              "authentication/oauth"
+            ]
+          },
+          {
+            "group": "Account",
+            "pages": [
+              "account-billing"
+            ]
+          },
+          {
+            "group": "Guides",
+            "pages": [
+              "guides/generate",
+              "guides/pipeline",
+              "guides/brand",
+              "guides/inspiration"
+            ]
+          },
+          {
+            "group": "Tools",
+            "pages": [
+              "tools/mcp",
+              "tools/cli"
+            ]
+          },
+          {
+            "group": "Recipes",
+            "pages": [
+              "cookbook"
+            ]
+          }
+        ]
+      },
+      {
+        "tab": "API Reference",
+        "groups": [
+          {
+            "group": "API Reference",
+            "pages": [
+              "api-reference/overview"
+            ]
+          }
         ]
       }
-    ],
-    "global": {
-      "anchors": [
-        {
-          "anchor": "Documentation",
-          "href": "https://mintlify.com/docs",
-          "icon": "book-open-cover"
-        },
-        {
-          "anchor": "Blog",
-          "href": "https://mintlify.com/blog",
-          "icon": "newspaper"
-        }
-      ]
-    }
+    ]
   },
   "logo": {
     "light": "/logo/light.svg",
@@ -40,33 +79,23 @@
   "navbar": {
     "links": [
       {
-        "label": "Support",
-        "href": "mailto:hi@mintlify.com"
+        "label": "App",
+        "href": "https://app.contenthero.ai"
+      },
+      {
+        "label": "Skills",
+        "href": "https://github.com/contenthero-ai/skills"
       }
     ],
     "primary": {
       "type": "button",
-      "label": "Dashboard",
-      "href": "https://app.mintlify.com"
+      "label": "Get an API key",
+      "href": "https://app.contenthero.ai"
     }
-  },
-  "contextual": {
-    "options": [
-      "copy",
-      "view",
-      "chatgpt",
-      "claude",
-      "perplexity",
-      "mcp",
-      "cursor",
-      "vscode"
-    ]
   },
   "footer": {
     "socials": {
-      "x": "https://x.com/mintlify",
-      "github": "https://github.com/mintlify",
-      "linkedin": "https://linkedin.com/company/mintlify"
+      "github": "https://github.com/contenthero-ai"
     }
   }
 }

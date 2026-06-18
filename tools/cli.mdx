@@ -1,0 +1,66 @@
+---
+title: "CLI"
+description: "Install and use the ContentHero CLI: shell-native, scriptable, browser-assisted login."
+---
+
+The `contenthero` CLI drives the full surface from a shell. It is the right transport when you do not have MCP wired up but you have a terminal. It rides the same `/api/v1` surface as the SDK.
+
+## Install
+
+```bash
+npm install -g @contenthero/cli
+contenthero --version
+```
+
+## Authenticate
+
+```bash
+contenthero login        # browser-assisted, provisions and stores a key
+contenthero auth status  # exits 0 when authenticated
+```
+
+`login` opens a browser, provisions a key, and stores it at `~/.contenthero/credentials` (mode 0600). The auth ladder is `--api-key` flag, then `CONTENTHERO_API_KEY` env, then the stored credential.
+
+## Shape
+
+The pattern is `contenthero <noun> <verb>`, with JSON on stdout by default.
+
+```bash
+contenthero generate image --prompt "..." --model nano-banana-2
+contenthero model list
+contenthero account balance
+contenthero brand-kit list
+contenthero post list
+```
+
+Exit codes: `0` ok, `1` general, `2` usage, `3` auth, `4` timeout (work accepted but not finished).
+
+## Discover arguments
+
+You do not need the docs open to find an argument shape.
+
+```bash
+contenthero schema                 # dump the schema of every command
+contenthero generate image --help  # one command's flags
+```
+
+## Cost preflight and async
+
+```bash
+contenthero generate image --prompt "..." --model nano-banana-2 --cost   # preview, charges nothing
+contenthero generate video --prompt "..." --model kling-3.0 --no-wait    # return an id immediately
+contenthero generation wait <outputId>                                   # block until done
+```
+
+## Scriptable
+
+Because output is JSON, the CLI composes with `jq` and shell pipelines:
+
+```bash
+contenthero model list | jq -r '.[].modelId'
+BAL=$(contenthero account balance | jq -r '.credits')
+```
+
+## Common groups
+
+`generate`, `model`, `generation`, `post`, `brand-kit` (including `knowledge`), `inspiration`, `connected`, `account`, `auth`. Run `contenthero --help` for the full tree.

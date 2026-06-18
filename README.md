@@ -1,55 +1,32 @@
-# Mintlify Starter Kit
+# ContentHero Developer Docs
 
-Use the starter kit to get your docs deployed and ready to customize.
+The source for [docs.contenthero.ai](https://docs.contenthero.ai), built with [Mintlify](https://mintlify.com).
 
-Click the green **Use this template** button at the top of this repo to copy the Mintlify starter kit. The starter kit contains examples with
+## Structure
 
-- Guide pages
-- Navigation
-- Customizations
-- API reference pages
-- Use of popular components
+- `docs.json` is the site config (navigation, theme, branding).
+- Pages are MDX, organized by the navigation groups: Get Started, Authentication, Account, Guides, Tools, Recipes, and API Reference.
+- Logo and favicon assets live under `logo/` and `favicon.svg`.
 
-**[Follow the full quickstart guide](https://starter.mintlify.com/quickstart)**
-
-## AI-assisted writing
-
-Set up your AI coding tool to work with Mintlify:
+## Local preview
 
 ```bash
-npx skills add https://mintlify.com/docs
-```
-
-This command installs Mintlify's documentation skill for your configured AI tools like Claude Code, Cursor, Windsurf, and others. The skill includes component reference, writing standards, and workflow guidance.
-
-See the [AI tools guides](/ai-tools) for tool-specific setup.
-
-## Development
-
-Install the [Mintlify CLI](https://www.npmjs.com/package/mint) to preview your documentation changes locally. To install, use the following command:
-
-```
 npm i -g mint
-```
-
-Run the following command at the root of your documentation, where your `docs.json` is located:
-
-```
 mint dev
 ```
 
-View your local preview at `http://localhost:3000`.
+Open the local URL Mintlify prints. Edits hot-reload.
 
-## Publishing changes
+## Publishing
 
-Install our GitHub app from your [dashboard](https://dashboard.mintlify.com/settings/organization/github-app) to propagate changes from your repo to your deployment. Changes are deployed to production automatically after pushing to the default branch.
+Pushes to the default branch deploy automatically through the connected Mintlify project.
 
-## Need help?
+## Source material
 
-### Troubleshooting
+Content is authored from the live developer surface and the agent skills:
 
-- If your dev environment isn't running: Run `mint update` to ensure you have the most recent version of the CLI.
-- If a page loads as a 404: Make sure you are running in a folder with a valid `docs.json`.
+- Skills repo: [`contenthero-ai/skills`](https://github.com/contenthero-ai/skills) (auth ladder, per-domain workflows, cookbook)
+- Packages: `@contenthero/sdk`, `@contenthero/mcp`, `@contenthero/cli`
+- The hosted MCP server: `https://mcp.contenthero.ai`
 
-### Resources
-- [Mintlify documentation](https://mintlify.com/docs)
+Writing rule: no em dashes or en dashes anywhere. Restructure the sentence instead.
