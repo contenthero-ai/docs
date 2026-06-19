@@ -3,11 +3,11 @@ title: "Generate"
 description: "Image, video, audio, reference boards, and lip-sync, with output-id chaining and cost preflight."
 ---
 
-The generate surface turns an idea into media. It is **execution only**: you bring the prompt, ContentHero produces the asset. Drafting the prompt in the user's voice is the [pipeline](/guides/pipeline)'s job, not this one.
+The generate tools turn an idea into media: you bring the prompt, ContentHero produces the asset. Drafting the prompt in the user's voice is the [pipeline](/guides/pipeline)'s job, not this one.
 
 ## Models
 
-The roster is live, resolved from the registry. It is exposed as the `modelId` enum on each generate tool (MCP), or via `contenthero model list` (CLI). There is no static model list to memorize; ask the surface.
+The roster is live, resolved from the registry. It is exposed as the `modelId` enum on each generate tool (MCP), or via `contenthero model list` (CLI). There is no static model list to memorize; ask for the current one.
 
 ## Core operations
 
@@ -44,7 +44,7 @@ The common chain: generate a key frame, then feed its output id straight into a 
 
 ## Cost preflight
 
-Preview any spend for free with `getCost: true` (MCP) or `--cost` (CLI). The preflight takes the same parameters as the real call, so the quote matches the charge.
+Preview any cost for free with `getCost: true` (MCP) or `--cost` (CLI). The preview takes the same parameters as the real call, so the quote matches the charge.
 
 ## Identity and references
 

@@ -1,9 +1,9 @@
 ---
 title: "Quickstart"
-description: "From zero to a generated asset in a few minutes. Pick a transport, authenticate, generate, poll."
+description: "From concept to content in a few minutes. Pick a transport, authenticate, generate, poll."
 ---
 
-This gets you from nothing to a generated image. Pick the transport that matches how you work: an agent host with MCP, a shell with the CLI, or raw HTTP.
+From concept to content in a few minutes. Pick the transport that matches how you work: an agent host with MCP, a shell with the CLI, or raw HTTP.
 
 ## 1. Get an API key
 
@@ -43,7 +43,7 @@ Never paste an API key into an agent chat. The CLI and MCP handle keys for you. 
   <Tab title="Raw API">
     ```bash
     export CONTENTHERO_API_KEY="ch_live_..."
-    curl https://app.contenthero.ai/api/v1/balance \
+    curl https://app.contenthero.ai/api/v1/account/balance \
       -H "Authorization: Bearer $CONTENTHERO_API_KEY"
     ```
 
@@ -116,7 +116,7 @@ If the render outlasts the smart-wait, you get an `outputId`. Poll it.
     Ground a post in your voice, produce the media, and schedule it.
   </Card>
   <Card title="Install the skills" icon="robot" href="/skills/overview">
-    Let your agent drive the whole surface with the official workflows.
+    Let your agent drive all of it with the official workflows.
   </Card>
   <Card title="Browse the recipes" icon="book-open" href="/cookbook/overview">
     End-to-end chains you can copy.

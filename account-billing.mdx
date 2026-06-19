@@ -3,7 +3,7 @@ title: "Account & Billing"
 description: "Credits, cost preflight, and reading your balance and usage."
 ---
 
-ContentHero bills generation in **credits**. Pricing is computed server-side per operation, based on the model, resolution, duration, and mode. The developer surface lets you read your balance and preview any spend before it happens.
+ContentHero bills generation in **credits**. Pricing is computed server-side per operation, based on the model, resolution, duration, and mode. The developer tools let you read your balance and preview any cost before it happens.
 
 ## Read your balance
 
@@ -18,7 +18,7 @@ ContentHero bills generation in **credits**. Pricing is computed server-side per
   </Tab>
   <Tab title="Raw API">
     ```bash
-    curl https://app.contenthero.ai/api/v1/balance \
+    curl https://app.contenthero.ai/api/v1/account/balance \
       -H "Authorization: Bearer $CONTENTHERO_API_KEY"
     ```
   </Tab>
@@ -26,7 +26,7 @@ ContentHero bills generation in **credits**. Pricing is computed server-side per
 
 ## Preview cost before you spend
 
-Every spend can be previewed for free. The preflight takes the exact same parameters as the real generation, so the quoted price matches what you will be charged.
+Every cost can be previewed for free. The preview takes the exact same parameters as the real generation, so the quoted price matches what you will be charged.
 
 <Tabs>
   <Tab title="MCP">
@@ -40,13 +40,13 @@ Every spend can be previewed for free. The preflight takes the exact same parame
 </Tabs>
 
 <Note>
-Always preview cost before a large or batched spend, and surface it to the user. This is a hard rule for agents.
+Always preview cost before a large or batched generation, and show it to the user. This is a hard rule for agents.
 </Note>
 
 ## Usage attribution
 
-Spends made with an API key are attributed to that key, so you can see which integration consumed what. Per-key usage is visible in the API Keys view in the app.
+Charges made with an API key are attributed to that key, so you can see which integration consumed what. Per-key usage is visible in the API Keys view in the app.
 
 ## Plans and limits
 
-Some surfaces are plan-limited (for example, the brand knowledge base caps items per brand kit by tier). When you hit a cap, the response says so. Upgrade the plan in the app, or remove an item to make room.
+Some features are plan-limited (for example, the brand knowledge base caps items per brand kit by tier). When you hit a cap, the response says so. Upgrade the plan in the app, or remove an item to make room.

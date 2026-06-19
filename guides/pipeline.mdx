@@ -3,10 +3,10 @@ title: "Pipeline"
 description: "Research to published post. Ground a draft in your voice, produce the media, assemble the post, schedule or publish."
 ---
 
-The pipeline is the hero surface. It takes a post from research to publication: ground it in your inspiration outliers and brand voice, draft on-brand copy in your own voice, produce the media, assemble the post, and schedule or publish.
+The pipeline is the flagship workflow. It takes a post from research to publication: ground it in your inspiration outliers and brand voice, draft on-brand copy in your own voice, produce the media, assemble the post, and schedule or publish.
 
 <Note>
-Your agent drafts the copy, grounded in your real context (your outliers, brand voice, and past posts), and you approve it before anything ships. ContentHero supplies the grounding and the method.
+Your agent drafts the copy, grounded in your real context (your outliers, brand voice, and past posts), and you approve it before anything goes live. ContentHero supplies the grounding and the method.
 </Note>
 
 ## The five phases
@@ -23,12 +23,12 @@ Your agent drafts the copy, grounded in your real context (your outliers, brand 
     Synthesize a concept, hook, and caption that emulate the user's proven patterns in the user's own voice. The user's own top posts win over a stated profile. Present the draft for approval. Do not invent copy that is not grounded.
   </Step>
   <Step title="Produce">
-    Generate the media with the [generate](/guides/generate) surface. A common chain is `generate_image` for the key frame, then its output id into `generate_video` as the start frame, grounded in the brand's visual style.
+    Generate the media with the [generate](/guides/generate) tools. A common chain is `generate_image` for the key frame, then its output id into `generate_video` as the start frame, grounded in the brand's visual style.
   </Step>
   <Step title="Assemble">
     `create_post` with the approved caption, then `add_post_asset` for the media, then `add_post_destination` for each platform (format and connected account).
   </Step>
-  <Step title="Ship">
+  <Step title="Publish">
     `schedule_post` for a future slot, or `publish_post` to go now, only after the user confirms destinations and timing.
   </Step>
 </Steps>
@@ -51,5 +51,5 @@ Posts publish to connected social accounts. List them with `list_connected_accou
 ## Approval is mandatory
 
 <Warning>
-Never schedule or publish without explicit user approval of the final content. Reads and drafts are free; shipping is gated on a yes.
+Never schedule or publish without explicit user approval of the final content. Reads and drafts are free; publishing is gated on a yes.
 </Warning>

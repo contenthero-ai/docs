@@ -9,6 +9,17 @@
     "dark": "#b89a30"
   },
   "favicon": "/favicon.svg",
+  "contextual": {
+    "options": [
+      "copy",
+      "view",
+      "chatgpt",
+      "claude",
+      "perplexity",
+      "grok"
+    ],
+    "display": "header"
+  },
   "navigation": {
     "tabs": [
       {
