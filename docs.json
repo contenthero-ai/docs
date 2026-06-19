@@ -12,7 +12,7 @@
   "navigation": {
     "tabs": [
       {
-        "tab": "Documentation",
+        "tab": "Guides",
         "groups": [
           {
             "group": "Get Started",
@@ -36,25 +36,90 @@
             ]
           },
           {
-            "group": "Guides",
+            "group": "Building with ContentHero",
             "pages": [
               "guides/generate",
               "guides/pipeline",
               "guides/brand",
               "guides/inspiration"
             ]
-          },
+          }
+        ]
+      },
+      {
+        "tab": "MCP",
+        "groups": [
           {
-            "group": "Tools",
+            "group": "MCP",
             "pages": [
-              "tools/mcp",
-              "tools/cli"
+              "mcp/overview"
             ]
           },
           {
-            "group": "Recipes",
+            "group": "Set up your host",
             "pages": [
-              "cookbook"
+              "mcp/claude-code",
+              "mcp/claude-desktop",
+              "mcp/cursor",
+              "mcp/codex",
+              "mcp/chatgpt",
+              "mcp/gemini-cli"
+            ]
+          }
+        ]
+      },
+      {
+        "tab": "CLI",
+        "groups": [
+          {
+            "group": "CLI",
+            "pages": [
+              "cli/overview",
+              "cli/commands",
+              "cli/output-and-async",
+              "cli/examples"
+            ]
+          }
+        ]
+      },
+      {
+        "tab": "Skills",
+        "groups": [
+          {
+            "group": "Skills",
+            "pages": [
+              "skills/overview",
+              "skills/install"
+            ]
+          },
+          {
+            "group": "The skills",
+            "pages": [
+              "skills/generate",
+              "skills/pipeline",
+              "skills/brand"
+            ]
+          },
+          {
+            "group": "Method",
+            "pages": [
+              "skills/voice-synthesis"
+            ]
+          }
+        ]
+      },
+      {
+        "tab": "Cookbook",
+        "groups": [
+          {
+            "group": "Cookbook",
+            "pages": [
+              "cookbook/overview",
+              "cookbook/ground-on-brand",
+              "cookbook/on-brand-caption",
+              "cookbook/outlier-to-clip",
+              "cookbook/talking-head",
+              "cookbook/grow-knowledge"
             ]
           }
         ]
@@ -65,7 +130,23 @@
           {
             "group": "API Reference",
             "pages": [
-              "api-reference/overview"
+              "api-reference/overview",
+              "api-reference/generate",
+              "api-reference/pipeline",
+              "api-reference/brand",
+              "api-reference/inspiration",
+              "api-reference/account"
+            ]
+          }
+        ]
+      },
+      {
+        "tab": "Changelog",
+        "groups": [
+          {
+            "group": "Changelog",
+            "pages": [
+              "changelog"
             ]
           }
         ]

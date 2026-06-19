@@ -1,0 +1,55 @@
+---
+title: "MCP Overview"
+description: "Connect the hosted ContentHero MCP server over OAuth. The full surface, no key handling, account-scoped."
+---
+
+The hosted MCP server exposes the full ContentHero surface at **`https://mcp.contenthero.ai`** over OAuth. It is the preferred transport for agents: no key handling, one consent flow, and every call runs as you against your own account and credits. Tools appear as `mcp__contenthero__*`.
+
+## Add ContentHero to your agent
+
+<Steps>
+  <Step title="Add the server">
+    Point your agent host at `https://mcp.contenthero.ai`. Pick your host from the sidebar for exact config.
+  </Step>
+  <Step title="Consent once">
+    On first use, the host opens a consent page. Sign in with your ContentHero account and approve. Your host receives a token; you never see or paste a key.
+  </Step>
+  <Step title="Use the tools">
+    The ContentHero tools appear in your toolset, scoped to your account and refreshed by the host.
+  </Step>
+</Steps>
+
+## Pick your host
+
+<CardGroup cols={2}>
+  <Card title="Claude Code" icon="terminal" href="/mcp/claude-code" />
+  <Card title="Claude Desktop" icon="message" href="/mcp/claude-desktop" />
+  <Card title="Cursor" icon="code" href="/mcp/cursor" />
+  <Card title="Codex" icon="square-terminal" href="/mcp/codex" />
+  <Card title="ChatGPT" icon="robot" href="/mcp/chatgpt" />
+  <Card title="Gemini CLI" icon="terminal" href="/mcp/gemini-cli" />
+</CardGroup>
+
+Any MCP-compatible host works. If yours is not listed, add a remote MCP server with the URL `https://mcp.contenthero.ai`. Hosts that only support stdio servers can bridge to it with `npx mcp-remote https://mcp.contenthero.ai`.
+
+## What you get
+
+The full surface across five domains:
+
+- **Generate:** image, video, audio, reference board, lip-sync, upscale, transcribe.
+- **Pipeline:** create, assemble, schedule, and publish posts.
+- **Brand:** read and edit your brand kit, and search, add to, and grow the knowledge base.
+- **Inspiration:** outliers, tracked accounts, and brand-account performance.
+- **Account:** balance and usage.
+
+The model roster is live: it is the `modelId` enum on the generate tools, resolved from the registry at startup.
+
+## Why OAuth
+
+- **No key handling.** The token lives in the host, not the conversation.
+- **Account-scoped.** Every call runs as you, against your own brand kits, media, and connected accounts.
+- **Revocable.** Disconnect the server in your host, or revoke the session in the ContentHero app, and access stops.
+
+## Verify
+
+Once connected, ask your agent to read your balance (`get_balance`) or list your brand kits (`list_brand_kits`). A clean read confirms the connection and your scopes.

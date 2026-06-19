@@ -1,0 +1,25 @@
+---
+title: "contenthero-generate"
+description: "The generation skill: idea to media, execution only, with chaining, cost preflight, and model-specific prompt craft."
+---
+
+`contenthero-generate` turns an idea into media. It is execution only: you bring the prompt, the skill produces the asset and knows how to prompt each model on our roster.
+
+## What it does
+
+- Image, video, audio, reference board, and lip-sync generation.
+- **Output-id chaining:** feed a generation's output id straight into the next as a reference (a start frame, an image input). No re-upload.
+- **Cost preflight:** preview any spend for free before committing.
+- **Model prompt craft:** the skill carries durable, model-specific prompting guidance, so a prompt is tuned to the model that will run it.
+
+## When the skill engages
+
+When you ask your agent to make an image, video, audio, board, or lip-sync clip, or to chain one into another. It picks the transport (MCP or CLI), preflights cost on large or batched spends, and keeps the output ids so it can chain.
+
+## How it grounds
+
+For on-brand visuals, the skill can pull visual details the brand has documented before generating, via the [brand skill](/skills/brand). Identity (consistent characters across generations) flows through avatars and reference boards as typed references.
+
+## The full guide
+
+This page is the summary. The skill's own `SKILL.md` and its `references/` (model catalog, prompt craft, identity, media inputs, chaining, troubleshooting) ship with the install. The corresponding product guide is [Generate](/guides/generate).

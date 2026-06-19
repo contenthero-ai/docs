@@ -1,0 +1,41 @@
+---
+title: "Claude Code"
+description: "Connect ContentHero to Claude Code over the hosted OAuth MCP server."
+---
+
+Claude Code supports remote MCP servers natively over HTTP.
+
+## Add the server
+
+```bash
+claude mcp add --transport http contenthero https://mcp.contenthero.ai
+```
+
+The first call opens an OAuth consent page in your browser. Sign in with your ContentHero account and approve. No API key needed.
+
+## Verify
+
+```
+> use the contenthero mcp to get my balance
+```
+
+Claude calls `get_balance` and returns your credit balance. The ContentHero tools appear as `mcp__contenthero__*`.
+
+## Install the skills (recommended)
+
+The skills encode the workflows and our model-specific prompt craft. With Claude Code:
+
+```bash
+gh skill install contenthero-ai/skills contenthero-generate
+gh skill install contenthero-ai/skills contenthero-pipeline
+gh skill install contenthero-ai/skills contenthero-brand
+```
+
+See [Skills](/skills/overview) for what they do.
+
+## Manage
+
+```bash
+claude mcp list              # see connected servers
+claude mcp remove contenthero
+```

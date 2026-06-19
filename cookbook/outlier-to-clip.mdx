@@ -1,0 +1,26 @@
+---
+title: "Outlier to Scheduled Clip"
+description: "The full pipeline: research to a produced, scheduled post, end to end."
+---
+
+Research to published, end to end. This is the [pipeline](/guides/pipeline) in full.
+
+<Steps>
+  <Step title="Ground">
+    `list_outliers`, then `get_inspiration_content` on the best few (patterns), `get_brand_kit` (voice and visual), `search_brand_knowledge` (your stance), and `get_brand_account_performance` (your own top posts).
+  </Step>
+  <Step title="Draft">
+    Your agent writes a concept, hook, and caption grounded in the above, in your voice, and you approve it.
+  </Step>
+  <Step title="Produce">
+    `generate_image` for the key frame, then chain its output id into `generate_video` as the start frame. Ground the visual in the brand's visual style.
+  </Step>
+  <Step title="Assemble">
+    `create_post`, `add_post_asset` (the video), `add_post_destination` (platform, format, connected account).
+  </Step>
+  <Step title="Ship">
+    `schedule_post`, after confirming destinations and timing.
+  </Step>
+</Steps>
+
+The Produce step uses output-id chaining: the image's id passes straight into the video as a start frame, no re-upload. See [Generate](/guides/generate).

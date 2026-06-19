@@ -8,10 +8,10 @@ ContentHero is the **context and execution layer** for AI content creation. Your
 The developer platform exposes that whole surface three ways, so whichever agent you use can drive it.
 
 <CardGroup cols={2}>
-  <Card title="MCP server" icon="plug" href="/tools/mcp">
+  <Card title="MCP server" icon="plug" href="/mcp/overview">
     Hosted at `mcp.contenthero.ai` over OAuth. The full tool surface, no key handling.
   </Card>
-  <Card title="CLI" icon="terminal" href="/tools/cli">
+  <Card title="CLI" icon="terminal" href="/cli/overview">
     `npm install -g @contenthero/cli`. Shell-native, scriptable, browser-assisted login.
   </Card>
   <Card title="TypeScript SDK" icon="code" href="/api-reference/overview">
@@ -22,17 +22,20 @@ The developer platform exposes that whole surface three ways, so whichever agent
   </Card>
 </CardGroup>
 
-## The thesis
+## How it works
 
-There are two different things, and only one is the anti-pattern.
+ContentHero gives your agent two things: the **grounding** to make content that sounds like you, and the **execution** to produce and ship it.
 
-<Warning>
-**Anti-pattern:** treating ContentHero as a black box that writes your copy. ContentHero's servers never generate copy. There is no "write my post for me" endpoint.
-</Warning>
+<CardGroup cols={2}>
+  <Card title="Grounding" icon="layer-group">
+    Your brand voice, your top-performing inspiration, and your own past posts. The context that makes content on-brand instead of generic.
+  </Card>
+  <Card title="Execution" icon="bolt">
+    Generate the media, assemble the post, schedule it, publish it. The work, done through one surface.
+  </Card>
+</CardGroup>
 
-<Note>
-**The feature:** your agent may draft copy, but only when it is grounded in your real context. Pull your outliers to learn the patterns that actually perform for you. Pull your brand kit for tone and vocabulary. Pull your own top posts. Then synthesize a draft in your own proven voice, present it for approval, and only then execute. The brain writes the words. ContentHero supplies the grounding and the method.
-</Note>
+Your agent brings the intelligence. ContentHero brings the context and the muscle. When your agent drafts copy, it grounds the draft in your real context (your outliers, brand voice, and past posts) and shows it to you for approval before anything ships.
 
 ## What you can do
 

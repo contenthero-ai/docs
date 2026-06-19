@@ -1,0 +1,58 @@
+---
+title: "Examples"
+description: "Practical CLI recipes: generate and chain, preview cost, and script the pipeline."
+---
+
+## Generate an image, then animate it
+
+Chain an image into a video by passing its output-id token as the start frame.
+
+```bash
+IMG=$(contenthero generate image \
+  --prompt "a marble bust of an owl, studio light" \
+  --model nano-banana-2 | jq -r '.outputId')
+
+contenthero generate video \
+  --prompt "slow push in, dust motes in the light" \
+  --model kling-3.0 \
+  --start-frame "$IMG"
+```
+
+A reference accepts a raw URL or a ContentHero output-id token, so no re-upload is needed.
+
+## Preview cost before a batch
+
+```bash
+for P in "a red cube" "a blue sphere" "a green pyramid"; do
+  contenthero generate image --prompt "$P" --model nano-banana-2 --cost \
+    | jq -r '"\(.modelId): \(.creditsEstimate) credits"'
+done
+```
+
+## Search the knowledge base
+
+```bash
+BK=$(contenthero brand-kit list | jq -r '.[0].id')
+contenthero brand-kit knowledge search "$BK" "what is our stance on short hooks" \
+  | jq -r '.matches[] | "\(.score): \(.title)"'
+```
+
+## Assemble and schedule a post
+
+```bash
+POST=$(contenthero post create --title "Launch teaser" --description "$CAPTION" | jq -r '.id')
+contenthero post asset add "$POST" --url "$VIDEO_URL"
+contenthero post destination add "$POST" --platform instagram --format reel --account "$IG"
+contenthero post schedule "$POST" --at "2026-07-01T15:00:00Z"
+```
+
+## Wait on a long render in a script
+
+```bash
+ID=$(contenthero generate video --prompt "..." --model kling-3.0 --no-wait | jq -r '.outputId')
+if contenthero generation wait "$ID"; then
+  echo "done"
+else
+  echo "still rendering or failed (exit $?)"
+fi
+```

@@ -1,0 +1,25 @@
+---
+title: "Account"
+description: "Balance and account endpoints."
+---
+
+Base URL `https://app.contenthero.ai/api/v1`. All endpoints take a bearer API key.
+
+## Balance
+
+| Method | Path | Purpose |
+| --- | --- | --- |
+| `GET` | `/account/balance` | Your current credit balance and plan tier. |
+
+```bash
+curl https://app.contenthero.ai/api/v1/account/balance \
+  -H "Authorization: Bearer $CONTENTHERO_API_KEY"
+```
+
+## Cost preflight
+
+There is no separate pricing endpoint. Every generation can be previewed for free by passing `getCost: true` (SDK and MCP) or `--cost` (CLI) on the generate call. The preflight takes the same parameters as the real call, so the quote matches the charge. See [Account & Billing](/account-billing).
+
+## Usage attribution
+
+Spends made with an API key are attributed to that key. Per-key usage is visible in the API Keys view in the app.

@@ -1,0 +1,20 @@
+---
+title: "Talking-head Post"
+description: "A presenter clip from a script you supply, via text-to-speech and lip-sync."
+---
+
+A presenter clip from a script you supply.
+
+<Steps>
+  <Step title="Voice the script">
+    `generate_audio` (a TTS model, your script, a `voiceId`). Capture the audio output id.
+  </Step>
+  <Step title="Lip-sync">
+    `generate_lip_sync` (a portrait image plus the audio output id) for the talking-head video.
+  </Step>
+  <Step title="Assemble and ship">
+    `create_post`, `add_post_asset` (the video), `add_post_destination`, then `schedule_post`.
+  </Step>
+</Steps>
+
+The script is yours. If you have not written one, that is a grounded [pipeline](/cookbook/outlier-to-clip) Draft, not an invention: your agent grounds it in your voice and you approve it first.

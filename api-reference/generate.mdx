@@ -1,0 +1,41 @@
+---
+title: "Generate"
+description: "Generation, status, boards, transcription, models, media, avatars, and voices endpoints."
+---
+
+Base URL `https://app.contenthero.ai/api/v1`. All endpoints take a bearer API key.
+
+## Generation
+
+| Method | Path | Scope | Purpose |
+| --- | --- | --- | --- |
+| `POST` | `/studio/generate` | generate | Image, video, audio, lip-sync, or upscale, selected by `type`. Smart-waits, then returns the asset or an `outputId`. Pass `getCost: true` to preview cost only. |
+| `GET` | `/studio/generate/{outputId}` | generate | Generation status and result for a pending `outputId`. Includes a `pollAfterSeconds` hint while in progress. |
+| `POST` | `/studio/reference-board` | generate | Generate a reference board from a source image and a board type. |
+| `POST` | `/studio/transcribe` | generate | Transcribe a media file to text. |
+
+A generation reference (start frame, image input, audio) accepts a raw URL or a ContentHero output-id token `<uuid>-<N>`.
+
+## Models
+
+| Method | Path | Scope | Purpose |
+| --- | --- | --- | --- |
+| `GET` | `/models` | read | The live model roster, resolved from the registry. The authoritative list of valid `modelId` values. |
+
+## Media
+
+| Method | Path | Scope | Purpose |
+| --- | --- | --- | --- |
+| `GET` | `/media` | read | List your media (creations, boards, looks), filterable by `kind`. |
+| `GET` | `/media/{token}` | read | Get one media item by id or output-id token. |
+
+## Avatars and voices
+
+| Method | Path | Scope | Purpose |
+| --- | --- | --- | --- |
+| `GET` | `/avatars` | read | List your avatars. |
+| `GET` | `/avatars/{avatarId}` | read | Get one avatar with its looks. |
+| `GET` | `/voices` | read | List available voices. |
+| `GET` | `/voices/{voiceId}` | read | Get one voice. |
+
+See the [Generate guide](/guides/generate) for the workflow, chaining, and cost preflight.

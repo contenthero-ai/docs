@@ -1,0 +1,23 @@
+---
+title: "On-brand Caption for a Reel"
+description: "The everyday request: you have a clip and want a caption in your voice."
+---
+
+You have a clip and want a caption that sounds like you. Ground it, draft it, attach it, ship it.
+
+<Steps>
+  <Step title="Ground">
+    `list_outliers` (scoped with `brandKitId`), then `get_inspiration_content` on the top few for hooks and structure. `get_brand_kit` for voice. `get_brand_account_performance` for your own best posts. `search_brand_knowledge` for your stance on the topic.
+  </Step>
+  <Step title="Draft">
+    Your agent writes the hook and caption emulating your proven patterns, in your voice, and presents it for approval. See [Voice synthesis](/skills/voice-synthesis).
+  </Step>
+  <Step title="Attach">
+    `create_post` with the approved caption as the description, `add_post_asset` for the reel, `add_post_destination` for the platform and format.
+  </Step>
+  <Step title="Ship">
+    `schedule_post` or `publish_post`, after you confirm.
+  </Step>
+</Steps>
+
+This is the [pipeline](/guides/pipeline) without a generation step: the media already exists, so you skip Produce.

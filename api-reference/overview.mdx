@@ -9,8 +9,21 @@ ContentHero exposes one backend surface three ways. They are the same operations
 | --- | --- | --- |
 | **`/api/v1`** | The REST surface, base `https://app.contenthero.ai/api/v1` | [API key](/authentication/api-keys), bearer token |
 | **`@contenthero/sdk`** | A typed TypeScript kernel over `/api/v1` | API key |
-| **`@contenthero/mcp`** / hosted MCP | The same surface as agent tools | [OAuth](/authentication/oauth) or key |
+| **MCP** (hosted or `@contenthero/mcp`) | The same surface as agent tools | [OAuth](/authentication/oauth) or key |
 | **`@contenthero/cli`** | The same surface as shell commands | `contenthero login` or key |
+
+## Base URL and auth
+
+```
+https://app.contenthero.ai/api/v1
+```
+
+Send your API key as a bearer token:
+
+```bash
+curl https://app.contenthero.ai/api/v1/account/balance \
+  -H "Authorization: Bearer $CONTENTHERO_API_KEY"
+```
 
 ## TypeScript SDK
 
@@ -30,16 +43,27 @@ const result = await ch.generateImageAndWait({
 });
 ```
 
-The SDK is a hand-written kernel: typed inputs and outputs, idempotency keys, and smart-wait plus polling helpers built in. The MCP server and the CLI both ride it.
+The SDK is a hand-written kernel: typed inputs and outputs, idempotency keys, and smart-wait plus polling helpers. The MCP server and the CLI both ride it.
 
 ## Conventions
 
-- **Async:** generation endpoints smart-wait, then return an `outputId` to poll. Use the wait helpers or `get_generation_status`.
+- **Async:** generation endpoints smart-wait, then return an `outputId` to poll at `GET /studio/generate/{outputId}`.
 - **Chaining:** references accept a raw URL or an output-id token `<uuid>-<N>`.
-- **Cost preflight:** every generate call has a cost-only mode that charges nothing.
-- **Scopes:** keys are scope-gated; a `403` names the missing scope.
+- **Cost preflight:** generation accepts a cost-only mode (`getCost: true`) that charges nothing.
+- **Scopes:** keys are scope-gated; a `403` names the missing scope. See [API Keys](/authentication/api-keys).
 - **Rate limits:** per-key, returning `429` when exceeded.
+- **Idempotency:** generation accepts an idempotency key so a retried request does not double-charge.
+
+## By domain
+
+<CardGroup cols={2}>
+  <Card title="Generate" icon="wand-magic-sparkles" href="/api-reference/generate" />
+  <Card title="Pipeline" icon="diagram-project" href="/api-reference/pipeline" />
+  <Card title="Brand" icon="book" href="/api-reference/brand" />
+  <Card title="Inspiration" icon="magnifying-glass-chart" href="/api-reference/inspiration" />
+  <Card title="Account" icon="wallet" href="/api-reference/account" />
+</CardGroup>
 
 <Note>
-A full per-endpoint reference is in progress. For now, the [SDK types](https://www.npmjs.com/package/@contenthero/sdk) are the authoritative contract for request and response shapes, and `contenthero schema` dumps every command's input schema from the CLI.
+These pages document the endpoints, their methods, scopes, and purpose. The authoritative contract for exact request and response shapes is the [SDK types](https://www.npmjs.com/package/@contenthero/sdk), and `contenthero schema` dumps every command's input schema from the CLI.
 </Note>

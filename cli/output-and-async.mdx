@@ -1,0 +1,45 @@
+---
+title: "Output & Async"
+description: "How the CLI formats output, its exit codes, cost preflight, and non-blocking polling."
+---
+
+## JSON output
+
+The CLI prints JSON on stdout by default, so it composes with `jq` and shell pipelines.
+
+```bash
+contenthero model list | jq -r '.[].modelId'
+BAL=$(contenthero account balance | jq -r '.credits')
+```
+
+## Exit codes
+
+| Code | Meaning |
+| --- | --- |
+| `0` | Success |
+| `1` | General error |
+| `2` | Usage error (bad flags or arguments) |
+| `3` | Auth error (no or invalid credentials) |
+| `4` | Timeout (work accepted but not finished in time) |
+
+Exit code `4` is not a failure: the generation was accepted and is still rendering. Poll it.
+
+## Cost preflight
+
+Preview any spend for free. The preflight takes the same parameters as the real call, so the quote matches the charge.
+
+```bash
+contenthero generate image --prompt "..." --model nano-banana-2 --cost
+```
+
+## Async and polling
+
+`generate` runs a smart-wait of about 50s, then returns the finished asset or an `outputId` if the render is still going. To return immediately and poll yourself:
+
+```bash
+contenthero generate video --prompt "..." --model kling-3.0 --no-wait   # return an id now
+contenthero generation wait <outputId>                                 # block until done
+contenthero generation status <outputId>                               # snapshot
+```
+
+The `outputId` is always returned, so you can always keep polling. A `status` response includes a `pollAfterSeconds` hint telling you when to check again.

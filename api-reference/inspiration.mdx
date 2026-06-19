@@ -1,0 +1,26 @@
+---
+title: "Inspiration"
+description: "Tracked accounts, outliers, content, and brand-account performance endpoints."
+---
+
+Base URL `https://app.contenthero.ai/api/v1`. All endpoints take a bearer API key and read with `brandkit:read`.
+
+## Inspiration
+
+| Method | Path | Purpose |
+| --- | --- | --- |
+| `GET` | `/inspiration/accounts` | List your tracked inspiration accounts. Accepts `brand_kit_id` to scope to one brand. |
+| `GET` | `/inspiration/accounts/{id}` | Get one account with its content count and top outliers. |
+| `GET` | `/inspiration/outliers` | List outliers (top-performing content) ranked by score. Filterable by platform, content type, minimum score, and `brand_kit_id`. |
+| `GET` | `/inspiration/content/{id}` | Get one content item in full, including transcript, hashtags, and keywords. |
+
+## Brand-account performance
+
+| Method | Path | Purpose |
+| --- | --- | --- |
+| `GET` | `/brand-accounts` | List your own brand social accounts. Accepts `brand_kit_id`. |
+| `GET` | `/brand-accounts/{id}/performance` | Aggregated performance for one account: totals, averages, top and recent content. |
+
+## The mining pattern
+
+Outliers come back shallow (title and metrics). To draft from a pattern, list and rank with `/inspiration/outliers`, then get the depth (transcript, hashtags) with `/inspiration/content/{id}` on the few you chose. See [Voice synthesis](/skills/voice-synthesis) for the method and the [Inspiration guide](/guides/inspiration) for the workflow.

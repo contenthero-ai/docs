@@ -1,0 +1,32 @@
+---
+title: "Claude Desktop"
+description: "Connect ContentHero to Claude Desktop as a custom connector over OAuth."
+---
+
+Claude Desktop connects to remote MCP servers as custom connectors.
+
+## Add the connector
+
+<Steps>
+  <Step title="Open Connectors">
+    Go to **Settings, Connectors** and choose **Add custom connector**.
+  </Step>
+  <Step title="Enter the server">
+    Name it `ContentHero` and set the remote MCP server URL:
+
+    ```
+    https://mcp.contenthero.ai
+    ```
+  </Step>
+  <Step title="Authorize">
+    Claude opens the OAuth consent page. Sign in with your ContentHero account and approve. No API key needed.
+  </Step>
+</Steps>
+
+## Verify
+
+Ask Claude to read your balance. It calls `get_balance` and returns your credits. By default the connector asks before each call; you can switch it to always allow in the connector settings.
+
+## Note
+
+Custom connectors are available on Claude paid plans. If you do not see **Add custom connector**, check that your plan supports it.

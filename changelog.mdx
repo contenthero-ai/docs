@@ -1,0 +1,40 @@
+---
+title: "Changelog"
+description: "Updates to the ContentHero developer platform: SDK, MCP, CLI, and skills."
+---
+
+<Update label="2026-06-19" tags={["Skills"]}>
+  **Agent skills released.** The [`contenthero-ai/skills`](https://github.com/contenthero-ai/skills) repo ships three installable skills: `contenthero-generate`, `contenthero-pipeline` (the hero), and `contenthero-brand`. They encode the workflows and our model-specific prompt craft, including grounded voice-synthesis. See [Skills](/skills/overview).
+
+  Packages: `skills 0.1.0`.
+</Update>
+
+<Update label="2026-06-19" tags={["Brand", "SDK", "MCP", "CLI"]}>
+  **Brand knowledge base on the API.** Search, list, get, add, and remove brand knowledge over `/api/v1`, MCP, and the CLI, with semantic retrieval and `fileUrl` ingestion for large files, video, and audio. Brand-kit-scoped inspiration reads via `brand_kit_id`.
+
+  Packages: `sdk 0.2.4`, `mcp 0.2.6`, `cli 0.1.4`.
+</Update>
+
+<Update label="2026-06-18" tags={["MCP"]}>
+  **Hosted OAuth MCP, full surface.** `https://mcp.contenthero.ai` serves the complete tool surface over OAuth, with a live model roster resolved from the registry. No key handling. See [MCP](/mcp/overview).
+
+  Packages: `mcp 0.2.4`.
+</Update>
+
+<Update label="2026-06-18" tags={["CLI"]}>
+  **CLI released.** `@contenthero/cli` (`contenthero`) drives the full surface from a shell, with browser-assisted login, cost preflight, and non-blocking polling. See [CLI](/cli/overview).
+
+  Packages: `cli 0.1.0`.
+</Update>
+
+<Update label="2026-06-18" tags={["Pipeline", "Brand", "Inspiration"]}>
+  **The execution surface.** Posts (create, assemble, schedule, publish), brand-kit writes, inspiration and outlier reads, and connected-account reads land on `/api/v1`, MCP, and the SDK. New scope `pipeline:write`.
+
+  Packages: `sdk 0.2.2`, `mcp 0.2.2`.
+</Update>
+
+<Update label="2026-06-15" tags={["Generate", "SDK", "MCP"]}>
+  **Reference boards and parity.** `generate_board` across the SDK and MCP, plus cost preflight (`getCost`), a standalone `wait_for_generation`, and `get_generation_status`.
+
+  Packages: `sdk 0.2.0`, `mcp 0.2.0`.
+</Update>

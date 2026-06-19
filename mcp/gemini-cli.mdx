@@ -1,0 +1,41 @@
+---
+title: "Gemini CLI"
+description: "Connect ContentHero to Gemini CLI over the hosted OAuth MCP server."
+---
+
+Gemini CLI loads MCP servers from its settings file.
+
+## Add the server
+
+Add ContentHero to `~/.gemini/settings.json`:
+
+```json
+{
+  "mcpServers": {
+    "contenthero": {
+      "httpUrl": "https://mcp.contenthero.ai"
+    }
+  }
+}
+```
+
+If your version of Gemini CLI does not support a remote `httpUrl`, bridge to it over stdio with `mcp-remote`:
+
+```json
+{
+  "mcpServers": {
+    "contenthero": {
+      "command": "npx",
+      "args": ["-y", "mcp-remote", "https://mcp.contenthero.ai"]
+    }
+  }
+}
+```
+
+## Authorize
+
+The first call opens the OAuth consent page in your browser. Sign in with your ContentHero account and approve. No API key needed.
+
+## Verify
+
+Run Gemini CLI and ask it to read your ContentHero balance, or run `/mcp` to list the connected servers and their tools.

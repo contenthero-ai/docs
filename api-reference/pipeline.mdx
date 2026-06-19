@@ -1,0 +1,49 @@
+---
+title: "Pipeline"
+description: "Posts, destinations, assets, scheduling, publishing, pipeline stages, and connected accounts endpoints."
+---
+
+Base URL `https://app.contenthero.ai/api/v1`. All endpoints take a bearer API key.
+
+## Posts
+
+| Method | Path | Scope | Purpose |
+| --- | --- | --- | --- |
+| `GET` | `/posts` | read | List your posts. |
+| `POST` | `/posts` | `pipeline:write` | Create a post. Resolves a pipeline stage by id, slug, or name. |
+| `GET` | `/posts/{id}` | read | Get a post with its destinations and assets. |
+| `PATCH` | `/posts/{id}` | `pipeline:write` | Update a post. Set status to `archived` to archive it (reversible). |
+
+## Destinations and assets
+
+| Method | Path | Scope | Purpose |
+| --- | --- | --- | --- |
+| `POST` | `/posts/{id}/destinations` | `pipeline:write` | Add a platform destination (platform, format, connected account). |
+| `PATCH` | `/posts/{id}/destinations` | `pipeline:write` | Update a destination. |
+| `POST` | `/posts/{id}/assets` | `assets:write` | Attach a media asset by URL. |
+
+## Schedule and publish
+
+| Method | Path | Scope | Purpose |
+| --- | --- | --- | --- |
+| `POST` | `/posts/{id}/schedule` | `pipeline:write` | Schedule the post and its destinations for a future time. |
+| `POST` | `/posts/{id}/publish` | `publish:write` | Publish now to the post's destinations. Returns per-destination results. |
+
+## Pipeline stages
+
+| Method | Path | Scope | Purpose |
+| --- | --- | --- | --- |
+| `GET` | `/pipeline-stages` | read | List your pipeline stages (seeds the defaults if none exist). |
+
+## Connected accounts
+
+| Method | Path | Scope | Purpose |
+| --- | --- | --- | --- |
+| `GET` | `/connected-accounts` | read | List your connected social accounts (safe projection; no credentials). |
+| `GET` | `/connected-accounts/{id}` | read | Get one connected account with its enabled capabilities. |
+
+<Note>
+Encrypted credential fields on a connected account are never exposed through the API. You reference an account by id when adding a destination.
+</Note>
+
+See the [Pipeline guide](/guides/pipeline) for the five-phase workflow.

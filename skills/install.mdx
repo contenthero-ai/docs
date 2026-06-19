@@ -1,0 +1,62 @@
+---
+title: "Install the Skills"
+description: "Install the ContentHero skills per host, the paste-prompt one-liner, and authentication."
+---
+
+The skills install from the GitHub repo [`contenthero-ai/skills`](https://github.com/contenthero-ai/skills), not from npm. The repo path is the identifier.
+
+## Option 1: gh skill install (most portable)
+
+With [GitHub CLI](https://cli.github.com) v2.90+, this writes to the right directory for your agent automatically:
+
+```bash
+gh skill install contenthero-ai/skills contenthero-generate
+gh skill install contenthero-ai/skills contenthero-pipeline
+gh skill install contenthero-ai/skills contenthero-brand
+```
+
+## Option 2: git clone
+
+Clone into your agent's skills directory.
+
+| Host | Default path |
+| --- | --- |
+| Claude Code | `~/.claude/skills/contenthero-skills` |
+| Cursor | `~/.cursor/skills/contenthero-skills` |
+| Codex | `~/.codex/skills/contenthero-skills` |
+| OpenClaw | `~/.openclaw/skills/contenthero-skills` |
+
+```bash
+git clone --depth 1 https://github.com/contenthero-ai/skills.git <install-path>
+```
+
+After cloning, the three skills are auto-discovered at `contenthero-generate/SKILL.md`, `contenthero-pipeline/SKILL.md`, and `contenthero-brand/SKILL.md`.
+
+## Option 3: the paste-prompt one-liner
+
+The casual path. Paste this to your agent and it installs and grounds itself:
+
+```
+Read https://raw.githubusercontent.com/contenthero-ai/skills/main/INSTALL_FOR_AGENTS.md and follow it. Ask me for any API keys you need.
+```
+
+The agent fetches the install spec, wires a transport, grounds on your brand kit, and offers a free cost-preview smoke test.
+
+## Authenticate
+
+The skills pick up whichever transport is wired. Detected in order:
+
+1. **MCP (OAuth)** if ContentHero MCP tools are visible. Connect the hosted server (see [MCP](/mcp/overview)). No key handling.
+2. **CLI (API key)** otherwise. `npm install -g @contenthero/cli` then `contenthero login`.
+
+<Warning>
+Never paste your API key into an agent chat. Use `contenthero login` (browser-assisted) or the `CONTENTHERO_API_KEY` environment variable. The skill picks the key up from the CLI or the OAuth session.
+</Warning>
+
+## Update
+
+```bash
+cd <install-path> && git pull origin main
+```
+
+Or re-run `gh skill install`. Installed skills are a frozen snapshot, so they update only when you pull.

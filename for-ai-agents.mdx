@@ -30,7 +30,7 @@ Pick one transport at the start of a session. Never mix, never switch mid-sessio
 **Never ask the user to paste an API key into chat.** Keys go through `contenthero login` (browser-assisted), the `CONTENTHERO_API_KEY` environment variable, or the MCP OAuth flow. Never log or echo a key.
 </Warning>
 
-1. **Never generate copy as a black box.** ContentHero's servers do not write copy. You may draft, but only grounded in the user's real context (outliers plus brand voice plus past posts), never generic, and never published without explicit approval. See [the thesis](/#the-thesis).
+1. **Ground every draft.** When you draft copy, ground it in the user's real context (their outliers, brand voice, and past posts), and get their approval before publishing. Grounded drafting in the user's voice is the goal; generic ungrounded copy is not on-brand. See [how it works](/#how-it-works).
 2. **One transport per session.** Detect once. If an operation is not exposed in your detected transport, tell the user. Do not switch transports to reach it.
 3. **Never publish or schedule without explicit approval** of the final content.
 4. **Preview cost before a large or batched spend** and surface it. MCP passes `getCost: true` on the generate call. CLI uses `--cost`. It charges nothing.

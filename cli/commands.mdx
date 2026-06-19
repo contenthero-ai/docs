@@ -1,0 +1,88 @@
+---
+title: "Commands"
+description: "The ContentHero CLI command tree, organized by resource."
+---
+
+Commands follow `contenthero <noun> <verb>`. Run `contenthero --help` for the live tree, `contenthero <command> --help` for one command's flags, and `contenthero schema` to dump the input schema of every command.
+
+## Discover
+
+```bash
+contenthero --help                 # the full command tree
+contenthero generate image --help  # one command's flags
+contenthero schema                 # JSON Schema of every command's inputs
+```
+
+`contenthero schema` is the discovery tool for agents: it returns the argument shape of every command without reading the docs.
+
+## Generate
+
+```bash
+contenthero generate image     --prompt "..." --model nano-banana-2
+contenthero generate video     --prompt "..." --model kling-3.0
+contenthero generate audio     --text "..."  --voice <voiceId>
+contenthero generate board     --image <url> --type <boardType>
+contenthero generate lip-sync  --image <url> --audio <url|outputId>
+contenthero upscale            --image <url>
+contenthero transcribe         --media <url>
+contenthero model list         # the live roster
+```
+
+## Generations
+
+```bash
+contenthero generation wait <outputId>     # block until done
+contenthero generation status <outputId>   # snapshot
+```
+
+## Posts (pipeline)
+
+```bash
+contenthero post list
+contenthero post get <postId>
+contenthero post create --title "..." --description "..."
+contenthero post update <postId> --stage <id|slug|name>
+contenthero post destination add <postId> --platform instagram --format reel --account <connectedAccountId>
+contenthero post asset add <postId> --url <mediaUrl>
+contenthero post schedule <postId> --at <iso8601>
+contenthero post publish <postId>
+contenthero post archive <postId>
+contenthero pipeline-stage list
+```
+
+## Brand kit
+
+```bash
+contenthero brand-kit list
+contenthero brand-kit get <brandKitId>
+contenthero brand-kit update <brandKitId> --name "..."
+contenthero brand-kit section add <brandKitId> --title "..." --content "..."
+contenthero brand-kit knowledge list   <brandKitId>
+contenthero brand-kit knowledge search <brandKitId> "<query>"
+contenthero brand-kit knowledge get    <brandKitId> <knowledgeId>
+contenthero brand-kit knowledge add    <brandKitId> --text "..."
+contenthero brand-kit knowledge remove <brandKitId> <knowledgeId>
+```
+
+## Inspiration
+
+```bash
+contenthero inspiration accounts list  [--brand-kit <id>]
+contenthero inspiration outliers list  [--brand-kit <id>]
+contenthero inspiration content get <contentId>
+contenthero brand-account list
+contenthero brand-account performance <accountId>
+```
+
+## Connected accounts and account
+
+```bash
+contenthero connected list
+contenthero connected get <id>
+contenthero account balance
+contenthero auth status
+```
+
+<Note>
+This tree reflects the surface at the time of writing. The live source of truth is `contenthero --help` and `contenthero schema`, which always match your installed version.
+</Note>

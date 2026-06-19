@@ -1,0 +1,20 @@
+---
+title: "Ground the Workspace on a Brand"
+description: "Run this first. Resolve the active brand kit and cache it so every later recipe is on-brand."
+---
+
+The setup every other recipe assumes. It resolves which brand you are working as and caches it, so the pipeline and generate steps pick it up without re-asking.
+
+<Steps>
+  <Step title="Resolve the brand">
+    `list_brand_kits` and pick the active one: the only one, the default, or ask the user which.
+  </Step>
+  <Step title="Read the voice">
+    `get_brand_kit` and summarize the tone, key vocabulary, and any banned words back in a line.
+  </Step>
+  <Step title="Cache it">
+    Write `active_brand_kit_id` (and any default avatar and connected accounts) to `.contenthero/context.md` at the workspace root.
+  </Step>
+</Steps>
+
+Now the [pipeline](/cookbook/outlier-to-clip) and [caption](/cookbook/on-brand-caption) recipes pick the brand up without re-asking. Revalidate a cached id with a live read before any spend or publish.

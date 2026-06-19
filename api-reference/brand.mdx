@@ -1,0 +1,38 @@
+---
+title: "Brand"
+description: "Brand kit, sections, and knowledge-base endpoints."
+---
+
+Base URL `https://app.contenthero.ai/api/v1`. All endpoints take a bearer API key.
+
+## Brand kit
+
+| Method | Path | Scope | Purpose |
+| --- | --- | --- | --- |
+| `GET` | `/brand-kits` | `brandkit:read` | List your brand kits. |
+| `GET` | `/brand-kits/{brandKitId}` | `brandkit:read` | Get one brand kit with its sections, linked accounts, and a knowledge preview. |
+| `PATCH` | `/brand-kits/{brandKitId}` | `brandkit:write` | Update allow-listed identity fields. Send `{ "archive": true }` to archive (reversible). |
+
+## Sections
+
+| Method | Path | Scope | Purpose |
+| --- | --- | --- | --- |
+| `POST` | `/brand-kits/{brandKitId}/sections` | `brandkit:write` | Add a section. |
+| `PATCH` | `/brand-kits/{brandKitId}/sections/{sectionId}` | `brandkit:write` | Update a section. |
+| `DELETE` | `/brand-kits/{brandKitId}/sections/{sectionId}` | `brandkit:write` | Archive a section (soft delete, reversible). |
+
+## Knowledge base
+
+| Method | Path | Scope | Purpose |
+| --- | --- | --- | --- |
+| `GET` | `/brand-kits/{brandKitId}/knowledge` | `brandkit:read` | List the knowledge index (titles and metadata). |
+| `POST` | `/brand-kits/{brandKitId}/knowledge` | `brandkit:write` | Add an item. Source is `text`, `url`, `youtube`, or a file via `fileData` (base64) or `fileUrl` (hosted). |
+| `GET` | `/brand-kits/{brandKitId}/knowledge/{knowledgeId}` | `brandkit:read` | Get one item's stored body. |
+| `DELETE` | `/brand-kits/{brandKitId}/knowledge/{knowledgeId}` | `brandkit:write` | Remove an item and its embeddings. |
+| `GET` | `/brand-kits/{brandKitId}/knowledge/search?q=` | `brandkit:read` | Semantic search, ranked by similarity. |
+
+<Note>
+Large files and video or audio must be added by a hosted URL (`fileUrl`), which the server fetches and chunks. Base64 (`fileData`) is for small documents and images. Adding is plan-limited; a `limitReached` response means the brand kit is at its cap.
+</Note>
+
+See the [Brand guide](/guides/brand) for the structure and the knowledge workflow.

@@ -1,0 +1,61 @@
+---
+title: "CLI Overview"
+description: "Install and authenticate the ContentHero CLI: shell-native, scriptable, browser-assisted login."
+---
+
+The `contenthero` CLI drives the full surface from a shell. It is the right transport when you do not have MCP wired up but you have a terminal, and it is ideal for CI and scripts. It rides the same `/api/v1` surface as the SDK.
+
+## Install
+
+```bash
+npm install -g @contenthero/cli   # Node 20+, binary is `contenthero`
+contenthero --version
+```
+
+## Authenticate
+
+```bash
+contenthero login        # browser-assisted, provisions and stores a key
+contenthero auth status  # exits 0 when authenticated
+```
+
+`login` opens a browser, provisions a key for this machine, and stores it at `~/.contenthero/credentials` (mode 0600).
+
+The auth ladder is `--api-key` flag, then the `CONTENTHERO_API_KEY` environment variable, then the stored credential. The environment variable always wins over the stored file, so CI can override a local login:
+
+```bash
+export CONTENTHERO_API_KEY=ch_live_...
+```
+
+<Warning>
+Never paste your key into an agent chat. Use `contenthero login` or the environment variable. See [API Keys](/authentication/api-keys).
+</Warning>
+
+## Shape
+
+The pattern is `contenthero <noun> <verb>`, with JSON on stdout by default.
+
+```bash
+contenthero generate image --prompt "..." --model nano-banana-2
+contenthero model list
+contenthero account balance
+contenthero brand-kit list
+contenthero post list
+```
+
+## Next
+
+<CardGroup cols={2}>
+  <Card title="Commands" icon="list" href="/cli/commands">
+    The full command tree by resource.
+  </Card>
+  <Card title="Output & async" icon="arrows-rotate" href="/cli/output-and-async">
+    JSON output, exit codes, cost preflight, and polling.
+  </Card>
+  <Card title="Examples" icon="code" href="/cli/examples">
+    Practical recipes and scripting patterns.
+  </Card>
+  <Card title="Cookbook" icon="book-open" href="/cookbook/overview">
+    End-to-end workflows.
+  </Card>
+</CardGroup>
