@@ -1,0 +1,32 @@
+---
+title: "Grok"
+description: "Connect ContentHero to Grok as a custom MCP connector over OAuth."
+---
+
+Grok connects to remote MCP servers as custom connectors.
+
+## Add the connector
+
+<Steps>
+  <Step title="Open Connectors">
+    Go to **grok.com/connectors** and click **New Connector**, then choose **Custom**.
+  </Step>
+  <Step title="Enter the server">
+    Enter the MCP server URL:
+
+    ```
+    https://mcp.contenthero.ai
+    ```
+  </Step>
+  <Step title="Authorize">
+    Complete the OAuth flow. Sign in with your ContentHero account and approve. No API key needed.
+  </Step>
+</Steps>
+
+## Verify
+
+In a chat with the connector enabled, ask Grok to read your ContentHero balance. It calls `get_balance` and returns your credits.
+
+<Note>
+Custom MCP connectors in Grok require a plan that supports them. If you do not see **New Connector**, check your plan.
+</Note>

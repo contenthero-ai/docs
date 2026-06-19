@@ -1,9 +1,9 @@
 ---
-title: "Claude Desktop"
-description: "Connect ContentHero to Claude Desktop as a custom connector over OAuth."
+title: "Claude Desktop & Web"
+description: "Connect ContentHero to Claude Desktop or claude.ai as a custom connector over OAuth."
 ---
 
-Claude Desktop connects to remote MCP servers as custom connectors.
+Claude Desktop and claude.ai (web) both connect to remote MCP servers as custom connectors, with the same flow.
 
 ## Add the connector
 
@@ -26,6 +26,8 @@ Claude Desktop connects to remote MCP servers as custom connectors.
 ## Verify
 
 Ask Claude to read your balance. It calls `get_balance` and returns your credits. By default the connector asks before each call; you can switch it to always allow in the connector settings.
+
+On claude.ai (web), the flow is the same: **Settings, Connectors, Add custom connector**, with the URL `https://mcp.contenthero.ai`.
 
 ## Note
 

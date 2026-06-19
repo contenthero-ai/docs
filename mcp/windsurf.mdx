@@ -1,0 +1,47 @@
+---
+title: "Windsurf"
+description: "Connect ContentHero to Windsurf over the hosted OAuth MCP server."
+---
+
+Windsurf connects to MCP servers from its Cascade panel.
+
+## Add the server
+
+<Steps>
+  <Step title="Open the MCP panel">
+    In Cascade, click the **MCP servers** button (the hammer icon), then **Configure**. This opens `~/.codeium/windsurf/mcp_config.json`.
+  </Step>
+  <Step title="Add ContentHero">
+    Add the remote server:
+
+    ```json
+    {
+      "mcpServers": {
+        "contenthero": {
+          "serverUrl": "https://mcp.contenthero.ai"
+        }
+      }
+    }
+    ```
+  </Step>
+  <Step title="Refresh and authorize">
+    Refresh the MCP servers in Cascade. The first call opens the OAuth consent page; sign in with your ContentHero account and approve.
+  </Step>
+</Steps>
+
+If your version of Windsurf does not accept a remote `serverUrl`, bridge to it over stdio instead:
+
+```json
+{
+  "mcpServers": {
+    "contenthero": {
+      "command": "npx",
+      "args": ["-y", "mcp-remote", "https://mcp.contenthero.ai"]
+    }
+  }
+}
+```
+
+## Verify
+
+Ask Cascade to read your ContentHero balance. It calls `get_balance` and returns your credits.

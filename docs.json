@@ -71,10 +71,17 @@
             "pages": [
               "mcp/claude-code",
               "mcp/claude-desktop",
-              "mcp/cursor",
-              "mcp/codex",
               "mcp/chatgpt",
-              "mcp/gemini-cli"
+              "mcp/codex",
+              "mcp/cursor",
+              "mcp/vscode",
+              "mcp/windsurf",
+              "mcp/gemini-cli",
+              "mcp/grok",
+              "mcp/manus",
+              "mcp/openclaw",
+              "mcp/hermes",
+              "mcp/other-hosts"
             ]
           }
         ]

@@ -1,0 +1,45 @@
+---
+title: "Other Hosts"
+description: "Connect any MCP-compatible host to ContentHero with one of two universal patterns."
+---
+
+Any MCP-compatible host can use ContentHero. If yours is not listed in the sidebar, one of these two patterns will connect it. The server is always the same:
+
+```
+https://mcp.contenthero.ai
+```
+
+## Pattern 1: a remote MCP server (URL)
+
+Hosts with native remote MCP support or a custom-connector UI take the URL directly. Add a new MCP server (or connector) and set its URL to `https://mcp.contenthero.ai`. The first call opens the OAuth consent page; sign in and approve. No API key needed.
+
+This covers most app-based and IDE hosts, for example Lovable, Superhuman, and others with a connector or `mcp.json`-style config.
+
+## Pattern 2: the stdio bridge
+
+Hosts that only speak stdio can reach the hosted server through `mcp-remote`, which handles OAuth and bridges to stdio:
+
+```bash
+npx -y mcp-remote https://mcp.contenthero.ai
+```
+
+Add that as the server command in your host's MCP config. For a JSON config:
+
+```json
+{
+  "mcpServers": {
+    "contenthero": {
+      "command": "npx",
+      "args": ["-y", "mcp-remote", "https://mcp.contenthero.ai"]
+    }
+  }
+}
+```
+
+## Verify
+
+Ask your agent to read your ContentHero balance (`get_balance`) or list your brand kits (`list_brand_kits`). A clean read confirms the connection.
+
+## Prefer the CLI instead
+
+If your host has a shell but no MCP support, use the [CLI](/cli/overview): `npm install -g @contenthero/cli` then `contenthero login`. It drives the same surface.

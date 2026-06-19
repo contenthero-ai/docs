@@ -1,0 +1,30 @@
+---
+title: "Hermes"
+description: "Connect ContentHero to a Hermes agent over the hosted OAuth MCP server."
+---
+
+Hermes agents connect to MCP servers through their tool configuration. The exact setup depends on your Hermes runtime, so follow its MCP docs for specifics; the server to point it at is the same.
+
+## Add the server
+
+Add the hosted OAuth endpoint as a remote MCP server:
+
+```
+https://mcp.contenthero.ai
+```
+
+The first call opens the OAuth consent page; sign in with your ContentHero account and approve. No API key needed.
+
+If your Hermes runtime expects a stdio server rather than a remote URL, bridge to the hosted endpoint:
+
+```bash
+npx -y mcp-remote https://mcp.contenthero.ai
+```
+
+## Verify
+
+Ask your Hermes agent to read your ContentHero balance. It calls `get_balance` and returns your credits.
+
+<Note>
+If your host is not Hermes specifically, the same two patterns (a remote URL, or the `mcp-remote` bridge) cover almost any MCP-compatible agent. See [Other hosts](/mcp/other-hosts).
+</Note>

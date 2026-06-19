@@ -1,0 +1,43 @@
+---
+title: "VS Code"
+description: "Connect ContentHero to VS Code (Copilot) over the hosted OAuth MCP server."
+---
+
+VS Code supports remote MCP servers through its MCP configuration.
+
+## Add the server
+
+The quickest way is the Command Palette:
+
+<Steps>
+  <Step title="Add server">
+    Open the Command Palette and run **MCP: Add Server**. Choose **HTTP**.
+  </Step>
+  <Step title="Enter the URL">
+    Paste the server URL:
+
+    ```
+    https://mcp.contenthero.ai
+    ```
+  </Step>
+  <Step title="Authorize">
+    VS Code runs the OAuth flow in your browser. Sign in with your ContentHero account and approve. No API key needed.
+  </Step>
+</Steps>
+
+Or add it directly to `.vscode/mcp.json` (workspace) or your user `mcp.json`:
+
+```json
+{
+  "servers": {
+    "contenthero": {
+      "type": "http",
+      "url": "https://mcp.contenthero.ai"
+    }
+  }
+}
+```
+
+## Verify
+
+Open Copilot Chat in agent mode and ask it to read your ContentHero balance. It calls `get_balance` and returns your credits. Enable the ContentHero tools in the MCP view if they are toggled off.

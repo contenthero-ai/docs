@@ -1,0 +1,28 @@
+---
+title: "OpenClaw"
+description: "Connect ContentHero to OpenClaw over the hosted OAuth MCP server."
+---
+
+OpenClaw manages MCP servers through its CLI registry, then projects them into your agent runtimes.
+
+## Add the server
+
+Register the ContentHero server with OpenClaw and follow the prompts to authorize. OpenClaw stores MCP servers in its own registry; see the [OpenClaw MCP docs](https://docs.openclaw.ai/cli/mcp) for the exact command on your version.
+
+The server to add is the hosted OAuth endpoint:
+
+```
+https://mcp.contenthero.ai
+```
+
+The first call opens the OAuth consent page; sign in with your ContentHero account and approve. No API key needed.
+
+If your runtime expects a stdio server, bridge to the hosted endpoint:
+
+```bash
+npx -y mcp-remote https://mcp.contenthero.ai
+```
+
+## Verify
+
+Ask your OpenClaw agent to read your ContentHero balance. It calls `get_balance` and returns your credits.
