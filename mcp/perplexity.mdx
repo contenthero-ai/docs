@@ -1,0 +1,32 @@
+---
+title: "Perplexity"
+description: "Connect ContentHero to Perplexity as a custom remote connector over OAuth."
+---
+
+Perplexity connects to remote MCP servers as custom connectors.
+
+## Add the connector
+
+<Steps>
+  <Step title="Open Connectors">
+    Go to **Settings, Connectors** and click **Add custom connector**, then choose **Remote**.
+  </Step>
+  <Step title="Enter the server">
+    Name it `ContentHero`, set **Streamable HTTP** transport and **OAuth** authentication, and enter the MCP server URL:
+
+    ```
+    https://mcp.contenthero.ai
+    ```
+  </Step>
+  <Step title="Authorize">
+    Perplexity discovers the OAuth endpoints automatically. Sign in with your ContentHero account and approve. No API key needed.
+  </Step>
+</Steps>
+
+## Verify
+
+Enable the connector under **Sources** in a thread, then ask Perplexity to read your ContentHero balance. It calls `get_balance` and returns your credits.
+
+<Note>
+Custom connectors are available on Perplexity Pro, Max, and Enterprise. In an organization, an admin must allow members to add custom connectors.
+</Note>

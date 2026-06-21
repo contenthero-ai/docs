@@ -1,0 +1,30 @@
+---
+title: "Antigravity"
+description: "Connect ContentHero to Google Antigravity over the hosted OAuth MCP server."
+---
+
+Antigravity connects to remote MCP servers from its MCP configuration.
+
+## Add the server
+
+Open **Settings, Customizations, Open MCP Config** (or edit `~/.gemini/config/mcp_config.json` directly) and add ContentHero:
+
+```json
+{
+  "mcpServers": {
+    "contenthero": {
+      "serverUrl": "https://mcp.contenthero.ai"
+    }
+  }
+}
+```
+
+The field is `serverUrl` for a remote server. Antigravity registers the client automatically, so no client ID or key is needed.
+
+## Authorize
+
+The first call opens the OAuth consent page in your browser. Sign in with your ContentHero account and approve. Antigravity stores and refreshes the token for you.
+
+## Verify
+
+Ask Antigravity to read your ContentHero balance. It calls `get_balance` and returns your credits. The ContentHero tools appear as `mcp__contenthero__*`.

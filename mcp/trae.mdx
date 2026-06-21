@@ -1,0 +1,34 @@
+---
+title: "Trae"
+description: "Connect ContentHero to Trae with the local MCP server and an API key."
+---
+
+Trae runs MCP servers locally over stdio. Connect ContentHero with the published MCP package and an API key.
+
+## Add the server
+
+Open **Settings, MCP, Add, Add Manually** (or edit `.trae/mcp.json` in your project and enable project MCP) and add ContentHero:
+
+```json
+{
+  "mcpServers": {
+    "contenthero": {
+      "command": "npx",
+      "args": ["-y", "@contenthero/mcp"],
+      "env": {
+        "CONTENTHERO_API_KEY": "your_api_key"
+      }
+    }
+  }
+}
+```
+
+Get an API key in the ContentHero app. The server runs locally and points at the same backend, so the tools appear as `mcp__contenthero__*`.
+
+## Verify
+
+Ask Trae to read your ContentHero balance. It calls `get_balance` and returns your credits.
+
+<Note>
+Trae does not support OAuth for remote MCP servers yet, so it uses the local stdio server with an API key rather than the hosted `https://mcp.contenthero.ai` endpoint. Requires Node.js, for `npx`.
+</Note>

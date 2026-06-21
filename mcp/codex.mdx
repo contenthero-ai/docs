@@ -1,28 +1,35 @@
 ---
 title: "Codex"
-description: "Connect ContentHero to Codex via the mcp-remote bridge."
+description: "Connect ContentHero to Codex over the hosted OAuth MCP server."
 ---
 
-Codex loads MCP servers from its config. Bridge to the hosted server with `mcp-remote`, which handles the OAuth flow and speaks stdio to Codex.
+Codex supports remote MCP servers natively over HTTP.
 
 ## Add the server
 
-Add ContentHero to `~/.codex/config.toml`:
+```bash
+codex mcp add contenthero --url https://mcp.contenthero.ai
+```
+
+This writes a `[mcp_servers.contenthero]` block to `~/.codex/config.toml`. You can also add it by hand:
 
 ```toml
 [mcp_servers.contenthero]
-command = "npx"
-args = ["-y", "mcp-remote", "https://mcp.contenthero.ai"]
+url = "https://mcp.contenthero.ai"
 ```
 
 ## Authorize
 
-The first run opens the OAuth consent page in your browser. Sign in with your ContentHero account and approve. `mcp-remote` caches the token, so you authorize once.
+```bash
+codex mcp login contenthero
+```
+
+This opens the OAuth consent page in your browser. Sign in with your ContentHero account and approve. Codex stores and refreshes the token, so you authorize once. No API key needed.
 
 ## Verify
 
-Start Codex and ask it to read your ContentHero balance. It calls `get_balance` through the bridge and returns your credits.
+Start Codex and ask it to read your ContentHero balance. It calls `get_balance` and returns your credits.
 
 <Note>
-The `mcp-remote` bridge is the universal way to reach a remote OAuth MCP server from a host that only speaks stdio. The same pattern works for any stdio-only host.
+Native remote MCP needs a current Codex CLI. If `codex mcp add --url` or `codex mcp login` is not recognized, update Codex. As a fallback for older builds, bridge over stdio: set the server `command` to `npx` with args `["-y", "mcp-remote", "https://mcp.contenthero.ai"]`.
 </Note>

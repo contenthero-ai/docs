@@ -1,0 +1,38 @@
+---
+title: "Cline"
+description: "Connect ContentHero to Cline over the hosted OAuth MCP server."
+---
+
+Cline connects to remote MCP servers from its MCP servers panel.
+
+## Add the server
+
+Open the **MCP Servers** icon, switch to the **Remote Servers** tab, and add ContentHero:
+
+- **Server Name:** `contenthero`
+- **Server URL:** `https://mcp.contenthero.ai`
+- **Transport:** Streamable HTTP
+
+You can also edit the config directly:
+
+```json
+{
+  "mcpServers": {
+    "contenthero": {
+      "url": "https://mcp.contenthero.ai"
+    }
+  }
+}
+```
+
+## Authorize
+
+On connect, Cline runs the OAuth flow in your browser. Sign in with your ContentHero account and approve. No API key needed.
+
+## Verify
+
+Ask Cline to read your ContentHero balance. It calls `get_balance` and returns your credits.
+
+<Note>
+OAuth for remote MCP needs a current Cline build. On an older version, use the local stdio path instead: set the server `command` to `npx` with args `["-y", "@contenthero/mcp"]`, and put your API key in `env.CONTENTHERO_API_KEY`. Get a key in the ContentHero app.
+</Note>

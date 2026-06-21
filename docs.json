@@ -76,11 +76,14 @@
               "mcp/cursor",
               "mcp/vscode",
               "mcp/windsurf",
+              "mcp/antigravity",
+              "mcp/cline",
               "mcp/gemini-cli",
               "mcp/grok",
-              "mcp/manus",
+              "mcp/perplexity",
               "mcp/openclaw",
               "mcp/hermes",
+              "mcp/trae",
               "mcp/other-hosts"
             ]
           }
