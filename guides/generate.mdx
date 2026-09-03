@@ -23,6 +23,8 @@ The roster is live, resolved from the registry. It is exposed as the `modelId` e
 
 Reads: `list_media` / `get_media` (spanning creations, boards, and looks via the `kind` filter), `list_avatars` / `get_avatar`, `list_voices` / `get_voice`.
 
+Avatar writes: `create_avatar` / `update_avatar` / `delete_avatar` (CLI `contenthero avatar create|update|delete`). Voices stay read-only.
+
 ## Async
 
 `generate_*` runs a smart-wait of about 50s, then returns the finished asset or an `outputId` if the render is still going. Poll a snapshot with `get_generation_status`, or block with `wait_for_generation` (CLI `contenthero generation wait <id>`). The `outputId` is always returned, so you can always keep polling.
@@ -62,3 +64,35 @@ contenthero generate image "on a rooftop at golden hour" \
 The MCP takes the same field: `generate_image` with `avatarId`, and `generate_board` with `avatarId` to file a character sheet against the avatar it was built for. Pass a reference image of the avatar alongside it to keep the subject on-model; `avatarId` decides where the result is filed, not what it looks like.
 
 The avatar must be one you own. An id you do not own is rejected rather than ignored.
+
+### Managing avatars
+
+`create_avatar` starts a character and generates its first look. It **spends credits** (preview with `getCost`, or `--cost` on the CLI), and it returns before the avatar is usable:
+
+```bash
+contenthero avatar create "Mika Vela" --age 20s --gender female \
+  --description "a documentary-style creator" --niche fitness
+```
+
+The avatar comes back at `status: "processing"` with no image. Its default look and profile photo are set when that first look finishes, so poll `get_avatar` (CLI `contenthero avatar get <id>`) until the status is `completed`. Credits are charged on completion, so a failed generation is not charged.
+
+Supply `referenceImageUrls` (`--ref`, repeatable) to make the avatar a likeness of a real person from their photos. Only use photos of someone who has agreed to it.
+
+**Filing an image you already have** costs nothing and is a separate operation from generating:
+
+```bash
+contenthero avatar look add <avatarId> --image <url>
+contenthero avatar look remove <avatarId> <lookId>
+```
+
+Over MCP these are ops on `update_avatar`, so one call can add a look and make it the default:
+
+```json
+{ "avatarId": "...", "defaultLookId": "...", "ops": [{ "op": "add_look", "imageUrls": ["..."] }] }
+```
+
+Ops run before the field updates, which is what lets a single call add a look and point at it. They are **not a transaction**: a failure part-way leaves the earlier ops applied, and the result's `applied` array says which ran.
+
+Two things behave more gently than their names suggest. Removing a look **trashes** it, recoverable for 30 days. Deleting an avatar is **soft, and its looks survive** as library images, so you can file them onto another avatar afterwards. That is what makes consolidating duplicate characters safe.
+
+Avatar writes need the `studio:write` scope, except `create_avatar`, which needs `studio:generate` because it charges credits.

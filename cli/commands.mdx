@@ -51,6 +51,22 @@ contenthero post archive <postId>
 contenthero pipeline-stage list
 ```
 
+## Avatars and voices
+
+```bash
+contenthero avatar list
+contenthero avatar get    <avatarId>
+contenthero avatar create "<name>" --age 20s --gender female   # spends credits; --cost to preview
+contenthero avatar update <avatarId> --name "..." --default-look <lookId>
+contenthero avatar delete <avatarId>                            # soft; its looks survive
+contenthero avatar look add    <avatarId> --image <url>         # files an image you already own
+contenthero avatar look remove <avatarId> <lookId>              # trashed, recoverable 30 days
+contenthero voice list
+contenthero voice get <voiceId>
+```
+
+`avatar create` returns before the avatar is usable: poll `avatar get` until the status is `completed`. Use `--voice none` on `avatar update` to clear the default voice. Voices are read-only; creating one stays in the app.
+
 ## Brand kit
 
 ```bash
