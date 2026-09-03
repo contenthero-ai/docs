@@ -49,3 +49,16 @@ Preview any cost for free with `getCost: true` (MCP) or `--cost` (CLI). The prev
 ## Identity and references
 
 For consistent characters across generations, ContentHero supports avatars and reference boards as reusable identity. Browse them with `list_avatars` and the board media reads, and pass them as typed references. The [pipeline](/guides/pipeline) and the `contenthero-generate` skill cover the full reference model.
+
+### Generating into a look
+
+An avatar owns a set of **looks**: one appearance of the same character, varying the outfit, setting or framing. Pass `avatarId` to file the result onto that avatar as a new look instead of saving a standalone library output.
+
+```bash
+contenthero generate image "on a rooftop at golden hour" \
+  --model nano-banana-2 --avatar <avatarId> --ref <avatarLookUrlOrId>
+```
+
+The MCP takes the same field: `generate_image` with `avatarId`, and `generate_board` with `avatarId` to file a character sheet against the avatar it was built for. Pass a reference image of the avatar alongside it to keep the subject on-model; `avatarId` decides where the result is filed, not what it looks like.
+
+The avatar must be one you own. An id you do not own is rejected rather than ignored.
