@@ -10,9 +10,7 @@ The skills install from the GitHub repo [`contenthero-ai/skills`](https://github
 With [GitHub CLI](https://cli.github.com) v2.90+, this writes to the right directory for your agent automatically:
 
 ```bash
-gh skill install contenthero-ai/skills contenthero-generate
-gh skill install contenthero-ai/skills contenthero-pipeline
-gh skill install contenthero-ai/skills contenthero-brand
+gh skill install contenthero-ai/skills contenthero
 ```
 
 ## Option 2: git clone
@@ -30,7 +28,7 @@ Clone into your agent's skills directory.
 git clone --depth 1 https://github.com/contenthero-ai/skills.git <install-path>
 ```
 
-After cloning, the three skills are auto-discovered at `contenthero-generate/SKILL.md`, `contenthero-pipeline/SKILL.md`, and `contenthero-brand/SKILL.md`.
+After cloning, the skill is auto-discovered at `contenthero/SKILL.md`.
 
 ## Option 3: the paste-prompt one-liner
 

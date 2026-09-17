@@ -1,46 +1,68 @@
 ---
-title: "Skills Overview"
-description: "Installable agent skills that encode the ContentHero workflows and our model-specific prompt craft."
+title: "Skill Overview"
+description: "One installable agent skill that encodes the ContentHero workflows and our model-specific prompt craft."
 ---
 
-The ContentHero skills are installable workflows for your agent. They turn ContentHero into a context-and-execution layer your agent already knows how to use well: how to ground a draft, how to chain a generation, how to prompt each model, how to assemble and publish a post. They run inside your agent (Claude Code, Cursor, Codex, and more) and drive the MCP, CLI, or raw API underneath.
+The ContentHero skill is an installable set of workflows for your agent. It turns ContentHero into a context-and-execution layer your agent already knows how to use well: how to ground a draft, how to chain a generation, how to prompt each model, how to assemble and publish. It runs inside your agent (Claude, Cursor, Codex, and more) and drives the MCP, CLI, or raw API underneath.
 
 The repo is [`contenthero-ai/skills`](https://github.com/contenthero-ai/skills).
 
-## The three skills
+<Note>
+It was three skills (`contenthero-generate`, `contenthero-pipeline`, `contenthero-brand`) until September 2026. One skill now covers the same ground with a single install. If you have the old three installed, remove them: two sets of instructions describing the same product means one of them is out of date.
+</Note>
 
-<CardGroup cols={3}>
-  <Card title="Generate" icon="wand-magic-sparkles" href="/skills/generate">
-    Idea to media: image, video, audio, board, and lip-sync, with chaining and cost preflight.
+## What it covers
+
+Everything on the public surface, routed by what you ask for rather than by which skill you picked.
+
+<CardGroup cols={2}>
+  <Card title="Generate" icon="wand-magic-sparkles">
+    Image, video, audio, reference boards, lip-sync, upscaling. Cost preflight before every spend, and output-id chaining so you never re-upload.
   </Card>
-  <Card title="Pipeline" icon="diagram-project" href="/skills/pipeline">
-    The hero. Research to published: ground, draft in your voice, produce, assemble, schedule.
+  <Card title="Plan and publish" icon="diagram-project">
+    Spaces, stages and cards, one post per platform, scheduling, and publishing to your connected accounts.
   </Card>
-  <Card title="Brand" icon="book" href="/skills/brand">
-    Your context. Read and grow your brand kit and knowledge base; feed the other two.
+  <Card title="Ground and draft" icon="book">
+    Your brand kit and its searchable knowledge base. Your LLM writes in your voice; you approve before anything goes live.
+  </Card>
+  <Card title="Research" icon="chart-line">
+    The accounts you track and their posts ranked by outlier score, which measures a post against its own creator's baseline rather than the platform's.
+  </Card>
+  <Card title="Media library" icon="folder">
+    Upload, import, search, folders, and archiving that is always reversible.
+  </Card>
+  <Card title="Editor" icon="film">
+    Projects, timelines, canvases, saved elements, previews, and exports.
   </Card>
 </CardGroup>
 
-They cooperate: `contenthero-brand` resolves your brand context, `contenthero-pipeline` grounds and publishes, and `contenthero-generate` produces the media along the way. Most people install all three.
+## What the skill adds
 
-## What the skills add
+ContentHero supplies the tools. The skill supplies the craft of using them well, which is the part a tool schema cannot carry:
 
-ContentHero supplies the tools; the skills supply the craft of using them well:
-
+- **The order to do things in**, so the agent grounds before it drafts and prices before it spends.
+- **The traps that cost money or delete work.** A card's posts and assets are declarative, so a partial update removes what you left out. A slow render is not a failed one, and re-submitting charges you twice.
 - **Model prompt craft** specific to our roster, so a prompt is tuned to the model that will run it.
-- **Grounded voice-synthesis**, the method for drafting copy that sounds like you (see [Voice synthesis](/skills/voice-synthesis)).
-- **The workflow**, so the agent knows the order: ground, draft, approve, produce, assemble, publish.
+- **Grounded voice synthesis**, the method for drafting copy that sounds like you (see [Voice synthesis](/skills/voice-synthesis)).
 
-When your agent drafts copy, the skills have it ground the draft in your real context (your outliers, brand voice, and past posts) and get your approval before publishing.
+It deliberately does **not** restate the tool reference. Your agent already receives every tool's name, description and full schema when it connects, so repeating them would cost context and drift out of date. Parameter detail lives in the [MCP tool reference](/mcp/tools/generate), generated from the published packages.
+
+## Coverage is enforced, not claimed
+
+The skill's CI reads the live tool surface from the published `@contenthero/mcp` and checks it in both directions: every tool the skill names must exist, and **every tool that exists must be named in a workflow**. A build fails if either drifts.
+
+That second direction is the one that matters. Before it existed, the skill named 21 tools that had been renamed away and reached only a quarter of the surface, with two whole domains missing, and nothing could say so.
 
 ## The frozen-snapshot model
 
-An installed skill is a git-clone snapshot. It does not auto-update; you update it with `git pull` or by re-running the installer. The skill is only instructions. The services it drives (the hosted MCP, the CLI to `/api/v1`, the model roster, pricing) are server-side and always live. So the skills bake durable guidance (craft and workflow) and defer volatile facts (model ids, prices) to live calls, which keeps a year-old install correct.
+An installed skill is a snapshot. It does not auto-update; you update it with `git pull` or by re-running the installer. The skill is only instructions. The services it drives (the hosted MCP, the CLI, the model roster, pricing) are server-side and always live.
+
+So the skill bakes in durable guidance (craft, sequence, traps) and defers volatile facts (model ids, prices, platform limits) to live calls. That is what keeps a year-old install correct.
 
 This is also why MCP ranks first in the [auth ladder](/for-ai-agents): it is the only self-updating transport.
 
 ## Install
 
-<Card title="Install the skills" icon="download" href="/skills/install">
+<Card title="Install the skill" icon="download" href="/skills/install">
   Per-host install, the paste-prompt one-liner, and how to authenticate.
 </Card>

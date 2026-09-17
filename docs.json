@@ -129,11 +129,7 @@
           },
           {
             "group": "The skills",
-            "pages": [
-              "skills/generate",
-              "skills/pipeline",
-              "skills/brand"
-            ]
+            "pages": []
           },
           {
             "group": "Method",
@@ -213,5 +209,19 @@
     "socials": {
       "github": "https://github.com/contenthero-ai"
     }
-  }
+  },
+  "redirects": [
+    {
+      "source": "/skills/generate",
+      "destination": "/skills/overview"
+    },
+    {
+      "source": "/skills/pipeline",
+      "destination": "/skills/overview"
+    },
+    {
+      "source": "/skills/brand",
+      "destination": "/skills/overview"
+    }
+  ]
 }
