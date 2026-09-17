@@ -7,13 +7,9 @@ The ContentHero skill is an installable set of workflows for your agent. It turn
 
 The repo is [`contenthero-ai/skills`](https://github.com/contenthero-ai/skills).
 
-<Note>
-It was three skills (`contenthero-generate`, `contenthero-pipeline`, `contenthero-brand`) until September 2026. One skill now covers the same ground with a single install. If you have the old three installed, remove them: two sets of instructions describing the same product means one of them is out of date.
-</Note>
-
 ## What it covers
 
-Everything on the public surface, routed by what you ask for rather than by which skill you picked.
+Everything on the public surface. The skill routes your request to the right workflow, so there is nothing to choose before you start.
 
 <CardGroup cols={2}>
   <Card title="Generate" icon="wand-magic-sparkles">
@@ -51,7 +47,7 @@ It deliberately does **not** restate the tool reference. Your agent already rece
 
 The skill's CI reads the live tool surface from the published `@contenthero/mcp` and checks it in both directions: every tool the skill names must exist, and **every tool that exists must be named in a workflow**. A build fails if either drifts.
 
-That second direction is the one that matters. Before it existed, the skill named 21 tools that had been renamed away and reached only a quarter of the surface, with two whole domains missing, and nothing could say so.
+The second direction is the one that matters. A skill can claim it covers a product and be wrong by most of the surface, and no test, build or typecheck would ever say so. This one cannot ship in that state.
 
 ## The frozen-snapshot model
 

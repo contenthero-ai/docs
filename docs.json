@@ -128,10 +128,6 @@
             ]
           },
           {
-            "group": "The skills",
-            "pages": []
-          },
-          {
             "group": "Method",
             "pages": [
               "skills/voice-synthesis"
