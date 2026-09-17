@@ -13,7 +13,7 @@ A presenter clip from a script you supply.
     `generate_lip_sync` (a portrait image plus the audio output id) for the talking-head video.
   </Step>
   <Step title="Assemble and publish">
-    `create_post`, `add_post_asset` (the video), `add_post_destination`, then `schedule_post`.
+    `create_card`, then one `update_card` carrying the video in `assets`, the platform in `posts`, and `scheduledAt`.
   </Step>
 </Steps>
 

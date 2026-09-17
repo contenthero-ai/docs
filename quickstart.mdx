@@ -97,7 +97,7 @@ If the render outlasts the smart-wait, you get an `outputId`. Poll it.
 
 <Tabs>
   <Tab title="MCP">
-    Call `get_generation_status` with the `outputId` for a snapshot, or `wait_for_generation` to block until it is done.
+    Call `get_generation_status` with the `outputId`. It blocks until the render finishes by default; pass `wait: false` for an instant snapshot.
   </Tab>
   <Tab title="CLI">
     ```bash

@@ -7,7 +7,7 @@ Research to published, end to end. This is the [pipeline](/guides/pipeline) in f
 
 <Steps>
   <Step title="Ground">
-    `list_outliers`, then `get_inspiration_content` on the best few (patterns), `get_brand_kit` (voice and visual), `search_brand_knowledge` (your stance), and `get_brand_account_performance` (your own top posts).
+    `list_content`, then `get_content` on the best few (patterns), `get_brand_kit` (voice and visual), `search_brand_knowledge` (your stance), and `get_account` (your own top posts).
   </Step>
   <Step title="Draft">
     Your agent writes a concept, hook, and caption grounded in the above, in your voice, and you approve it.
@@ -16,10 +16,10 @@ Research to published, end to end. This is the [pipeline](/guides/pipeline) in f
     `generate_image` for the key frame, then chain its output id into `generate_video` as the start frame. Ground the visual in the brand's visual style.
   </Step>
   <Step title="Assemble">
-    `create_post`, `add_post_asset` (the video), `add_post_destination` (platform, format, connected account).
+    `create_card`, `update_card` with `assets` (the video), `posts` (platform, format, connected account).
   </Step>
   <Step title="Publish">
-    `schedule_post`, after confirming destinations and timing.
+    `update_card` with `scheduledAt`, after confirming destinations and timing.
   </Step>
 </Steps>
 

@@ -27,7 +27,7 @@ Avatar writes: `create_avatar` / `update_avatar` / `delete_avatar` (CLI `content
 
 ## Async
 
-`generate_*` runs a smart-wait of about 50s, then returns the finished asset or an `outputId` if the render is still going. Poll a snapshot with `get_generation_status`, or block with `wait_for_generation` (CLI `contenthero generation wait <id>`). The `outputId` is always returned, so you can always keep polling.
+`generate_*` runs a smart-wait of about 50s, then returns the finished asset or an `outputId` if the render is still going. Check it with `get_generation_status` (CLI `contenthero generation status <id>`), which blocks until the render finishes by default; pass `wait: false`, or `--no-wait`, for an instant snapshot. The `outputId` is always returned, so you can always keep polling.
 
 ## Chaining outputs
 

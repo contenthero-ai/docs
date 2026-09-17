@@ -40,10 +40,12 @@ contenthero brand-kit knowledge search "$BK" "what is our stance on short hooks"
 ## Assemble and schedule a post
 
 ```bash
-POST=$(contenthero post create --title "Launch teaser" --description "$CAPTION" | jq -r '.id')
-contenthero post asset add "$POST" --url "$VIDEO_URL"
-contenthero post destination add "$POST" --platform instagram --format reel --account "$IG"
-contenthero post schedule "$POST" --at "2026-07-01T15:00:00Z"
+CARD=$(contenthero card create "Launch teaser" --platform instagram | jq -r '.id')
+contenthero card update "$CARD" \
+  --notes "$CAPTION" \
+  --assets "[{\"assetUrl\":\"$VIDEO_URL\"}]" \
+  --posts  "[{\"platform\":\"instagram\",\"format\":\"reel\",\"connectedAccountId\":\"$IG\"}]" \
+  --schedule "2026-07-01T15:00:00Z"
 ```
 
 ## Wait on a long render in a script

@@ -3,23 +3,34 @@ title: "Inspiration"
 description: "Read tracked accounts, outliers, and brand-account performance to ground every decision."
 ---
 
-Inspiration is the research layer. It reads the accounts you track, the outliers (top-performing content) from them, and your own brand-account performance. It is the grounding the [pipeline](/guides/pipeline) draws on before any draft.
+Inspiration is the research layer. It reads the social accounts you track and their posts, ranked by outlier score. It is the grounding the [pipeline](/guides/pipeline) draws on before any draft.
+
+## Two kinds of tracked account, one list
+
+A tracked account is either **inspiration** (a creator or competitor you watch) or **brand** (one of your own profiles). Both live in `list_accounts`, and every row reports its own `accountType`, so omit the filter to see both and pass one to narrow.
+
+They mean opposite things, which is why the distinction is worth keeping straight: inspiration accounts tell you what works for other people, brand accounts tell you what works for you.
 
 ## Operations
 
 | What | MCP tool |
 | --- | --- |
-| Tracked inspiration accounts | `list_inspiration_accounts`, `get_inspiration_account` |
-| Content from a tracked account | `get_inspiration_content` |
-| Outliers (top performers) | `list_outliers` |
-| Your own brand accounts | `list_brand_accounts` |
-| Your own account performance | `get_brand_account_performance` |
+| Tracked accounts, either kind | `list_accounts` (filter with `accountType`) |
+| One account's performance | `get_account` |
+| Posts, ranked by outlier score | `list_content` |
+| One post in full, with transcript | `get_content` |
 
-All reads need `brandkit:read`.
+All reads need `brandkit:read`. Full parameters are in the [inspiration tool reference](/mcp/tools/inspiration).
+
+## What an outlier score is
+
+An outlier score measures how far a post overperformed **its own creator's baseline**, not the platform's. A small account's breakout ranks above a large account's routine post, which is what makes the list useful for finding transferable patterns rather than just popular accounts.
+
+`list_content` spans both the creators you watch and your own posts by default. Every row carries `isOwn`, so one call answers both "what is working for the people I watch" and "how did my own posts do". Narrow with `scope` when you want only one.
 
 ## Scoping to a brand kit
 
-Most reads accept a `brandKitId` so you see only the accounts and outliers linked to one brand. `list_outliers --brand-kit <id>` (CLI) or the `brandKitId` argument (MCP) narrows the pool. If a scoped read comes back empty, the brand kit may have no linked accounts; check `get_brand_kit` for its `inspirationAccounts` and `brandAccounts`. Accounts are linked to a brand kit in the app.
+`list_accounts` and `list_content` accept a `brandKitId` so you see only what is linked to one brand. If a scoped read comes back empty, the brand kit may have no linked accounts; check `get_brand_kit` for its `inspirationAccounts` and `brandAccounts`.
 
 ## Mining outliers (the two-step)
 
@@ -27,10 +38,10 @@ Outliers carry the signal that makes a draft perform. List them, then go deep on
 
 <Steps>
   <Step title="List">
-    `list_outliers` (scoped with `brandKitId`) to find the top performers. Each carries performance signals.
+    `list_content` (scoped with `brandKitId`) to find the top performers, already ranked by outlier score.
   </Step>
   <Step title="Get content">
-    `get_inspiration_content` on the top few for the full detail: transcript, hashtags, and the structure you want to learn from (hook archetype, pacing, CTA).
+    `get_content` on the top few for the full detail: hashtags, keywords, audio, and the structure you want to learn from. The transcript is **opt-in**, because a long video is a large document: pass `transcript: "text"` for the whole thing or `"segments"` for timed slices, then narrow with `startMs`, `endMs` or `transcriptSearch`.
   </Step>
 </Steps>
 

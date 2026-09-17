@@ -13,8 +13,8 @@ A brand kit has structured sections covering positioning, audience, voice, visua
 | --- | --- |
 | List and read | `list_brand_kits`, `get_brand_kit` |
 | Edit identity | `update_brand_kit` |
-| Add or edit a section | `add_brand_kit_section`, `update_brand_kit_section` |
-| Archive (reversible) | `archive_brand_kit`, `archive_brand_kit_section` |
+| Add or edit sections | `update_brand_kit` with `sections` (replaces the set; a section left out is archived) |
+| Archive a kit (reversible) | `archive` with `assetType: "brand_kit"` |
 
 Edits need `brandkit:write`. Read the current value, modify it, and write the whole object back rather than sending a partial that would drop fields. Archiving is a soft delete; there is no hard delete.
 

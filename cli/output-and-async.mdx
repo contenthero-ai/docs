@@ -38,8 +38,8 @@ contenthero generate image --prompt "..." --model nano-banana-2 --cost
 
 ```bash
 contenthero generate video --prompt "..." --model kling-3.0 --no-wait   # return an id now
-contenthero generation wait <outputId>                                 # block until done
-contenthero generation status <outputId>                               # snapshot
+contenthero generation status <outputId>                               # blocks until done
+contenthero generation status <outputId> --no-wait                     # snapshot
 ```
 
 The `outputId` is always returned, so you can always keep polling. A `status` response includes a `pollAfterSeconds` hint telling you when to check again.

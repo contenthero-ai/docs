@@ -7,16 +7,16 @@ You have a clip and want a caption that sounds like you. Ground it, draft it, at
 
 <Steps>
   <Step title="Ground">
-    `list_outliers` (scoped with `brandKitId`), then `get_inspiration_content` on the top few for hooks and structure. `get_brand_kit` for voice. `get_brand_account_performance` for your own best posts. `search_brand_knowledge` for your stance on the topic.
+    `list_content` (scoped with `brandKitId`), then `get_content` on the top few for hooks and structure. `get_brand_kit` for voice. `get_account` on one of your own tracked profiles for your best posts. `search_brand_knowledge` for your stance on the topic.
   </Step>
   <Step title="Draft">
     Your agent writes the hook and caption emulating your proven patterns, in your voice, and presents it for approval. See [Voice synthesis](/skills/voice-synthesis).
   </Step>
   <Step title="Attach">
-    `create_post` with the approved caption as the description, `add_post_asset` for the reel, `add_post_destination` for the platform and format.
+    `create_card` with the approved title, then one `update_card` carrying the caption in `notes`, the reel in `assets`, and the platform and format in `posts`.
   </Step>
   <Step title="Publish">
-    `schedule_post` or `publish_post`, after you confirm.
+    `update_card` with `scheduledAt`, or `publish_post` to go now, after you confirm.
   </Step>
 </Steps>
 

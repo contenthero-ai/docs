@@ -38,6 +38,18 @@ const REPO = dirname(import.meta.dirname)
 const GENERATED = ['mcp/tools', 'cli/reference.mdx']
 
 /**
+ * The changelog is exempt as a FILE, not by name.
+ *
+ * Its entries record what shipped on a date, so "a standalone `wait_for_generation`" in
+ * the 2026-06-15 entry is true about that release and stays true no matter what the tool
+ * is called now. Rewriting history to satisfy a linter would make the changelog wrong.
+ *
+ * Exempting the file rather than allowlisting the name matters: allowlisting
+ * `wait_for_generation` globally would let a live page start recommending it again.
+ */
+const HISTORICAL = ['changelog.mdx']
+
+/**
  * Names that look like tools but are deliberately written about as gone, or belong to
  * another vocabulary. Keep this list short and justify every entry, or it becomes the
  * place dead names go to hide.
@@ -118,6 +130,7 @@ const problems = []
 for (const file of mdxFiles(REPO)) {
   const rel = relative(REPO, file)
   if (GENERATED.some((g) => rel === g || rel.startsWith(g + '/'))) continue
+  if (HISTORICAL.includes(rel)) continue
 
   const text = readFileSync(file, 'utf8')
 
@@ -133,19 +146,21 @@ for (const file of mdxFiles(REPO)) {
   for (const match of text.matchAll(CLI_RE)) {
     const phrase = match[1].trim()
 
-    // A phrase is fine when it IS a leaf command, or is a PREFIX of one. That covers
-    // prose naming a group ("the contenthero avatar commands"), three-level commands
-    // like `avatar look add`, and a leaf quoted with its flags stripped, while still
-    // rejecting a verb that no longer exists.
+    // A phrase is fine in three cases, and all three are needed:
+    //   1. it IS a leaf command                        `card get`
+    //   2. it is a PREFIX of one, so prose can name a group    `avatar look`, `brand-kit knowledge`
+    //   3. a prefix of IT is a leaf, so the rest is arguments  `archive card` (leaf is `archive`)
     //
-    // Two earlier versions got this wrong in opposite directions. Accepting any phrase
-    // whose FIRST WORD headed something let `contenthero generation wait` pass, because
-    // `generation status` exists. Then requiring two-word phrases to be exact leaves
-    // wrongly flagged `contenthero avatar look`, which is a real group. Prefix matching
-    // is the rule that satisfies both.
+    // Three earlier versions each missed one of these. Matching on the first word alone
+    // let `generation wait` pass because `generation status` exists. Requiring exact
+    // leaves flagged `avatar look`, a real group. Prefix-of-a-leaf alone then flagged
+    // `archive card`, where `card` is a positional argument, not a subcommand.
+    const words = phrase.split(' ')
+    const prefixes = words.map((_, i) => words.slice(0, i + 1).join(' '))
     const ok =
       phrase.startsWith('-') ||
-      [...liveCommands].some((c) => c === phrase || c.startsWith(phrase + ' '))
+      [...liveCommands].some((c) => c === phrase || c.startsWith(phrase + ' ')) ||
+      prefixes.some((p) => liveCommands.has(p))
     if (ok) continue
     const line = text.slice(0, match.index).split('\n').length
     problems.push(`${rel}:${line}  command \`contenthero ${phrase}\` does not exist`)

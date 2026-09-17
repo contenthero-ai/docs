@@ -32,24 +32,41 @@ contenthero model list         # the live roster
 ## Generations
 
 ```bash
-contenthero generation wait <outputId>     # block until done
-contenthero generation status <outputId>   # snapshot
+contenthero generation status <outputId>              # blocks until done
+contenthero generation status <outputId> --no-wait    # snapshot
 ```
 
-## Posts (pipeline)
+## Cards (pipeline)
+
+A **card** is one piece of work. Its **posts** are how it reaches each platform, one per platform. Cards live on a **space**, whose columns are **stages**.
 
 ```bash
-contenthero post list
-contenthero post get <postId>
-contenthero post create --title "..." --description "..."
-contenthero post update <postId> --stage <id|slug|name>
-contenthero post destination add <postId> --platform instagram --format reel --account <connectedAccountId>
-contenthero post asset add <postId> --url <mediaUrl>
-contenthero post schedule <postId> --at <iso8601>
-contenthero post publish <postId>
-contenthero post archive <postId>
-contenthero pipeline-stage list
+contenthero card list --space <spaceId>
+contenthero card get <cardId>
+contenthero card create "<title>" --platform instagram --space <spaceId>
+contenthero card update <cardId> --stage <id|slug|name>
+contenthero card update <cardId> --posts '[{"platform":"instagram","format":"reel","connectedAccountId":"..."}]'
+contenthero card update <cardId> --assets '[{"assetUrl":"<mediaUrl>"}]'
+contenthero card update <cardId> --schedule <iso8601>
+contenthero card publish <cardId>
+contenthero archive card <cardId>
 ```
+
+<Warning>
+`--posts` and `--assets` **replace** the whole set. Send every entry you want to keep, not just the new one.
+</Warning>
+
+## Spaces and stages
+
+```bash
+contenthero space list
+contenthero stage list --space <spaceId>
+contenthero stage create "<name>" --space <spaceId> --after <stageId>
+contenthero stage update <stageId> --space <spaceId> --name "<name>"
+contenthero stage delete <stageId> --space <spaceId> --target <stageId>
+```
+
+`stage delete` needs `--target` unless the column is empty: the server refuses to silently drop the cards in it.
 
 ## Avatars and voices
 
@@ -73,7 +90,7 @@ contenthero voice get <voiceId>
 contenthero brand-kit list
 contenthero brand-kit get <brandKitId>
 contenthero brand-kit update <brandKitId> --name "..."
-contenthero brand-kit section add <brandKitId> --title "..." --content "..."
+contenthero brand-kit update <brandKitId> --sections '[{"tab":"...","sectionName":"..."}]'
 contenthero brand-kit knowledge list   <brandKitId>
 contenthero brand-kit knowledge search <brandKitId> "<query>"
 contenthero brand-kit knowledge get    <brandKitId> <knowledgeId>
@@ -83,19 +100,20 @@ contenthero brand-kit knowledge remove <brandKitId> <knowledgeId>
 
 ## Inspiration
 
+Tracked accounts come in two kinds in one list: `inspiration` for creators you watch, `brand` for your own profiles. `content list` spans both and ranks by outlier score.
+
 ```bash
-contenthero inspiration accounts list  [--brand-kit <id>]
-contenthero inspiration outliers list  [--brand-kit <id>]
-contenthero inspiration content get <contentId>
-contenthero brand-account list
-contenthero brand-account performance <accountId>
+contenthero tracked-account list [--kind inspiration|brand] [--brand-kit <id>]
+contenthero tracked-account get <accountId>
+contenthero content list [--brand-kit <id>] [--scope <scope>] [--since week]
+contenthero content get <contentId> --transcript text
 ```
 
 ## Connected accounts and account
 
 ```bash
-contenthero connected list
-contenthero connected get <id>
+contenthero connected-account list
+contenthero connected-account get <id>
 contenthero account balance
 contenthero auth status
 ```
