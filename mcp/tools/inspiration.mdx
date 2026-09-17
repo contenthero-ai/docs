@@ -1,0 +1,160 @@
+---
+title: "Inspiration"
+description: "The research surface: the social accounts you track, and their posts ranked by outlier score."
+---
+
+{/* GENERATED FILE. Do not edit by hand. */}
+{/* Regenerate with `npm run generate:reference` in contenthero-docs. */}
+
+The research surface: the social accounts you track, and their posts ranked by outlier score. 4 tools.
+
+Every tool below is exposed by the hosted MCP server at `https://mcp.contenthero.ai` and by the `@contenthero/mcp` npm package. A <Badge>write</Badge> tool changes your account; a <Badge>read</Badge> tool does not.
+
+### `list_accounts`
+
+<Badge>read</Badge>
+
+List the social accounts this ContentHero account tracks. TWO KINDS, in one list: accountType 'inspiration' is the creators and competitors they watch for research, 'brand' is their OWN profiles (distinct from list_brand_kits, which are the brand identity documents). Every row reports its own accountType, so omit the filter to see both. Call get_account for one account's performance, or list_content for the posts. Pass brandKitId to scope to the accounts linked to a specific brand kit.
+
+<ParamField body name="accountType" type="`inspiration` \| `brand`">
+Narrow to one kind. Omitted, both come back.
+</ParamField>
+
+<ParamField body name="brandKitId" type="string">
+Scope to the accounts linked to this brand kit (from get_brand_kit).
+</ParamField>
+
+### `get_account`
+
+<Badge>read</Badge>
+
+Get one tracked account with how its content actually performs: post count, total and average views/likes/comments, average engagement and outlier score, plus its top posts by outlier score and its most recent ones. Works for either kind of account: use it on one of the owner's OWN accounts to ground decisions in their real numbers, or on a creator they watch to study what works for that creator.
+
+<ParamField body name="accountId" type="string" required>
+The account id from list_accounts.
+</ParamField>
+
+### `list_content`
+
+<Badge>read</Badge>
+
+The core research read: social posts this account tracks, ranked by OUTLIER SCORE (how far a post overperformed its own creator's baseline, so a small account's hit still surfaces). SPANS BOTH the creators they watch and their OWN posts by default; set scope to narrow, and every row carries isOwn either way. This is how you answer both "what is working for the people I watch" and "how did my own posts do" without picking a subsystem first. Filter by platform, content type, a published window (publicationDate like 'week' or 'month', or exact publishedAfter/publishedBefore), and ranges over score, views, duration and follower count. Call get_content for one post in full, including its transcript.
+
+<ParamField body name="accountIds" type="string[]">
+Limit to these tracked account ids (from list_accounts).
+</ParamField>
+
+<ParamField body name="addedByYou" type="boolean">
+Only the one-off posts the owner saved by url.
+</ParamField>
+
+<ParamField body name="brandKitId" type="string">
+Scope to the accounts linked to this brand kit.
+</ParamField>
+
+<ParamField body name="contentType" type="string">
+Filter by content type, e.g. 'video', 'short', 'reel'.
+</ParamField>
+
+<ParamField body name="durationMax" type="number">
+Maximum duration in seconds.
+</ParamField>
+
+<ParamField body name="durationMin" type="number">
+Minimum duration in seconds.
+</ParamField>
+
+<ParamField body name="favorited" type="boolean">
+Only content the account has favorited.
+</ParamField>
+
+<ParamField body name="limit" type="integer">
+How many to return (default 20).
+</ParamField>
+
+<ParamField body name="offset" type="integer">
+Pagination offset.
+</ParamField>
+
+<ParamField body name="outlierScoreMax" type="number">
+Only content at or below this outlier score.
+</ParamField>
+
+<ParamField body name="outlierScoreMin" type="number">
+Only content at or above this outlier score.
+</ParamField>
+
+<ParamField body name="platform" type="`youtube` \| `instagram`">
+Filter to one platform.
+</ParamField>
+
+<ParamField body name="publicationDate" type="`week` \| `month` \| `3months` \| `6months` \| `year` \| `2years`">
+Published within this window. Use publishedAfter for an exact date instead.
+</ParamField>
+
+<ParamField body name="publishedAfter" type="string">
+ISO timestamp. Wins over publicationDate.
+</ParamField>
+
+<ParamField body name="publishedBefore" type="string">
+ISO timestamp.
+</ParamField>
+
+<ParamField body name="scope" type="`all` \| `inspiration` \| `brand`">
+'inspiration' = creators they watch, 'brand' = their own accounts, 'all' = both (default).
+</ParamField>
+
+<ParamField body name="search" type="string">
+Text search across title, creator, handle, and description.
+</ParamField>
+
+<ParamField body name="sortBy" type="`score` \| `date` \| `views` \| `engagement`">
+Sort field (default 'score').
+</ParamField>
+
+<ParamField body name="sortOrder" type="`asc` \| `desc`">
+Sort direction (default 'desc').
+</ParamField>
+
+<ParamField body name="subscribersMax" type="number">
+Maximum follower count of the post's account.
+</ParamField>
+
+<ParamField body name="subscribersMin" type="number">
+Minimum follower count of the post's account.
+</ParamField>
+
+<ParamField body name="viewsMax" type="number">
+
+</ParamField>
+
+<ParamField body name="viewsMin" type="number">
+
+</ParamField>
+
+### `get_content`
+
+<Badge>read</Badge>
+
+Get one tracked post in full: engagement stats, outlier score, hashtags, keywords, mentions and audio info. Works for a creator's post and for the owner's own. THE TRANSCRIPT IS OPT-IN because a long video is a large document: pass transcript='text' for the whole thing, or transcript='segments' for timed slices, and then narrow with startMs/endMs or transcriptSearch to pull only the part that matters. The transcript reports a status: 'complete', 'not_applicable' (there is nothing to transcribe), 'failed' (it will be retried), 'processing', or 'absent' (never attempted), so an empty result is never ambiguous.
+
+<ParamField body name="contentId" type="string" required>
+The content id from list_content or get_account.
+</ParamField>
+
+<ParamField body name="endMs" type="number">
+Window end, ms from the start of the media. Implies segments.
+</ParamField>
+
+<ParamField body name="startMs" type="number">
+Window start, ms from the start of the media. Implies segments.
+</ParamField>
+
+<ParamField body name="transcript" type="`none` \| `text` \| `segments`">
+How much transcript to include. Default 'none'.
+</ParamField>
+
+<ParamField body name="transcriptSearch" type="string">
+Return only the segments containing this phrase. Implies segments.
+</ParamField>
+

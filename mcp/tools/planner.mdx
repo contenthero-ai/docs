@@ -1,0 +1,376 @@
+---
+title: "Planner"
+description: "Spaces, stages and cards: the content pipeline, and publishing from it."
+---
+
+{/* GENERATED FILE. Do not edit by hand. */}
+{/* Regenerate with `npm run generate:reference` in contenthero-docs. */}
+
+Spaces, stages and cards: the content pipeline, and publishing from it. 20 tools.
+
+Every tool below is exposed by the hosted MCP server at `https://mcp.contenthero.ai` and by the `@contenthero/mcp` npm package. A <Badge>write</Badge> tool changes your account; a <Badge>read</Badge> tool does not.
+
+### `list_spaces`
+
+<Badge>read</Badge>
+
+List the account's SPACES. A space is the planner's top-level container: Space \> Stage \> Card \> Post. Each space has its own stages, so two spaces can both hold a stage called 'Published'. Call this FIRST to discover which board to work in, then pass a space id to list_stages, list_cards or create_card. Archived spaces are excluded unless includeArchived is set.
+
+<ParamField body name="includeArchived" type="boolean">
+Include archived spaces. Default false, matching the grid in the app.
+</ParamField>
+
+### `get_space`
+
+<Badge>read</Badge>
+
+Return one space with its live card count. Use list_spaces to discover ids. The count excludes archived cards, and is the same number list_spaces reports for that space.
+
+<ParamField body name="spaceId" type="string" required>
+The space id.
+</ParamField>
+
+### `create_space`
+
+<Badge>write</Badge>
+
+Create a space: a new planner board with its own stages. duplicateFrom copies another space's STAGES, never its cards, so the new board arrives with the columns and none of the work. Requires the planner:write scope.
+
+<ParamField body name="name" type="string" required>
+The space name.
+</ParamField>
+
+<ParamField body name="coverUrl" type="string">
+A cover image URL for the space tile.
+</ParamField>
+
+<ParamField body name="duplicateFrom" type="string">
+Copy this space's stages into the new one. Cards are never copied.
+</ParamField>
+
+### `update_space`
+
+<Badge>write</Badge>
+
+Rename a space or change its cover. This is a PATCH: a field you omit is left alone, so renaming does not disturb the cover. Pass coverUrl as an empty string to REMOVE the cover. To favorite or archive a space, use the `favorite` and `archive` tools with assetType 'space' instead. Requires the planner:write scope.
+
+<ParamField body name="spaceId" type="string" required>
+The space id to update.
+</ParamField>
+
+<ParamField body name="coverUrl" type="string">
+A new cover image URL. Pass an empty string to remove the cover entirely.
+</ParamField>
+
+<ParamField body name="name" type="string">
+A new name.
+</ParamField>
+
+### `delete_space`
+
+<Badge>write</Badge>
+
+Delete a space. The server REFUSES a space that still holds cards and names the count, because the delete cascades to every card in it along with their covers, captions, posts and schedules. Archive the space instead if you want it out of the way. Requires the planner:write scope.
+
+<ParamField body name="spaceId" type="string" required>
+The space id to delete.
+</ParamField>
+
+### `list_stages`
+
+<Badge>read</Badge>
+
+List one SPACE's stages, in order. ⚠️ STAGES ARE PER-SPACE: without spaceId this is the account's DEFAULT space, and two spaces can each hold a stage named 'Published' with different ids, so a stage name resolved against the wrong space is a different column. Stages are user-customizable (renamed, reordered, added, removed), so call this to discover the real stages before placing a card; pass a stage's id (most stable), slug, or name to create_card / update_card.
+
+<ParamField body name="spaceId" type="string">
+Which space's stages, from list_spaces. Omit only when you mean the account's default space.
+</ParamField>
+
+### `create_stage`
+
+<Badge>write</Badge>
+
+Create a stage (a column on one board). ⚠️ STAGES ARE PER-SPACE: without spaceId this creates on the account's DEFAULT board, which is rarely what you want once more than one space exists, so call list_spaces first. The slug is DERIVED from the name and is not settable; a board cannot hold two columns whose names produce the same slug and the server refuses the second rather than renaming it for you. Place the column with afterId/beforeId, or omit both to put it at the end. Requires the planner:write scope.
+
+<ParamField body name="name" type="string" required>
+The column name, for example "In Review". Must contain a letter or number.
+</ParamField>
+
+<ParamField body name="afterId" type="string">
+Put the new column immediately after this stage id.
+</ParamField>
+
+<ParamField body name="beforeId" type="string">
+Put the new column immediately before this stage id.
+</ParamField>
+
+<ParamField body name="color" type="string">
+A hex color such as "#3B82F6".
+</ParamField>
+
+<ParamField body name="spaceId" type="string">
+Which board, from list_spaces. Omit only when you mean the account's default space.
+</ParamField>
+
+### `update_stage`
+
+<Badge>write</Badge>
+
+Rename, recolor or move one stage. This is a PATCH: a field you omit is left alone. ⚠️ spaceId is REQUIRED, because a stage id alone does not tell the server which board you mean and guessing the wrong one silently changes nothing. Renaming re-derives the slug, so renaming a column away from 'Published' also stops publishing auto-moving cards into it; a rename that collides with another column on the same board is refused. Moving names NEIGHBORS, not a position: pass afterId or beforeId. Requires the planner:write scope.
+
+<ParamField body name="spaceId" type="string" required>
+The board this stage is on, from list_stages or list_spaces.
+</ParamField>
+
+<ParamField body name="stageId" type="string" required>
+The stage id to update, from list_stages.
+</ParamField>
+
+<ParamField body name="afterId" type="string">
+Move it immediately after this stage id. Use the empty string to move it to the far left.
+</ParamField>
+
+<ParamField body name="beforeId" type="string">
+Move it immediately before this stage id. Use the empty string to move it to the far right.
+</ParamField>
+
+<ParamField body name="color" type="string">
+A new hex color such as "#3B82F6".
+</ParamField>
+
+<ParamField body name="name" type="string">
+A new name. The slug follows it automatically.
+</ParamField>
+
+### `delete_stage`
+
+<Badge>write</Badge>
+
+Delete a stage and move its cards to another column. The server REFUSES a column that still holds cards when you name no targetStageId, and tells you how many there are: cards are never destroyed by deleting a column, and the delete and the reassignment happen in one transaction. Returns the board that is left. Requires the planner:write scope.
+
+<ParamField body name="spaceId" type="string" required>
+The board this stage is on.
+</ParamField>
+
+<ParamField body name="stageId" type="string" required>
+The stage id to delete, from list_stages.
+</ParamField>
+
+<ParamField body name="targetStageId" type="string">
+Where this column's cards should go. Required unless the column is empty.
+</ParamField>
+
+### `list_cards`
+
+<Badge>read</Badge>
+
+List one SPACE's cards (newest-updated first). ⚠️ SCOPED, NOT COMPLETE: without spaceId this lists the account's DEFAULT space only, and cards on any other board are absent with nothing in the response saying so (search misses them too). Call list_spaces FIRST and pass spaceId unless you specifically mean the default board. Filter by status, platform, stage (id/slug/name), favorite, or a title search. Call get_card for one card's full detail (posts + assets).
+
+<ParamField body name="archived" type="boolean">
+Only ARCHIVED cards. Archived cards are excluded by default, matching the board.
+</ParamField>
+
+<ParamField body name="limit" type="integer">
+How many to return (default 50).
+</ParamField>
+
+<ParamField body name="offset" type="integer">
+Pagination offset.
+</ParamField>
+
+<ParamField body name="platform" type="`youtube` \| `instagram` \| `tiktok` \| `facebook` \| `linkedin` \| `x` \| `threads` \| `general`">
+Filter by the post platform.
+</ParamField>
+
+<ParamField body name="search" type="string">
+Case-insensitive title search, scoped to the chosen space.
+</ParamField>
+
+<ParamField body name="spaceId" type="string">
+Which space's board to list, from list_spaces. Omit ONLY when you mean the account's default space; omitting it does not search every board.
+</ParamField>
+
+<ParamField body name="stage" type="string">
+Filter by a stage id, slug, or name. Resolved within the chosen space.
+</ParamField>
+
+### `get_card`
+
+<Badge>read</Badge>
+
+Get one post in full: its fields (title, description, script, notes, status, stage, schedule), plus its publish posts and attached assets.
+
+<ParamField body name="cardId" type="string" required>
+The card id from list_cards.
+</ParamField>
+
+### `create_card`
+
+<Badge>write</Badge>
+
+Create a card, the container in the content pipeline. A card holds the work (title, script, notes, cover) and the posts that publish it. Attach posts and media by passing `posts` and `assets` to update_card, then publish with publish_post. ⚠️ WITHOUT spaceId THIS LANDS ON THE ACCOUNT'S DEFAULT BOARD, which is rarely what you want once more than one space exists, so call list_spaces first. `stage` accepts a stage id/slug/name and DECIDES the space when it is an id; a spaceId that disagrees with it is rejected rather than guessed. Requires a key with the planner:write scope.
+
+<ParamField body name="platform" type="`youtube` \| `instagram` \| `tiktok` \| `facebook` \| `linkedin` \| `x` \| `threads` \| `general`" required>
+Primary platform for the post.
+</ParamField>
+
+<ParamField body name="title" type="string" required>
+Post title (required).
+</ParamField>
+
+<ParamField body name="coverOutputId" type="string">
+A media token (output id, first-8, or "-N") for the cover, resolved to its URL. Use this or coverUrl.
+</ParamField>
+
+<ParamField body name="coverUrl" type="string">
+Public URL for the post cover (the card thumbnail).
+</ParamField>
+
+<ParamField body name="spaceId" type="string">
+Which board to create the card on, from list_spaces. Omit only when you mean the account's default space.
+</ParamField>
+
+<ParamField body name="stage" type="string">
+Pipeline stage id, slug, or name. Defaults to the first stage.
+</ParamField>
+
+<ParamField body name="tags" type="string[]">
+Tag names to set on the post (must already exist; see list_tags / create_tag). Replaces the set.
+</ParamField>
+
+### `update_card`
+
+<Badge>write</Badge>
+
+Update a card: its fields (title, description, script, notes, platform, cover, stage), its POSTS (one per platform, which is how it publishes), its ASSETS (the media on it, in order), and its SCHEDULE. posts and assets are DECLARATIVE: pass the WHOLE set, because anything you leave out is removed. Posts key on platform. Assets key on id, and THE ARRAY ORDER IS THE carousel ORDER, so reordering is just sending the same ids in a different order; keep an existing asset by id, add a new one by assetUrl or outputId. scheduledAt sets the time on the card AND every post (pass null to clear); give a post its own scheduledAt to override it for that platform. To publish NOW, use publish_post. Pass spaceId to MOVE the card to another space; without a stage it lands in the target space's stage whose slug matches its current one, or that space's first stage. Pass cardIds to update several cards at once, which crossed with spaceId is how a selection moves in one call; fields that describe ONE card (title, notes, script, cover) still need exactly one. Requires the planner:write scope.
+
+<ParamField body name="cardId" type="string" required>
+The card id.
+</ParamField>
+
+<ParamField body name="assets" type="object[]">
+The post's assets IN ORDER, each \{ id \} to keep an existing one or \{ assetUrl | outputId, assetType?, displayName? \} to add. REPLACES the list; [] clears it.
+</ParamField>
+
+<ParamField body name="cardIds" type="string[]">
+Update several cards at once. Fields that describe ONE card (title, notes, script, cover) still require exactly one.
+</ParamField>
+
+<ParamField body name="coverOutputId" type="string">
+A media token (output id, first-8, or "-N") for the cover, resolved to its URL.
+</ParamField>
+
+<ParamField body name="coverUrl" type="string">
+Public URL for the post cover.
+</ParamField>
+
+<ParamField body name="notes" type="string">
+
+</ParamField>
+
+<ParamField body name="platform" type="`youtube` \| `instagram` \| `tiktok` \| `facebook` \| `linkedin` \| `x` \| `threads` \| `general`">
+
+</ParamField>
+
+<ParamField body name="posts" type="object[]">
+The card's posts, each \{ platform, format?, connectedAccountId?, platformSpecificData?, scheduledAt?, status? \}. REPLACES the set, keyed by platform; [] detaches all.
+</ParamField>
+
+<ParamField body name="scheduledAt" type="string,null">
+ISO time to publish. Sets the card AND every post. null clears the schedule.
+</ParamField>
+
+<ParamField body name="script" type="string">
+
+</ParamField>
+
+<ParamField body name="spaceId" type="string">
+Move the card to a different space (id or slug). Without a stage, it lands in that space's stage whose slug matches its current one, or that space's first stage.
+</ParamField>
+
+<ParamField body name="stage" type="string">
+Move the post to this stage (id, slug, or name).
+</ParamField>
+
+<ParamField body name="tags" type="string[]">
+Tag names to set on the post (must already exist; replaces the set). Omit to leave tags unchanged.
+</ParamField>
+
+<ParamField body name="title" type="string">
+
+</ParamField>
+
+### `list_tags`
+
+<Badge>read</Badge>
+
+List the account's tags (the organizational tag library). Set a post's tags with the `tags` field on create_card / update_card. A tag is just a lowercase name.
+
+Takes no parameters.
+
+### `create_tag`
+
+<Badge>write</Badge>
+
+Create a tag in the account's tag library (the name is lowercased). Tags organize posts; apply them with the `tags` field on create_card / update_card. Requires the planner:write scope.
+
+<ParamField body name="name" type="string" required>
+The tag name (lowercased on save).
+</ParamField>
+
+### `update_tag`
+
+<Badge>write</Badge>
+
+Rename a tag (preserves its assignments on all posts). To detach a tag from one post, set that post's `tags` without it via update_card. Requires the planner:write scope.
+
+<ParamField body name="name" type="string" required>
+The new tag name (lowercased on save).
+</ParamField>
+
+<ParamField body name="tagId" type="string" required>
+The tag id (from list_tags).
+</ParamField>
+
+### `delete_tag`
+
+<Badge>write</Badge>
+
+Delete a tag from the account's library. This DESTROYS the tag and removes it from every post it was on. To just detach a tag from one post, set that post's `tags` without it via update_card instead. Requires the planner:write scope.
+
+<ParamField body name="tagId" type="string" required>
+The tag id (from list_tags).
+</ParamField>
+
+### `publish_post`
+
+<Badge>write</Badge>
+
+Publish a card's posts NOW: every post on the card, or only the named platform's post when `platform` is given. Each post must have a connected account. Requires a key with the publish:write scope; holding that scope is the account owner's consent to autonomous publishing. Returns one result per post.
+
+<ParamField body name="cardId" type="string" required>
+The card id to publish.
+</ParamField>
+
+<ParamField body name="platform" type="`youtube` \| `instagram` \| `tiktok` \| `facebook` \| `linkedin` \| `x` \| `threads` \| `general`">
+Publish only this platform. Omit to publish all posts.
+</ParamField>
+
+### `list_connected_accounts`
+
+<Badge>read</Badge>
+
+List the social accounts the owner has connected (the publish targets), default first. Use an account's id as connectedAccountId on a post in update_card, then publish_post. Read-only: connecting an account is done in the ContentHero app.
+
+Takes no parameters.
+
+### `get_connected_account`
+
+<Badge>read</Badge>
+
+Get one connected account's detail: platform, status, and capabilities. Use it to confirm a target can publish before attaching it to a post.
+
+<ParamField body name="accountId" type="string" required>
+The connected account id from list_connected_accounts.
+</ParamField>
+

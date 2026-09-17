@@ -1,0 +1,28 @@
+name: Check
+
+# Pushes to main publish straight to docs.contenthero.ai through the connected
+# Mintlify project, so these checks run on the pull request, before anything is live.
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+jobs:
+  reference:
+    name: Reference matches the published packages
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: npm install
+
+      # Fails when a generated page differs from what the published @contenthero/mcp
+      # and @contenthero/cli actually expose. Regenerate and commit to fix.
+      - run: npm run check:reference
+
+      # Fails when a hand-written page names a tool or command that does not exist.
+      # This is the guard for the drift that went unnoticed for three months: 65 dead
+      # references across 10 files, survivors of the post-to-card rename.
+      - run: npm run check:tool-names

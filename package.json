@@ -1,0 +1,17 @@
+{
+  "name": "contenthero-docs",
+  "private": true,
+  "type": "module",
+  "description": "Source for docs.contenthero.ai. Tooling only: Mintlify renders the MDX, these scripts generate and guard the reference pages.",
+  "scripts": {
+    "generate:reference": "node scripts/generate-reference.mjs",
+    "check:reference": "node scripts/generate-reference.mjs --check",
+    "check:tool-names": "node scripts/check-tool-names.mjs",
+    "check": "npm run check:reference && npm run check:tool-names"
+  },
+  "devDependencies": {
+    "@contenthero/cli": "0.3.4",
+    "@contenthero/mcp": "0.4.5",
+    "@modelcontextprotocol/sdk": "^1.0.0"
+  }
+}

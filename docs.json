@@ -67,6 +67,19 @@
             ]
           },
           {
+            "group": "Tool reference",
+            "pages": [
+              "mcp/tools/generate",
+              "mcp/tools/media",
+              "mcp/tools/characters",
+              "mcp/tools/planner",
+              "mcp/tools/brand",
+              "mcp/tools/editor",
+              "mcp/tools/inspiration",
+              "mcp/tools/account"
+            ]
+          },
+          {
             "group": "Set up your host",
             "pages": [
               "mcp/claude-code",
@@ -97,6 +110,7 @@
             "pages": [
               "cli/overview",
               "cli/commands",
+              "cli/reference",
               "cli/output-and-async",
               "cli/examples"
             ]

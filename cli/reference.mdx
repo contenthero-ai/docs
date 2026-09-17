@@ -1,0 +1,1264 @@
+---
+title: "Command reference"
+description: "Every ContentHero CLI command, its arguments and its options."
+---
+
+{/* GENERATED FILE. Do not edit by hand. */}
+{/* Regenerate with `npm run generate:reference` in contenthero-docs. */}
+
+Every command the CLI exposes, grouped by resource. 101 commands.
+
+Run `contenthero schema` to get this same information as JSON, which is the discovery path for agents.
+
+## Global options
+
+These apply to every command.
+
+| Flag | Purpose |
+| --- | --- |
+| `-v, --version` | print the CLI version |
+| `--json` | output raw JSON (the default) |
+| `--human` | render human-readable output instead of JSON |
+| `--api-key <key>` | API key (overrides env and the stored credential) |
+| `--base-url <url>` | API base URL (overrides env and stored config) |
+
+## `account`
+
+### `contenthero account balance`
+
+Show the credit balance, subscription tier, and auto-top-up state
+
+## `archive`
+
+### `contenthero archive <assetType> <id>`
+
+Archive an asset, or restore it with --off (reversible; requires favorites:write)
+
+| Argument | Required | Purpose |
+| --- | --- | --- |
+| `assetType` | yes | card | brand_kit | brand_kit_section | project | space | media |
+| `id` | yes | the asset id (or studio output id when assetType is media) |
+
+| Option | Purpose |
+| --- | --- |
+| `--variation <n>` | 1-based studio media variation slot (media only) |
+| `--off` | restore instead of archiving |
+
+## `audio`
+
+### `contenthero audio enhance <source>`
+
+Enhance an audio file (level loudness, clean up background noise). Asynchronous.
+
+| Argument | Required | Purpose |
+| --- | --- | --- |
+| `source` | yes | source audio (URL or output id) to enhance |
+
+| Option | Purpose |
+| --- | --- |
+| `--duration <seconds>` | source audio length in seconds (required for --cost, and when the source is not a stored ContentHero asset) |
+| `--cost` | estimate the credit cost instead of running |
+| `--no-wait` | return the outputId immediately instead of waiting |
+| `--timeout <seconds>` | how long to wait before handing back the outputId Defaults to `600`. |
+
+### `contenthero audio enhance-clips <projectId>`
+
+Enhance the audio OF EXISTING CLIPS on an editor timeline, in place. One job per SOURCE: a recording's clips are enhanced together so the level and noise floor stay consistent across cuts, while separate recordings stay separate jobs.
+
+| Argument | Required | Purpose |
+| --- | --- | --- |
+| `projectId` | yes | the editor project whose clips to enhance |
+
+| Option | Purpose |
+| --- | --- |
+| `--clips <ids...>` | clip ids to enhance (omit for every audible clip on the timeline) |
+| `--no-wait` | return the outputIds immediately instead of waiting |
+| `--timeout <seconds>` | how long to wait before handing back the outputIds Defaults to `600`. |
+
+### `contenthero audio isolate <source>`
+
+Isolate vocals from an audio file (remove background noise and music)
+
+| Argument | Required | Purpose |
+| --- | --- | --- |
+| `source` | yes | source audio (URL or output id) to isolate |
+
+| Option | Purpose |
+| --- | --- |
+| `--duration <seconds>` | source audio length in seconds (required for --cost) |
+| `--project <id>` | editor project to place the result on (omit for a standalone library output) |
+| `--placement <json>` | placement intent as JSON, e.g. \{"mode":"atPlayhead"\} (omit to place at the playhead when known, else append) |
+| `--playhead <frame>` | current playhead frame, for playhead-relative placement |
+| `--cost` | estimate the credit cost instead of running |
+| `--no-wait` | return the outputId immediately instead of waiting |
+| `--timeout <seconds>` | how long to wait before handing back the outputId Defaults to `600`. |
+
+## `auth`
+
+### `contenthero auth login`
+
+Authenticate the CLI. Browser-assisted by default; --with-key stores an existing key.
+
+| Option | Purpose |
+| --- | --- |
+| `--with-key [key]` | store an existing API key (pass the key, or pipe it via stdin). Omit to use the browser flow. |
+
+### `contenthero auth logout`
+
+Delete the stored credential (env / --api-key are unaffected)
+
+### `contenthero auth status`
+
+Verify the active API key and show the account it resolves to
+
+## `avatar`
+
+### `contenthero avatar create <name>`
+
+Create an avatar and start generating its first look (spends credits)
+
+| Argument | Required | Purpose |
+| --- | --- | --- |
+| `name` | yes | avatar name, at least 3 characters |
+
+| Option | Purpose |
+| --- | --- |
+| `--age <age>` | apparent age, e.g. '20s', '35' |
+| `--gender <gender>` | gender presentation |
+| `--ethnicity <ethnicity>` | ethnicity, for a more specific likeness |
+| `--niche <niche>` | content niche; repeatable |
+| `--style <style>` | visual style hint for the portrait |
+| `-d, --description <text>` | description of the character |
+| `--voice <voiceId>` | default voice id (see `contenthero voice list`) |
+| `--ref <urlOrId>` | photo of a REAL PERSON to anchor identity to; repeatable. Only use photos of someone who agreed |
+| `--cost` | show the credit cost and exit without creating |
+
+### `contenthero avatar delete <id>`
+
+Delete an avatar (its looks survive and can be filed onto another avatar)
+
+| Argument | Required | Purpose |
+| --- | --- | --- |
+| `id` | yes | the avatar id |
+
+### `contenthero avatar get <id>`
+
+Get one avatar with its looks
+
+| Argument | Required | Purpose |
+| --- | --- | --- |
+| `id` | yes | the avatar id |
+
+### `contenthero avatar list`
+
+List avatars (base look + default voice)
+
+### `contenthero avatar look add <avatarId>`
+
+File images you already own onto an avatar as looks (costs nothing)
+
+| Argument | Required | Purpose |
+| --- | --- | --- |
+| `avatarId` | yes | the avatar id |
+
+| Option | Purpose |
+| --- | --- |
+| `--image <urlOrId>` | image to file; repeatable |
+
+### `contenthero avatar look remove <avatarId> <lookId>`
+
+Remove a look (trashed, recoverable for 30 days)
+
+| Argument | Required | Purpose |
+| --- | --- | --- |
+| `avatarId` | yes | the avatar id |
+| `lookId` | yes | the look id (see `contenthero avatar get`) |
+
+### `contenthero avatar update <id>`
+
+Rename an avatar, or set its default look or voice
+
+| Argument | Required | Purpose |
+| --- | --- | --- |
+| `id` | yes | the avatar id |
+
+| Option | Purpose |
+| --- | --- |
+| `--name <name>` | new name, at least 3 characters |
+| `--default-look <lookId>` | look to make the default (also becomes the profile photo) |
+| `--voice <voiceId>` | default voice id, or "none" to clear it |
+
+## `brand-kit`
+
+### `contenthero brand-kit create`
+
+Create a brand kit: empty, from a website, or as a copy (requires brandkit:write)
+
+| Option | Purpose |
+| --- | --- |
+| `--name <text>` | the kit's name; optional when a website or social profile url is given |
+| `--website-url <url>` | the business website |
+| `--extract` | scrape --website-url and fill the kit in automatically (returns immediately) |
+| `--duplicate-from <id>` | copy an existing brand kit instead of starting empty |
+| `--business-name <text>` |  |
+| `--primary-offer <text>` |  |
+| `--niche <text>` | niche definition |
+| `--visual-style <text>` |  |
+| `--logo <ref>` | a logo: a url, or a generation id to copy in (e.g. out9-2). Repeatable; the first is primary |
+| `--asset <ref>` | a brand asset: a url, or a generation id to copy in. Repeatable |
+| `--sections <json>` | curated sections as JSON: [\{ tab, sectionName, sortOrder?, fields? \}] |
+
+### `contenthero brand-kit extract <id>`
+
+Re-run website extraction for an existing kit (returns immediately)
+
+| Argument | Required | Purpose |
+| --- | --- | --- |
+| `id` | yes | the brand kit id |
+
+### `contenthero brand-kit get <id>`
+
+Get one brand kit in full (the whole brand document)
+
+| Argument | Required | Purpose |
+| --- | --- | --- |
+| `id` | yes | the brand kit id |
+
+### `contenthero brand-kit knowledge add <brandKitId>`
+
+Add an item to a brand kit's knowledge base (requires brandkit:write)
+
+| Argument | Required | Purpose |
+| --- | --- | --- |
+| `brandKitId` | yes | the brand kit id |
+
+| Option | Purpose |
+| --- | --- |
+| `--text <text>` | add a text note |
+| `--url <url>` | scrape and add a web page |
+| `--youtube <url>` | add a YouTube video transcript |
+| `--file <path>` | add a local document or image file (PDF, DOCX, PNG, etc.) |
+| `--file-url <url>` | add a hosted file by URL the server fetches (large files, video, audio) |
+| `--file-ext <ext>` | extension for --file-url when not in the URL, e.g. pdf |
+| `--title <title>` | optional title (else derived) |
+
+### `contenthero brand-kit knowledge get <brandKitId> <knowledgeId>`
+
+Get one knowledge item with its stored body
+
+| Argument | Required | Purpose |
+| --- | --- | --- |
+| `brandKitId` | yes | the brand kit id |
+| `knowledgeId` | yes | the knowledge item id |
+
+### `contenthero brand-kit knowledge list <brandKitId>`
+
+List the knowledge items in a brand kit (the complete index)
+
+| Argument | Required | Purpose |
+| --- | --- | --- |
+| `brandKitId` | yes | the brand kit id |
+
+| Option | Purpose |
+| --- | --- |
+| `--limit <n>` | how many to return (default 50) |
+| `--offset <n>` | pagination offset |
+
+### `contenthero brand-kit knowledge remove <brandKitId> <knowledgeId>`
+
+Remove a knowledge item and its embeddings (requires brandkit:write)
+
+| Argument | Required | Purpose |
+| --- | --- | --- |
+| `brandKitId` | yes | the brand kit id |
+| `knowledgeId` | yes | the knowledge item id to remove |
+
+### `contenthero brand-kit knowledge search <brandKitId> <query>`
+
+Semantic search over a brand kit's knowledge base
+
+| Argument | Required | Purpose |
+| --- | --- | --- |
+| `brandKitId` | yes | the brand kit id |
+| `query` | yes | what to search for (natural language) |
+
+| Option | Purpose |
+| --- | --- |
+| `--limit <n>` | max matches (default 8) |
+| `--threshold <n>` | minimum similarity 0-1 (default 0.45) |
+
+### `contenthero brand-kit list`
+
+List the account's brand kits (default first; excludes archived unless --archived)
+
+| Option | Purpose |
+| --- | --- |
+| `--favorite` | only favorited brand kits |
+| `--archived` | only archived brand kits (default excludes archived) |
+
+### `contenthero brand-kit reorder <ids>...`
+
+Reorder every brand kit. Pass ALL ids, in the order you want them
+
+| Argument | Required | Purpose |
+| --- | --- | --- |
+| `ids` | yes | brand kit ids, in order |
+
+### `contenthero brand-kit update <id>`
+
+Update a brand kit's identity fields (requires brandkit:write)
+
+| Argument | Required | Purpose |
+| --- | --- | --- |
+| `id` | yes | the brand kit id |
+
+| Option | Purpose |
+| --- | --- |
+| `--name <text>` |  |
+| `--business-name <text>` |  |
+| `--website-url <url>` |  |
+| `--primary-offer <text>` |  |
+| `--niche <text>` | niche definition |
+| `--visual-style <text>` |  |
+| `--positioning <json>` | positioning object (JSON) |
+| `--audience <json>` | audience object (JSON) |
+| `--voice-profile <json>` | voice profile object (JSON) |
+| `--content-strategy <json>` | content strategy object (JSON) |
+| `--design-principle <text>` | a design principle; repeatable |
+| `--default` | make this the default brand kit, un-defaulting every other |
+| `--brand-account <ref>` | the owner's OWN profile: a tracked-account id, or a profile url / platform:handle to ADD one. Repeatable. REPLACES the list |
+| `--inspiration-account <ref>` | a competitor/creator profile: same forms as --brand-account. Repeatable. REPLACES the list |
+| `--logo <ref>` | a logo: a url, or a generation id to copy in (e.g. out9-2). Repeatable; the first is primary. REPLACES the list |
+| `--asset <ref>` | a brand asset: a url, or a generation id to copy in. Repeatable. REPLACES the list |
+| `--sections <json>` | curated sections as JSON. REPLACES the set, keyed by (tab, sectionName); one left out is ARCHIVED |
+
+## `card`
+
+### `contenthero card create <title>`
+
+Create a post (requires planner:write)
+
+| Argument | Required | Purpose |
+| --- | --- | --- |
+| `title` | yes | post title |
+
+| Option | Purpose |
+| --- | --- |
+| `--platform <platform>` | primary platform: youtube, instagram, tiktok, facebook, linkedin, x, threads, general |
+| `--space <space>` | which space's board (from `contenthero space list`); default space if omitted |
+| `--stage <stage>` | stage id, slug, or name (defaults to the first stage) |
+| `--cover-url <url>` | public URL for the post cover |
+| `--cover-output-id <id>` | media token (output id, first-8, or "-N") for the cover |
+| `--tags <list>` | comma-separated tag names (must exist; see `tag list`) |
+
+### `contenthero card get <id>`
+
+Get one card with its posts and assets
+
+| Argument | Required | Purpose |
+| --- | --- | --- |
+| `id` | yes | the post id |
+
+### `contenthero card list`
+
+List one space's cards (newest-updated first; defaults to the default space)
+
+| Option | Purpose |
+| --- | --- |
+| `--space <id>` | which space's board (from `contenthero space list`); default space if omitted |
+| `--archived` | only ARCHIVED cards (excluded by default) |
+| `--platform <platform>` | filter by platform |
+| `--stage <stage>` | filter by stage (id, slug, or name) |
+| `--search <text>` | case-insensitive title search |
+| `--favorite` | only favorited posts |
+| `--limit <n>` | how many to return (default 50) |
+| `--offset <n>` | pagination offset |
+
+### `contenthero card publish <id>`
+
+Publish a card's posts NOW (requires publish:write; pushes to live socials)
+
+| Argument | Required | Purpose |
+| --- | --- | --- |
+| `id` | yes | the post id |
+
+| Option | Purpose |
+| --- | --- |
+| `--platform <platform>` | publish only this platform (default: every post on the card) |
+
+### `contenthero card update <id>`
+
+Update a post's fields, including its stage (requires planner:write)
+
+| Argument | Required | Purpose |
+| --- | --- | --- |
+| `id` | yes | the post id |
+
+| Option | Purpose |
+| --- | --- |
+| `--title <text>` |  |
+| `--platform <platform>` |  |
+| `--stage <stage>` | move the post to this stage (id, slug, or name) |
+| `--space <space>` | move the card to another space (id or slug); without --stage it lands in that space's matching stage, or its first |
+| `--also <id>` | another card id to apply this to; repeatable. Fields describing ONE card (title, notes, script, cover) still need exactly one |
+| `--script <text>` |  |
+| `--notes <text>` |  |
+| `--cover-url <url>` | public URL for the post cover |
+| `--cover-output-id <id>` | media token (output id, first-8, or "-N") for the cover |
+| `--tags <list>` | comma-separated tag names (replaces the set; must exist) |
+| `--schedule <when>` | ISO-8601 publish time for the card AND its posts, or "clear" |
+| `--posts <json>` | the card's posts as JSON. REPLACES the set, keyed by platform; [] detaches all |
+| `--assets <json>` | the post's assets as JSON, IN ORDER. REPLACES the list; [] clears it |
+
+## `config`
+
+### `contenthero config list`
+
+Show the resolved configuration (key source and base URL)
+
+### `contenthero config path`
+
+Print the config and credential file paths
+
+### `contenthero config set <key> <value>`
+
+Set a preference. Supported keys: base-url
+
+| Argument | Required | Purpose |
+| --- | --- | --- |
+| `key` | yes | the preference to set (base-url) |
+| `value` | yes | the value |
+
+## `connected-account`
+
+### `contenthero connected-account get <id>`
+
+Get one connected account's detail
+
+| Argument | Required | Purpose |
+| --- | --- | --- |
+| `id` | yes | the connected account id |
+
+### `contenthero connected-account list`
+
+List connected accounts (default first)
+
+## `content`
+
+### `contenthero content get <id>`
+
+Get one tracked post in full (engagement, hashtags, optional transcript)
+
+| Argument | Required | Purpose |
+| --- | --- | --- |
+| `id` | yes | the content id (from content list, or a tracked account) |
+
+| Option | Purpose |
+| --- | --- |
+| `--transcript [grain]` | include the transcript: none, text, segments (default none) |
+| `--start-ms <n>` | transcript window start, ms into the media |
+| `--end-ms <n>` | transcript window end, ms into the media |
+| `--transcript-search <text>` | only the transcript segments containing this phrase |
+
+### `contenthero content list`
+
+List tracked content, ranked by outlier score
+
+| Option | Purpose |
+| --- | --- |
+| `--scope <scope>` | which accounts: all, inspiration, brand (default all) |
+| `--platform <platform>` | filter to one platform (youtube, instagram) |
+| `--type <type>` | content type, e.g. video, short, reel |
+| `--min-score <n>` | only content at or above this outlier score |
+| `--max-score <n>` | only content at or below this outlier score |
+| `--min-views <n>` | minimum view count |
+| `--max-views <n>` | maximum view count |
+| `--min-duration <n>` | minimum duration in seconds |
+| `--max-duration <n>` | maximum duration in seconds |
+| `--min-followers <n>` | minimum follower count of the post's account |
+| `--max-followers <n>` | maximum follower count of the post's account |
+| `--since <window>` | published within: week, month, 3months, 6months, year, 2years |
+| `--published-after <iso>` | published on or after this ISO timestamp (wins over --since) |
+| `--published-before <iso>` | published on or before this ISO timestamp |
+| `--search <text>` | text search across title, creator, handle, description |
+| `--sort <sort>` | sort field: score, date, views, engagement (default score) |
+| `--asc` | sort ascending (default descending) |
+| `--account <id>` | limit to this tracked account; repeatable |
+| `--added-by-you` | only the one-off posts saved by url |
+| `--brand-kit <id>` | scope to the accounts linked to this brand kit |
+| `--favorite` | only content the account has favorited |
+| `--limit <n>` | how many to return (default 20) |
+| `--offset <n>` | pagination offset |
+
+## `context`
+
+### `contenthero context`
+
+Read what the user is currently viewing in the open app (requires context:read)
+
+| Option | Purpose |
+| --- | --- |
+| `--project <id>` | scope to a specific project (editor/canvas) |
+| `--capture` | also capture a fresh screenshot of the live viewport (the user's screen; slower) |
+| `--render` | also render your work inline; ephemeral. Use --mode filmstrip for several frames |
+| `--mode <mode>` | render tier: still (default) | filmstrip |
+| `--frame <n>` | still (editor): which timeline frame (omit for the current playhead) |
+| `--slide <id>` | still (canvas): which slide id (omit for the focused slide) |
+| `--slide-index <n>` | still (canvas): 1-based slide index (alternative to --slide) |
+| `--from-frame <n>` | filmstrip: start timeline frame of the range |
+| `--to-frame <n>` | filmstrip: end timeline frame of the range |
+| `--count <n>` | filmstrip: how many frames |
+| `--width <n>` | still: render at this DISPLAY width in px, to judge legibility at real size (height follows the aspect ratio) |
+| `--save <path>` | write the produced image(s) to this file (filmstrip appends -1, -2, ...) |
+
+## `element`
+
+### `contenthero element create`
+
+Create a reference element from 2-4 images (or 1 video)
+
+| Option | Purpose |
+| --- | --- |
+| `--name <name>` | referenced in the prompt as @name |
+| `--description <text>` | what the element represents |
+| `--category <category>` | auto | character | location | prop Defaults to `"auto"`. |
+| `--image <urlOrId>` | image URL or output id; repeatable (2-4) |
+| `--video <urlOrId>` | a single video URL or output id (alternative to images) |
+
+### `contenthero element delete <id>`
+
+Delete a reference element
+
+| Argument | Required | Purpose |
+| --- | --- | --- |
+| `id` | yes | element id |
+
+### `contenthero element get <id>`
+
+Get one reference element by id
+
+| Argument | Required | Purpose |
+| --- | --- | --- |
+| `id` | yes | element id |
+
+### `contenthero element list`
+
+List your saved reference elements
+
+### `contenthero element update <id>`
+
+Update an element's name, description, or category
+
+| Argument | Required | Purpose |
+| --- | --- | --- |
+| `id` | yes | element id |
+
+| Option | Purpose |
+| --- | --- |
+| `--name <name>` |  |
+| `--description <text>` |  |
+| `--category <category>` | auto | character | location | prop |
+
+## `favorite`
+
+### `contenthero favorite <assetType> <id>`
+
+Favorite an asset, or clear it with --off (requires favorites:write)
+
+| Argument | Required | Purpose |
+| --- | --- | --- |
+| `assetType` | yes | card | voice | brand_kit | project | inspiration_content | gallery | transition | space | media |
+| `id` | yes | the asset id (or studio output id when assetType is media) |
+
+| Option | Purpose |
+| --- | --- |
+| `--variation <n>` | 1-based studio media variation slot (media only) |
+| `--off` | clear the favorite instead of setting it |
+
+## `folder`
+
+### `contenthero folder create <name>`
+
+Create a folder (manual by default; --smart for a saved query with --text)
+
+| Argument | Required | Purpose |
+| --- | --- | --- |
+| `name` | yes | folder name |
+
+| Option | Purpose |
+| --- | --- |
+| `--smart` | create a smart (saved-query) folder |
+| `--text <text>` | smart-folder semantic query text |
+| `--parent <id>` | nest under this parent folder id |
+
+### `contenthero folder delete <id>`
+
+Delete a folder and its subtree (pointers only; assets are never deleted)
+
+| Argument | Required | Purpose |
+| --- | --- | --- |
+| `id` | yes | folder id |
+
+### `contenthero folder get <id>`
+
+A folder's contents (a folder id or a derived key: recents, favorites, edits, canvas, cards)
+
+| Argument | Required | Purpose |
+| --- | --- | --- |
+| `id` | yes | folder id or derived key |
+
+### `contenthero folder list`
+
+List your folders plus the built-in derived folders
+
+### `contenthero folder update <id>`
+
+Rename, move, re-query a folder, and file or unfile items (requires assets:write)
+
+| Argument | Required | Purpose |
+| --- | --- | --- |
+| `id` | yes | the folder id |
+
+| Option | Purpose |
+| --- | --- |
+| `--name <text>` | a new name |
+| `--parent <id>` | move under this folder id, or "none" for the top level |
+| `--also <id>` | apply to this folder too; repeatable. Name and query still need exactly one |
+| `--add <ref>` | file an item: sourceTable:sourceRecordId[:variant]. Repeatable |
+| `--remove <ref>` | unfile an item: sourceTable:sourceRecordId[:variant]. Repeatable |
+
+## `generate`
+
+### `contenthero generate audio`
+
+Generate audio with ElevenLabs: speech (TTS), music, or a sound effect
+
+| Option | Purpose |
+| --- | --- |
+| `-m, --model <id>` | audio model id (see `contenthero model list --type audio`) |
+| `--prompt <text>` | for music / sfx: what to generate |
+| `--text <text>` | for TTS: the words to speak |
+| `--voice <id>` | for TTS: the ElevenLabs voice id |
+| `--voice-name <name>` | for TTS: human-readable voice name (display only) |
+| `--duration <seconds>` | for music / sfx: length in seconds |
+| `--prompt-influence <0-1>` | for sfx: how literally to follow the prompt |
+| `--cost` | estimate the credit cost instead of generating |
+| `--project <id>` | editor project to place the result on (omit for a standalone library output) |
+| `--placement <json>` | placement intent as JSON, e.g. \{"mode":"atPlayhead"\} (omit to place at the playhead when known, else append) |
+| `--playhead <frame>` | current playhead frame, for playhead-relative placement |
+
+### `contenthero generate board [prompt]`
+
+Generate a Reference Board (dense multi-panel reference sheet, 3:4 / 4K)
+
+| Argument | Required | Purpose |
+| --- | --- | --- |
+| `prompt` | no | subject description (required when no --ref is given) |
+
+| Option | Purpose |
+| --- | --- |
+| `-t, --type <type>` | board type: character, pose, mascot, creature, weapon, vehicle, object, location, shot |
+| `--ref <urlOrId>` | source image (URL or output id); repeatable |
+| `-n, --num <count>` | number of board variations (1-4) |
+| `--name <name>` | optional board name |
+| `--avatar <id>` | associate the board with this avatar (see `contenthero avatar list`) |
+| `--cost` | estimate the credit cost instead of generating (nothing runs, nothing is charged) |
+| `--no-wait` | return the outputId immediately instead of waiting for the render |
+| `--timeout <seconds>` | how long to wait before handing back the outputId Defaults to `600`. |
+
+### `contenthero generate image [prompt]`
+
+Generate one or more images from a prompt (optionally image-to-image)
+
+| Argument | Required | Purpose |
+| --- | --- | --- |
+| `prompt` | no | the image prompt (optional for a few reference-only models) |
+
+| Option | Purpose |
+| --- | --- |
+| `-m, --model <id>` | image model id (see `contenthero model list --type image`) |
+| `--aspect <ratio>` | aspect ratio, e.g. 16:9, 1:1, 9:16 |
+| `--resolution <res>` | resolution, e.g. 1K, 2K, 4K (model-dependent) |
+| `--mode <mode>` | variant mode for models that expose one (e.g. flux-2-pro: pro/flex) |
+| `-n, --num <count>` | number of variations (1-4) |
+| `--seed <seed>` | seed for reproducibility |
+| `--ref <urlOrId>` | reference image (URL or output id); repeatable |
+| `--avatar <id>` | file the result onto this avatar as a new look (see `contenthero avatar list`) |
+| `--cost` | estimate the credit cost instead of generating (nothing runs, nothing is charged) |
+| `--no-wait` | return the outputId immediately instead of waiting for the render |
+| `--timeout <seconds>` | how long to wait before handing back the outputId Defaults to `600`. |
+| `--project <id>` | editor project to place the result on (omit for a standalone library output) |
+| `--placement <json>` | placement intent as JSON, e.g. \{"mode":"atPlayhead"\} (omit to place at the playhead when known, else append) |
+| `--playhead <frame>` | current playhead frame, for playhead-relative placement |
+
+### `contenthero generate lip-sync`
+
+Animate a portrait so the subject speaks (image + audio or script)
+
+| Option | Purpose |
+| --- | --- |
+| `-m, --model <id>` | lip-sync model id (see `contenthero model list --type video`) |
+| `--image <urlOrId>` | portrait to animate (image URL or output id) |
+| `--audio <urlOrId>` | existing speech clip (audio URL or output id). Use this OR --script + --voice |
+| `--script <text>` | text for the subject to speak (requires --voice) |
+| `--voice <id>` | ElevenLabs voice id to speak the script |
+| `--voice-name <name>` | human-readable voice name (display only) |
+| `--motion <text>` | optional motion / expression hint |
+| `--resolution <res>` | resolution, e.g. 480p, 720p, 1080p (model-dependent) |
+| `--audio-duration <seconds>` | length of --audio in seconds (improves cost accuracy) |
+| `--cost` | estimate the credit cost instead of generating (nothing runs, nothing is charged) |
+| `--no-wait` | return the outputId immediately instead of waiting for the render |
+| `--timeout <seconds>` | how long to wait before handing back the outputId Defaults to `600`. |
+
+### `contenthero generate video [prompt]`
+
+Generate a video from a prompt (optionally with frames / references)
+
+| Argument | Required | Purpose |
+| --- | --- | --- |
+| `prompt` | no | the video prompt |
+
+| Option | Purpose |
+| --- | --- |
+| `-m, --model <id>` | video model id (see `contenthero model list --type video`) |
+| `--aspect <ratio>` | aspect ratio, e.g. 16:9, 9:16 |
+| `--resolution <res>` | resolution, e.g. 720p, 1080p, 4K (model-dependent) |
+| `--duration <seconds>` | clip length in seconds (model-dependent) |
+| `--audio` | enable generated audio (models that support it) |
+| `-n, --num <count>` | number of variations (1-4) |
+| `--negative <text>` | what to avoid (models that support it) |
+| `--seed <seed>` | seed for reproducibility |
+| `--start-frame <urlOrId>` | first frame (image URL or output id) |
+| `--end-frame <urlOrId>` | last frame (image URL or output id) |
+| `--ref <urlOrId>` | reference image (URL or output id); repeatable |
+| `--ref-video <urlOrId>` | reference video (URL or output id); repeatable |
+| `--ref-audio <urlOrId>` | reference audio (URL or output id); repeatable |
+| `--element <id>` | saved reference element id (Kling 3.0, @name in prompt); repeatable |
+| `--multi-shot` | enable multi-shot mode (e.g. WAN 2.6) |
+| `--shots <json>` | Kling 3.0 multi-shot: JSON array of \{ prompt, duration \} objects |
+| `--cost` | estimate the credit cost instead of generating (nothing runs, nothing is charged) |
+| `--no-wait` | return the outputId immediately instead of waiting for the render |
+| `--timeout <seconds>` | how long to wait before handing back the outputId Defaults to `600`. |
+| `--project <id>` | editor project to place the result on (omit for a standalone library output) |
+| `--placement <json>` | placement intent as JSON, e.g. \{"mode":"atPlayhead"\} (omit to place at the playhead when known, else append) |
+| `--playhead <frame>` | current playhead frame, for playhead-relative placement |
+
+## `generation`
+
+### `contenthero generation status <id>...`
+
+Show one or more generations; blocks until they finish unless --no-wait
+
+| Argument | Required | Purpose |
+| --- | --- | --- |
+| `id` | yes | one or more outputIds from a generate / upscale command |
+
+| Option | Purpose |
+| --- | --- |
+| `--no-wait` | take an instant snapshot instead of blocking |
+| `--timeout <seconds>` | how long to block before handing back Defaults to `600`. |
+
+## `login`
+
+### `contenthero login`
+
+Authenticate the CLI. Browser-assisted by default; --with-key stores an existing key.
+
+| Option | Purpose |
+| --- | --- |
+| `--with-key [key]` | store an existing API key (pass the key, or pipe it via stdin). Omit to use the browser flow. |
+
+## `logout`
+
+### `contenthero logout`
+
+Delete the stored credential (env / --api-key are unaffected)
+
+## `media`
+
+### `contenthero media get <id>`
+
+Get one media item by id (studio output, or an upload/stock item with --source)
+
+| Argument | Required | Purpose |
+| --- | --- | --- |
+| `id` | yes | media id (full or first-8); creations also accept a "-N" variation suffix |
+
+| Option | Purpose |
+| --- | --- |
+| `--source <source>` | which library the id belongs to: creations, uploads, stock (default creations) |
+| `--save <dir>` | download each variation to \<dir\> (materialize the bytes for local viewing or re-ingestion) |
+
+### `contenthero media import <url>`
+
+Import a remote URL as first-class media (requires assets:write)
+
+| Argument | Required | Purpose |
+| --- | --- | --- |
+| `url` | yes | public http(s) URL to fetch and re-host |
+
+| Option | Purpose |
+| --- | --- |
+| `--content-type <mime>` | MIME type override (else taken from the response) |
+| `--name <name>` | file name override (used for the extension) |
+
+### `contenthero media list`
+
+List recent media (newest first). --source uploads|stock|all beyond creations.
+
+| Option | Purpose |
+| --- | --- |
+| `--source <source>` | which library: creations, uploads, stock, all (default creations) |
+| `--type <type>` | filter by media type: image, video, audio, transcript |
+| `--kind <kind>` | creations only: filter by asset class: creation, board, look, upload |
+| `--status <status>` | status filter (defaults to 'completed') |
+| `--favorite` | creations only: only outputs with a favorited variation |
+| `--archived` | creations only: only outputs with an archived variation |
+| `--limit <n>` | how many to return (default 20) |
+
+### `contenthero media search <query>`
+
+Semantically search your library (creations, uploads, stock, brand) by describing the content
+
+| Argument | Required | Purpose |
+| --- | --- | --- |
+| `query` | yes | natural-language description of the media to find |
+
+| Option | Purpose |
+| --- | --- |
+| `--kinds <kinds>` | restrict to media kinds (comma-separated): image, video, audio |
+| `--limit <n>` | max assets to return (default 12, max 50) |
+
+### `contenthero media upload <file>`
+
+Upload a local file as first-class media (requires assets:write)
+
+| Argument | Required | Purpose |
+| --- | --- | --- |
+| `file` | yes | path to the local file |
+
+| Option | Purpose |
+| --- | --- |
+| `--content-type <mime>` | MIME type override (else inferred from the extension) |
+| `--name <name>` | file name override (else the basename) |
+
+### `contenthero media watch <idOrUrl>`
+
+Watch a VIDEO as low-res keyframes across a time window (inspect raw footage)
+
+| Argument | Required | Purpose |
+| --- | --- | --- |
+| `idOrUrl` | yes | a studio output id (first-8 ok) OR a media URL on our storage |
+
+| Option | Purpose |
+| --- | --- |
+| `--from <sec>` | start of the source-time window (seconds) |
+| `--to <sec>` | end of the source-time window (seconds) |
+| `--frames <n>` | how many keyframes (default 8) |
+| `--save <dir>` | write the keyframes to \<dir\> |
+
+## `model`
+
+### `contenthero model get <id>`
+
+Get one model's full request shape (the parameters it accepts)
+
+| Argument | Required | Purpose |
+| --- | --- | --- |
+| `id` | yes | model id (from `model list`) |
+
+### `contenthero model list`
+
+List the models available to this key (the discovery catalog)
+
+| Option | Purpose |
+| --- | --- |
+| `--type <type>` | filter by content type: image, video, or audio |
+
+## `platform`
+
+### `contenthero platform get <platform>`
+
+Get one platform's full publishing shape (the fields a post requires)
+
+| Argument | Required | Purpose |
+| --- | --- | --- |
+| `platform` | yes | platform id (from `platform list`) |
+
+| Option | Purpose |
+| --- | --- |
+| `--format <format>` | narrow to one format (e.g. reel, short, story, thread) |
+
+### `contenthero platform list`
+
+List the platforms you can publish to (formats + connected flag)
+
+## `preview`
+
+### `contenthero preview`
+
+Render a short composed video of an editor range (ephemeral preview), polling until ready
+
+| Option | Purpose |
+| --- | --- |
+| `--project <id>` | the editor project to preview |
+| `--from-frame <n>` | start timeline frame of the range |
+| `--to-frame <n>` | end timeline frame of the range |
+| `--save <path>` | download the finished mp4 to this file |
+| `--timeout <sec>` | max seconds to wait for the render (default 120) |
+
+## `project`
+
+### `contenthero project apply <projectId>`
+
+Apply a batch of ops to a project composition. Ops both CREATE (create_clip, insert_track, insert_prebuilt_track, add_transition) and EDIT (move_clip, trim_clip, update_clip, delete_clip, remove_background, disable_ranges, update_transition, remove_transition, ...). One-shot cleanups: remove_silence, remove_filler_words, extract_audio (see `project timeline-types` for shapes). Build items from the `example` skeletons in `project timeline-types` / `layer-types`; run `project get` first for the current revision and pass it as --expected-revision for safe concurrent edits. Requires editor:write.
+
+| Argument | Required | Purpose |
+| --- | --- | --- |
+| `projectId` | yes | the project id |
+
+| Option | Purpose |
+| --- | --- |
+| `--ops <json>` | the ops as a JSON array string |
+| `--ops-file <path>` | read the ops JSON array from a file |
+| `--intent <text>` | a short description of the edit (for attribution) |
+| `--expected-revision <n>` | revision for optimistic concurrency (from `project get`) |
+
+### `contenthero project create`
+
+Create a project (requires editor:write)
+
+| Option | Purpose |
+| --- | --- |
+| `--surface <surface>` | editor | canvas (default: editor) |
+| `--title <text>` | project title (default: Untitled) |
+| `--orientation <ratio>` | e.g. 16:9, 9:16, 1:1 (default: 16:9) |
+| `--width <n>` | pixel width (default: from orientation) |
+| `--height <n>` | pixel height (default: from orientation) |
+
+### `contenthero project delete <projectId>`
+
+PERMANENTLY delete a project, irreversible (requires editor:write)
+
+| Argument | Required | Purpose |
+| --- | --- | --- |
+| `projectId` | yes | the project id |
+
+| Option | Purpose |
+| --- | --- |
+| `--yes` | confirm the irreversible permanent delete |
+
+### `contenthero project export <projectId>`
+
+Export a project to a file (mp4/png/jpg both surfaces; pdf/pptx canvas) (requires editor:write)
+
+| Argument | Required | Purpose |
+| --- | --- | --- |
+| `projectId` | yes | the project id |
+
+| Option | Purpose |
+| --- | --- |
+| `--format <format>` | mp4 | png | jpg | pdf | pptx (default mp4) |
+| `--resolution <res>` | output resolution for ANY format: 480p|720p|1080p|2k|4k. Defaults 720p for an editor mp4, the project native size for a still. 1080p+ is plan-gated |
+| `--quality <q>` | mp4 quality: low|recommended|high |
+| `--frame <n>` | editor still (png/jpg) only: timeline frame to render (default 0) |
+| `--no-watermark` | remove the watermark (plan-gated) |
+| `--wait` | poll until the export finishes and print the URL |
+| `--timeout <ms>` | max wait when --wait (default 600000) |
+
+### `contenthero project export-formats`
+
+List available export formats (requires editor:read)
+
+### `contenthero project export-status <exportId>`
+
+Poll an export job by id (requires editor:read)
+
+| Argument | Required | Purpose |
+| --- | --- | --- |
+| `exportId` | yes | the export id |
+
+### `contenthero project get <projectId>`
+
+Read a project's composition + revision (summary by default; requires editor:read)
+
+| Argument | Required | Purpose |
+| --- | --- | --- |
+| `projectId` | yes | the project id |
+
+| Option | Purpose |
+| --- | --- |
+| `--detail <detail>` | 'summary' (default) or 'full' (the complete composition) |
+| `--from <frame>` | timeline only: start frame of a window (clips overlapping [from, to]) |
+| `--to <frame>` | timeline only: end frame of the window |
+| `--track <trackId>` | timeline only: scope to one track by id |
+| `--slide <slideId>` | canvas only: scope to one slide by id (applies to --detail full too) |
+
+### `contenthero project import`
+
+Import a PPTX/Slides file URL or a Canva design into a new canvas project (requires editor:write)
+
+| Option | Purpose |
+| --- | --- |
+| `--source-type <type>` | pptx | canva |
+| `--file-url <url>` | PPTX / slides file URL (when --source-type pptx) |
+| `--design-id <id>` | Canva design id (when --source-type canva) |
+| `--title <text>` | title for the created project |
+
+### `contenthero project layer-types`
+
+List canvas layer types + editable props (requires editor:read)
+
+### `contenthero project list`
+
+List projects, both editor + canvas (requires editor:read)
+
+| Option | Purpose |
+| --- | --- |
+| `--filter <state>` | archived | favorited (omitted = active) |
+| `--surface <surface>` | editor | canvas (omitted = both) |
+| `--search <text>` | case-insensitive title search |
+
+### `contenthero project timeline-types`
+
+List editor timeline clip + track types with editable props. Each clip type also carries a copy-pasteable `example` clip skeleton, and the catalog carries a `creation` section documenting the CREATE ops (create_clip, insert_track, insert_prebuilt_track, add_transition). Read this before building any clip with `project apply`; use --json for the full skeletons. Requires editor:read.
+
+### `contenthero project transcript <projectId>`
+
+Read a project's transcript mapped to its timeline clips (requires editor:read)
+
+| Argument | Required | Purpose |
+| --- | --- | --- |
+| `projectId` | yes | the editor project id |
+
+| Option | Purpose |
+| --- | --- |
+| `--search <text>` | only clip segments whose text contains this substring |
+| `--start <ms>` | source-media start time in ms (with --end, filters to this window; word mode also clips words to it) |
+| `--end <ms>` | source-media end time in ms |
+| `--granularity <level>` | 'clip' (default) or 'word' (adds word timing + timeline frames + confidence + speaker, derived silences, audio events) |
+| `--pace-threshold <ms>` | word mode: minimum pause (ms) to report as a silence ("Pace"); defaults to the project setting, else 500 |
+| `--padding-start <ms>` | word mode: breathing room (ms) kept after speech at a silence start edge (negative tightens) |
+| `--padding-end <ms>` | word mode: breathing room (ms) kept before speech at a silence end edge (negative tightens) |
+
+## `schema`
+
+### `contenthero schema [command]...`
+
+Dump the input schema of the CLI commands as JSON (for agents)
+
+| Argument | Required | Purpose |
+| --- | --- | --- |
+| `command` | no | a command path to scope the dump, e.g. "generate image" |
+
+## `space`
+
+### `contenthero space create <name>`
+
+Create a space. --duplicate-from copies another space's STAGES, never its cards
+
+| Argument | Required | Purpose |
+| --- | --- | --- |
+| `name` | yes | space name |
+
+| Option | Purpose |
+| --- | --- |
+| `--cover <url>` | cover image URL for the space tile |
+| `--duplicate-from <id>` | copy this space's stages into the new one |
+
+### `contenthero space delete <id>`
+
+Delete an EMPTY space. The server refuses one that still holds cards, naming the count
+
+| Argument | Required | Purpose |
+| --- | --- | --- |
+| `id` | yes | space id |
+
+### `contenthero space get <id>`
+
+One space, with its live card count
+
+| Argument | Required | Purpose |
+| --- | --- | --- |
+| `id` | yes | space id |
+
+### `contenthero space list`
+
+List the account's spaces, most recently active first
+
+| Option | Purpose |
+| --- | --- |
+| `--archived` | include archived spaces |
+
+### `contenthero space update <id>`
+
+Rename a space or change its cover. A PATCH: a flag you omit leaves that field alone
+
+| Argument | Required | Purpose |
+| --- | --- | --- |
+| `id` | yes | space id |
+
+| Option | Purpose |
+| --- | --- |
+| `--name <text>` | a new name |
+| `--cover <url>` | a new cover image URL |
+| `--no-cover` | remove the cover entirely (and its framing) |
+
+## `stage`
+
+### `contenthero stage create <name>`
+
+Create a column. The slug is derived from the name and is not settable
+
+| Argument | Required | Purpose |
+| --- | --- | --- |
+| `name` | yes | column name, for example "In Review" |
+
+| Option | Purpose |
+| --- | --- |
+| `--space <id>` | which board (from `contenthero space list`); default space if omitted |
+| `--color <hex>` | a hex color such as "#3B82F6" |
+| `--after <id>` | place it immediately after this stage |
+| `--before <id>` | place it immediately before this stage |
+
+### `contenthero stage delete <id>`
+
+Delete a column and move its cards. The server refuses a non-empty column with no --target
+
+| Argument | Required | Purpose |
+| --- | --- | --- |
+| `id` | yes | stage id |
+
+| Option | Purpose |
+| --- | --- |
+| `--space <id>` | the board this stage is on |
+| `--target <id>` | where this column's cards should go (required unless it is empty) |
+
+### `contenthero stage list`
+
+List a space's stages, in order (defaults to the default space)
+
+| Option | Purpose |
+| --- | --- |
+| `--space <id>` | which space's stages (from `contenthero space list`); default space if omitted |
+
+### `contenthero stage update <id>`
+
+Rename, recolor or move a column. A PATCH: a flag you omit leaves that field alone
+
+| Argument | Required | Purpose |
+| --- | --- | --- |
+| `id` | yes | stage id |
+
+| Option | Purpose |
+| --- | --- |
+| `--space <id>` | the board this stage is on (required: an id alone does not name a board) |
+| `--name <text>` | a new name; the slug follows it |
+| `--color <hex>` | a new hex color |
+| `--after <id>` | move it immediately after this stage |
+| `--before <id>` | move it immediately before this stage |
+| `--to-start` | move it to the far left of the board |
+| `--to-end` | move it to the far right of the board |
+
+## `tag`
+
+### `contenthero tag create <name>`
+
+Create a tag (the name is lowercased) (requires planner:write)
+
+| Argument | Required | Purpose |
+| --- | --- | --- |
+| `name` | yes | the tag name |
+
+### `contenthero tag list`
+
+List the account's tags
+
+### `contenthero tag remove <id>`
+
+Delete a tag from the account, removing it from every post (requires planner:write)
+
+| Argument | Required | Purpose |
+| --- | --- | --- |
+| `id` | yes | the tag id (from `tag list`) |
+
+### `contenthero tag update <id> <name>`
+
+Rename a tag, keeping its post assignments (requires planner:write)
+
+| Argument | Required | Purpose |
+| --- | --- | --- |
+| `id` | yes | the tag id (from `tag list`) |
+| `name` | yes | the new tag name |
+
+## `tracked-account`
+
+### `contenthero tracked-account get <id>`
+
+Get one tracked account with its performance and top content
+
+| Argument | Required | Purpose |
+| --- | --- | --- |
+| `id` | yes | the tracked account id |
+
+### `contenthero tracked-account list`
+
+List tracked accounts (both kinds by default)
+
+| Option | Purpose |
+| --- | --- |
+| `--kind <kind>` | narrow to one kind: inspiration, brand |
+| `--brand-kit <id>` | scope to the accounts linked to this brand kit |
+
+## `transcribe`
+
+### `contenthero transcribe <audioUrl>`
+
+Transcribe an audio URL to text (speech-to-text)
+
+| Argument | Required | Purpose |
+| --- | --- | --- |
+| `audioUrl` | yes | public URL of the audio to transcribe |
+
+| Option | Purpose |
+| --- | --- |
+| `--language <code>` | ISO language hint, e.g. en (auto-detected when omitted) |
+| `--diarize` | label each speaker (diarization) |
+
+## `upscale`
+
+### `contenthero upscale <source>`
+
+Upscale an existing image or video to a higher resolution
+
+| Argument | Required | Purpose |
+| --- | --- | --- |
+| `source` | yes | source media (URL or output id) to upscale |
+
+| Option | Purpose |
+| --- | --- |
+| `-m, --model <id>` | upscale model id (see `contenthero model list`) |
+| `--factor <factor>` | upscale factor, e.g. 2x, 4x (model-dependent) |
+| `--duration <seconds>` | source video length in seconds (required for video upscalers) |
+| `--cost` | estimate the credit cost instead of upscaling |
+| `--no-wait` | return the outputId immediately instead of waiting |
+| `--timeout <seconds>` | how long to wait before handing back the outputId Defaults to `600`. |
+
+## `voice`
+
+### `contenthero voice get <id>`
+
+Get one voice by its voiceId
+
+| Argument | Required | Purpose |
+| --- | --- | --- |
+| `id` | yes | the voice id |
+
+### `contenthero voice list`
+
+List saved voices (favorites first)
+
+| Option | Purpose |
+| --- | --- |
+| `--favorite` | only favorited voices |
+

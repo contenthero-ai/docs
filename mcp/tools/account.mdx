@@ -1,0 +1,92 @@
+---
+title: "Account"
+description: "Your balance and tier, the platforms available to publish to, and what the user is looking at."
+---
+
+{/* GENERATED FILE. Do not edit by hand. */}
+{/* Regenerate with `npm run generate:reference` in contenthero-docs. */}
+
+Your balance and tier, the platforms available to publish to, and what the user is looking at. 4 tools.
+
+Every tool below is exposed by the hosted MCP server at `https://mcp.contenthero.ai` and by the `@contenthero/mcp` npm package. A <Badge>write</Badge> tool changes your account; a <Badge>read</Badge> tool does not.
+
+### `get_balance`
+
+<Badge>read</Badge>
+
+Get the current ContentHero credit balance, subscription tier, and auto-top-up state.
+
+Takes no parameters.
+
+### `get_context`
+
+<Badge>read</Badge>
+
+Read the live context of what the user is currently viewing in the open app: the active surface, the focused element, the playhead, and the current selection, so you act on what the user is looking at rather than guessing. Read this first. It is fast, structured, and does not disturb the live page, and structured context alone is enough whenever the task does not depend on the exact pixels; it returns no image by default. Acquire vision only when the task genuinely requires seeing, and pick the path by what you need to see. Set render=true to see the composed output itself: the actual rendered editor frame or canvas slide, reconstructed from saved data, so you can visually verify your own edits while iterating. Pass frame (editor) or slideId/slideIndex (canvas) to inspect a specific point, or render=true alone for the point the user is viewing. The render returns inline as an image, is ephemeral, leaves nothing in the user's storage, and does not need a live tab. Set capture=true instead only when you need the user's actual screen as shown right now, including transient interface state and unsaved edits; capturing renders the current screen on demand, so its latency and brief page interruption grow with how visually heavy that screen is. Do not use export_project to check your work: exports are permanent deliverables that count against the user's storage; use render for previews. Returns the most-recent-active session and the live participant set, or nothing when no one is viewing (render still works with an explicit projectId). Optionally scope to one project. Requires the context:read scope.
+
+<ParamField body name="capture" type="boolean">
+Also return a screenshot of the user's live viewport (their SCREEN), captured at read time. Default false returns structured context only. Request it only when the task depends on seeing the live, as-shown state including unsaved UI. To see the composed OUTPUT rather than the screen, use render instead.
+</ParamField>
+
+<ParamField body name="count" type="integer">
+filmstrip: how many frames to return. Omit for a proportional default.
+</ParamField>
+
+<ParamField body name="frame" type="integer">
+still (editor): which timeline frame to render. Omit to render the current playhead frame.
+</ParamField>
+
+<ParamField body name="fromFrame" type="integer">
+filmstrip: start timeline frame of the range. Omit to start at the beginning.
+</ParamField>
+
+<ParamField body name="mode" type="`still` \| `filmstrip`">
+Render tier (inferred from the params if omitted): 'still' = one composed editor frame / canvas slide; 'filmstrip' = several composed frames across an editor range (judge motion / flow / cut placement).
+</ParamField>
+
+<ParamField body name="projectId" type="string">
+Scope to a specific project (editor/canvas). Omit for the user's most-recent-active surface anywhere. Required for render when no session is live.
+</ParamField>
+
+<ParamField body name="render" type="boolean">
+Also return an inline render (image[s]) of your work, so you can visually verify edits. Ephemeral, stored nowhere, counts against no quota, works without a live tab. render=true alone renders the current focus point as a still. Use mode=filmstrip for several frames across a range. Use this to check your work, not export_project. To watch a RAW source clip use get_media with a video item; for a composed VIDEO of a range use create_preview.
+</ParamField>
+
+<ParamField body name="slideId" type="string">
+still (canvas): the id of the slide to render. Omit to render the focused slide.
+</ParamField>
+
+<ParamField body name="slideIndex" type="integer">
+still (canvas): the 1-based slide index to render (alternative to slideId).
+</ParamField>
+
+<ParamField body name="toFrame" type="integer">
+filmstrip: end timeline frame of the range. Omit to run to the end.
+</ParamField>
+
+<ParamField body name="width" type="integer">
+still: render at an explicit DISPLAY width in pixels, to judge legibility at the size the output will actually be seen (a course tile, a thumbnail, a feed card) rather than at full resolution, where small type always looks fine. Height follows the composition aspect ratio and is not settable. Clamped; the size produced is reported back on rendered.
+</ParamField>
+
+### `list_platforms`
+
+<Badge>read</Badge>
+
+List the platforms this account can publish to (the discovery catalog): each platform's formats and whether a connected account exists for it. Use this to pick a platform and format, then call get_platform for the exact fields a post requires. Source of truth for valid platforms/formats; do not hardcode them.
+
+Takes no parameters.
+
+### `get_platform`
+
+<Badge>read</Badge>
+
+Get one platform's full publishing shape: the fields, options (enums), and character limits a post requires per format (post, reel, short, story, thread). Ground a post's platformSettings against this instead of guessing the fields. Optionally pass a format to narrow the result.
+
+<ParamField body name="platform" type="`youtube` \| `instagram` \| `tiktok` \| `facebook` \| `linkedin` \| `x` \| `threads` \| `general`" required>
+The platform id, e.g. from list_platforms (such as "instagram").
+</ParamField>
+
+<ParamField body name="format" type="string">
+Optional format to narrow to (e.g. "reel", "short", "story", "thread").
+</ParamField>
+

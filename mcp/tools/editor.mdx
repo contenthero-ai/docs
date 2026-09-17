@@ -1,0 +1,352 @@
+---
+title: "Editor and canvas"
+description: "Projects, their timelines and canvases, the elements on them, and exports."
+---
+
+{/* GENERATED FILE. Do not edit by hand. */}
+{/* Regenerate with `npm run generate:reference` in contenthero-docs. */}
+
+Projects, their timelines and canvases, the elements on them, and exports. 16 tools.
+
+Every tool below is exposed by the hosted MCP server at `https://mcp.contenthero.ai` and by the `@contenthero/mcp` npm package. A <Badge>write</Badge> tool changes your account; a <Badge>read</Badge> tool does not.
+
+### `list_projects`
+
+<Badge>read</Badge>
+
+List the account's editor (video timeline) and canvas (slides/layers) projects. Filter by state (archived / favorited), by surface (editor / canvas), or by a title search. Returns lightweight summaries; call get_project for a single project's full composition. Requires the editor:read scope.
+
+<ParamField body name="filter" type="`archived` \| `favorited`">
+archived -\> only archived; favorited -\> favorited and not archived; omitted -\> active (not archived).
+</ParamField>
+
+<ParamField body name="kind" type="`editor` \| `canvas`">
+Deprecated alias for `surface`. Prefer `surface`; this is accepted for one release window.
+</ParamField>
+
+<ParamField body name="search" type="string">
+Case-insensitive title search.
+</ParamField>
+
+<ParamField body name="surface" type="`editor` \| `canvas`">
+Restrict to one surface; omitted returns both.
+</ParamField>
+
+### `get_project`
+
+<Badge>read</Badge>
+
+Read a project's composition + revision. By DEFAULT returns a SUMMARY: metadata + revision + a lightweight per-clip view, dropping heavy payloads (media URLs, transcripts, graphic code, caption words) so a structural read stays small. For a TIMELINE the summary is each clip's \{ id, type, from, durationInFrames, speed, trackId, disabled, sourceId \}, where `sourceId` identifies the SOURCE FILE the clip was cut from: clips sharing a sourceId came from one recording, and a clip id never tells you this (ids are minted per edit, so a shared prefix means a shared operation, not a shared file). Use it to tell a rough cut of one recording apart from a timeline of separate files, which decides how much work a source-wide job is: an audio enhancement runs one vendor production per source. Absent when the clip's media is not one of our stored objects (an external stock url); for a CANVAS it is each slide with its layers' \{ id, type, text \}, where a text layer's `text` is truncated to 80 chars and is what lets you tell one slide (or one of two text layers) from another without a full read. Pass detail:'full' for the complete composition (every prop, for a faithful round-trip or a deep edit). Scope a timeline read to a window with fromFrame/toFrame (and optionally trackId) to get just the clips overlapping that range, the same convention as get_transcript's startMs/endMs; scope a CANVAS read to one slide with slideId, which applies to detail:'full' too, so asking for a single slide's detail does not pay for the whole deck. Pass the returned revision back as expectedRevision for a concurrency-safe edit. Editing does NOT require this call: update_timeline/update_canvas' expectedRevision is optional, and get_transcript already returns the revision. Requires the editor:read scope.
+
+<ParamField body name="projectId" type="string" required>
+The project id to read.
+</ParamField>
+
+<ParamField body name="detail" type="`summary` \| `full`">
+'summary' (default) returns the lightweight per-clip/per-layer structure; 'full' returns the complete composition with every property.
+</ParamField>
+
+<ParamField body name="fromFrame" type="integer">
+Timeline only: start of a frame window; returns clips overlapping [fromFrame, toFrame].
+</ParamField>
+
+<ParamField body name="includeRenderUrl" type="boolean">
+Also return a preview still URL of the current composition (renders one only if it changed).
+</ParamField>
+
+<ParamField body name="slideId" type="string">
+Canvas only: scope the read to a single slide by id. Applies to detail:'full' as well. An id matching no slide returns every slide rather than nothing.
+</ParamField>
+
+<ParamField body name="toFrame" type="integer">
+Timeline only: end of the frame window (see fromFrame).
+</ParamField>
+
+<ParamField body name="trackId" type="string">
+Timeline only: scope the read to a single track by id.
+</ParamField>
+
+### `create_project`
+
+<Badge>write</Badge>
+
+Create a new project. `surface` picks where it lives: 'editor' (video timeline) or 'canvas' (slides/layers). All fields are optional; defaults match the in-app new-project flow (16:9 landscape, editor surface). A new canvas starts with one empty slide already, so add content to it with update_canvas create_layer (use create_slide only to add MORE slides); a new editor starts with an empty timeline. Returns the new project id + revision. Requires the editor:write scope.
+
+<ParamField body name="brandKitId" type="string">
+Optional brand kit to associate.
+</ParamField>
+
+<ParamField body name="height" type="number">
+Pixel height. Defaults from the orientation.
+</ParamField>
+
+<ParamField body name="kind" type="`editor` \| `canvas`">
+Deprecated alias for `surface`. Prefer `surface`; accepted for one release window.
+</ParamField>
+
+<ParamField body name="orientation" type="string">
+Aspect ratio, e.g. '16:9', '9:16', '1:1'. Defaults to '16:9'.
+</ParamField>
+
+<ParamField body name="surface" type="`editor` \| `canvas`">
+The surface. Defaults to 'editor'.
+</ParamField>
+
+<ParamField body name="title" type="string">
+Project title. Defaults to 'Untitled'.
+</ParamField>
+
+<ParamField body name="width" type="number">
+Pixel width. Defaults from the orientation.
+</ParamField>
+
+### `delete_project`
+
+<Badge>write</Badge>
+
+PERMANENTLY delete a project. This is irreversible: the project, its edit history, and its render exports are destroyed (uploaded media stays in the library). To reversibly hide a project instead, use archive. You must pass confirm: true to proceed. Requires the editor:write scope.
+
+<ParamField body name="confirm" type="boolean" required>
+Must be true to confirm the irreversible permanent delete.
+</ParamField>
+
+<ParamField body name="projectId" type="string" required>
+The project id to permanently delete.
+</ParamField>
+
+### `import_project`
+
+<Badge>write</Badge>
+
+Import a PowerPoint / Google Slides file (by URL) or a Canva design (by id) into a NEW canvas project with editable layers. Set sourceType to 'pptx' and pass fileUrl (a URL to a .pptx / slides file), or set sourceType to 'canva' and pass designId (uses the account's Canva connection; fails with canva_not_connected if not linked). Returns the new project id + revision. Requires the editor:write scope.
+
+<ParamField body name="sourceType" type="`pptx` \| `canva`" required>
+'pptx' for a file URL, 'canva' for a Canva design id.
+</ParamField>
+
+<ParamField body name="designId" type="string">
+Required when sourceType is 'canva': the Canva design id.
+</ParamField>
+
+<ParamField body name="fileUrl" type="string">
+Required when sourceType is 'pptx': a URL to the .pptx / slides file.
+</ParamField>
+
+<ParamField body name="title" type="string">
+Title for the created project. Defaults to 'Imported deck'.
+</ParamField>
+
+### `export_project`
+
+<Badge>write</Badge>
+
+Export (render) a project's saved composition to a downloadable file the user KEEPS: a permanent deliverable that counts against the user's storage. To preview or verify a frame or slide while editing, do NOT export; use get_context with render (ephemeral, stored nowhere). format 'mp4' works for both editor and canvas (a video render; may take a while). 'png' / 'jpg' work for both surfaces too: a canvas project renders one image per slide (multiple slides come back as a zip), while an editor project renders a single composited frame of the timeline (pick which frame with `frame`; defaults to frame 0). Canvas projects additionally support 'pdf' and 'pptx'. Resolution and watermark apply to EVERY format, not just mp4: a free account never exports above 720p and never removes the watermark, on any format or surface. `quality` is mp4 only. Returns the download URL when the render finishes in time, otherwise an exportId to poll with get_export. Requires the editor:write scope.
+
+<ParamField body name="projectId" type="string" required>
+The project to export.
+</ParamField>
+
+<ParamField body name="format" type="`mp4` \| `png` \| `jpg` \| `pdf` \| `pptx`">
+Output format. Defaults to 'mp4'. mp4/png/jpg work for both surfaces (png/jpg on an editor project render one timeline frame); pdf/pptx are canvas-only.
+</ParamField>
+
+<ParamField body name="frame" type="integer">
+Editor still (png/jpg) only: which timeline frame to render. Clamped to the composition length. Defaults 0. Use the playhead frame from get_context to render exactly the frame the user is viewing.
+</ParamField>
+
+<ParamField body name="quality" type="`low` \| `recommended` \| `high`">
+mp4 ONLY: video bitrate. Meaningless for a still, which has no duration to spread bits over. Defaults recommended.
+</ParamField>
+
+<ParamField body name="resolution" type="`480p` \| `720p` \| `1080p` \| `2k` \| `4k`">
+Output resolution, for EVERY format including stills. Defaults '720p' for an editor mp4 and the project's NATIVE size for a still or canvas mp4, in both cases clamped to your plan. 1080p and above are plan-gated: NAMING one above your plan is a 403, omitting one clamps instead.
+</ParamField>
+
+<ParamField body name="watermark" type="boolean">
+Keep the watermark. Defaults true; removing it is plan-gated.
+</ParamField>
+
+### `get_export`
+
+<Badge>read</Badge>
+
+Poll an export job started by export_project. Returns its status and, when done, the download URL. Requires the editor:read scope.
+
+<ParamField body name="exportId" type="string" required>
+The export id returned by export_project.
+</ParamField>
+
+### `get_export_formats`
+
+<Badge>read</Badge>
+
+List the export formats (and their options) available per project surface, so you know what export_project accepts. Requires the editor:read scope.
+
+Takes no parameters.
+
+### `update_timeline`
+
+<Badge>write</Badge>
+
+Apply a batch of ops to an EDITOR (video timeline) project. update_timeline both CREATES and EDITS. EDIT ops act on existing clips: disable_ranges, delete_ranges, merge_clips, move_clip, trim_clip, split, delete_clip, duplicate, set_disabled, set_hidden, set_locked, group, ungroup, update_group, update_clip. CREATE ops add new clips/tracks: create_clip (\{ op: 'create_clip', trackId, clip \}) appends a clip to a track; insert_track (\{ op: 'insert_track', referenceTrackId, position: 'above'|'below', trackType \}) adds an empty track; insert_prebuilt_track (\{ op: 'insert_prebuilt_track', index, track: \{ id, name, items: [item], trackType \} \}) inserts a whole track WITH its clips in one op (index 0 = top overlay) - the one-shot way to drop a graphic/text/shape onto a project without an existing empty track. TRANSITIONS: add_transition (\{ op: 'add_transition', trackId, leftClipId, rightClipId, preset, durationFrames?, timing? \}) adds a transition at the CUT between two TOUCHING adjacent clips (leftClipId's out-point meets rightClipId's in-point); preset is fade | crossfade | slide-left|right|up|down | wipe-left|right|up|down | flip | iris | clock-wipe; durationFrames defaults to 1s; one transition per cut (re-creating on the same pair replaces it); the result carries createdTransitionId. update_transition (\{ op: 'update_transition', transitionId, patch: \{ preset?, durationFrames?, timing? \} \}) and remove_transition (\{ op: 'remove_transition', transitionId \}) edit or remove one (transition ids are on each track.transitions[] in get_project). ANIMATIONS: add_animation (\{ op: 'add_animation', clipId, edge: 'in'|'out', preset, durationFrames?, timing? \}) gives a single clip an ENTRANCE (edge 'in') or EXIT (edge 'out') animation, the clip animating against emptiness on that edge; preset is fade | slide-left|right|up|down | wipe-left|right|up|down | flip | iris | clock-wipe (single-clip presets, NOT crossfade which blends two clips); durationFrames defaults to 15 (0.5s at 30fps), timing 'linear' (default) or 'spring'; idempotent, a per-clip field keyed by clipId + edge so it creates or updates that edge's animation. remove_animation (\{ op: 'remove_animation', clipId, edge: 'in'|'out' \}) clears it. Choose add_animation when the motion belongs to ONE clip against emptiness; choose add_transition for a blend BETWEEN two adjacent clips. BACKGROUND REMOVAL: remove_background (\{ op: 'remove_background', clipId \}) cuts out the background of an IMAGE or VIDEO clip, replacing it with transparency, as an ASYNC job: the result carries a generatingOutputId to poll with get_generation_status, and the clip's media swaps to the transparent cutout when it completes (the original is kept, so it stays restorable). Image removal is FREE; video removal is a PREMIUM metered feature (Champion+, charged per second, 60s cap) and returns an error if the plan or credits are insufficient. Only image/video clips have a background; other clip types return an error. MASKS: to add a CapCut-style shape mask to an IMAGE or VIDEO clip, set its `masks` array via update_clip (or update_clips) - each entry is a ClipMask cutout (shape, normalized position/size, rotation, feather, invert) that keeps only the pixels inside its shape, multiple masks union, and invert:true subtracts; masks are a clip PROPERTY, not an op, so patch them like any other field (a patch REPLACES the whole array; set [] to clear), and read get_timeline_types for the exact ClipMask shape. CAPTIONS: add_captions (\{ op: 'add_captions', style?, clipIds? \}) generates word-timed captions from the project's transcript, one block per spoken clip on a dedicated caption track - whole-timeline by default, or pass clipIds to scope; `style` is a caption template key (omit for the default); clips without a ready transcript are skipped and reported in the result warnings (media is normally transcribed on ingest); re-running refreshes + restyles existing caption blocks. update_captions (\{ op: 'update_captions', style?, patch?, clipIds? \}) restyles EXISTING captions - `style` re-resolves a template, `patch` sets caption overlay props directly (e.g. \{ textColor: '#FFDD00', fontSize: 32 \}); pass one or both; it never creates captions where none exist (that is add_captions). remove_captions (\{ op: 'remove_captions', clipIds? \}) removes captions (all, or a clipIds subset) and drops the caption track if empty. Build the `clip` from get_timeline_types, which returns a copy-pasteable `example` skeleton per clip type plus the `creation` op shapes; mint your own string ids and put overlays on a NON-primary media track so they do not ripple the primary. Each op is an object with an `op` name plus its fields (e.g. \{ op: 'delete_clip', clipIds: ['clip-id'] \} or \{ op: 'move_clip', clipId: 'clip-id', toFrame: 90, toTrackIndex: 0 \}). CONTENT-AWARE EDITING: to cut sections you found in get_transcript, DEFAULT to disable_ranges: \{ op: 'disable_ranges', clipId, ranges: [\{ startMs, endMs \}], note? \} - it takes SOURCE-media time ranges, splits the clip and marks those ranges disabled (non-destructively excluded from the render but still on the timeline, so the user can review via skip-disabled playback and toggle any back on). Prefer the SILENCE edges get_transcript reports as your cut boundaries (they already include breathing room, so cuts do not clip words or feel abrupt) rather than exact word starts. Pass all of a clip's ranges in ONE disable_ranges op. The optional `note` is shown to the USER, so keep it concise and human and use mm:ss for any times (never raw ms). delete_ranges has the same shape but HARD-deletes (ripple-closes the gap, irreversible) - use it ONLY after the user explicitly approves a permanent delete; otherwise always prefer disable_ranges. set_disabled toggles a WHOLE clip by id. RE-TIMING: a time-based clip's timeline length is DERIVED from its source media and its playback speed, so you never set its `durationInFrames` directly. To retime a clip, set the duration-affecting property in the `update_clip` (or `update_clips`) patch (today that property is `speed`) and the reducer recomputes the clip's length for you: the clip keeps covering the same span of its source, so its timeline length scales inversely with the speed change (2x speed halves its length, 0.5x doubles it). Re-timing then honors each track's positioning in the SAME op: on the magnetic primary track the following clips ripple so that no gap opens and none is left behind, while clips on other (free) tracks, and every clip while the magnetic track is off, keep their absolute positions. So a speed change, whether on one clip or a bulk `update_clips`, lands gap-free in a single call with no per-clip length math on your side. Any `durationInFrames` you pass for such a clip is ignored in favor of the derived value. update_clips (\{ op: 'update_clips', clipIds?, groupId?, patch \}) applies one patch to a SET of clips at once, the bulk form of update_clip; target an explicit clipIds array OR a whole group via groupId (resolves to its members; clipIds wins if both). Every listed clip takes the same patch, but a duration-affecting property re-times each clip from ITS OWN values (a `speed` change recomputes each clip's length from its own source and speed, per the RE-TIMING rule above), and the magnetic primary track ripples so the whole batch lands gap-free in one op. Use it for a bulk property change (speed, volume, opacity, and so on) instead of many update_clip ops. GROUPS: group (\{ op: 'group', clipIds, name? \}) links 2+ clips under one shared groupId, stamping a stable 'Group N' ordinal that never renumbers (the result carries groupId + groupOrdinal); optional name labels it. ungroup (\{ op: 'ungroup', clipIds \}) clears the group. update_group (\{ op: 'update_group', groupId, patch: \{ name \} \}) renames a group. List groups with their ids / ordinals / names / member clips via get_project's top-level `groups`, then target a whole group with update_group or update_clips \{ groupId \}. merge_clips (\{ op: 'merge_clips', clipIds \}) rejoins adjacent, same-source, contiguous clips into one (the inverse of split; use it to clean up fragments a range edit leaves behind, or to reverse a cut after re-enabling the disabled pieces). ONE-SHOT CLEANUPS (prefer these over hand-rolling ranges for the common cases): remove_silence (\{ op: 'remove_silence', paceThresholdMs?, paddingStartMs?, paddingEndMs? \}) detects and disables dead-air pauses across the WHOLE timeline (paceThresholdMs = min pause length to cut, default 500; paddingStartMs/paddingEndMs = breathing room, default 200) - idempotent + re-adjustable, so re-running re-cuts at the new settings; remove_filler_words (\{ op: 'remove_filler_words' \}) disables high-confidence disfluencies (um/uh/er) across the whole timeline; extract_audio (\{ op: 'extract_audio', clipIds? \}) splits each video clip's audio onto its own track (whole-timeline, or a clipIds subset). remove_silence + remove_filler_words need a ready transcript; each reports a warning + changes nothing when there is nothing to do (no transcript / no gaps / no fillers / no video). They expand to the same disable_ranges / create_clip primitives, so reach for get_transcript + disable_ranges only for CONTEXTUAL or selective cuts the macros cannot express. expectedRevision is OPTIONAL: omit it to apply to the project's current revision (last-write-wins, fine for single-editor and id-targeted ops), or pass the revision from a prior get_project/get_transcript to fail loudly on a concurrent change instead of clobbering it. You do NOT need to fetch the project just to get the revision. Each successful edit returns the new revision for chaining further edits. Requires the editor:write scope.
+
+<ParamField body name="ops" type="object[]" required>
+The timeline ops to apply, in order.
+</ParamField>
+
+<ParamField body name="projectId" type="string" required>
+The editor project id.
+</ParamField>
+
+<ParamField body name="userIntent" type="string" required>
+A short description of what this edit does (for attribution).
+</ParamField>
+
+<ParamField body name="expectedRevision" type="integer">
+The revision from get_project; rejects with a conflict if a concurrent edit landed.
+</ParamField>
+
+<ParamField body name="includeRenderUrl" type="boolean">
+Also return a preview still URL of the resulting composition.
+</ParamField>
+
+### `update_canvas`
+
+<Badge>write</Badge>
+
+Apply a batch of ops to a CANVAS (slides/layers) project. Ops act on layers + slides: create_layer, update_layer, delete_layer, reorder_layer, duplicate_layers, set_layer_hidden, set_layer_locked, group_layers, ungroup_layers, set_layer_as_background, create_slide, update_slide, delete_slide, duplicate_slides, reorder_slides, set_background, and more. BACKGROUND REMOVAL: remove_background (\{ op: 'remove_background', layerId \}) cuts out the background of an IMAGE or VIDEO layer, replacing it with transparency, as an ASYNC job (the result carries a generatingOutputId to poll with get_generation_status; the layer's media swaps to the transparent cutout when done, the original kept). Image removal is FREE; video removal is PREMIUM + metered (Champion+, per second, 60s cap). Other layer types return an error. Each op is an object with an `op` name plus its fields. expectedRevision is OPTIONAL: omit it to apply to the project's current revision (last-write-wins, fine for a single editor), or pass the revision from a prior get_project to fail loudly on a concurrent change instead of clobbering it. You do NOT need to fetch the project just to get the revision. Each successful edit returns the new revision for chaining further edits. Requires the editor:write scope.
+
+<ParamField body name="ops" type="object[]" required>
+The canvas ops to apply, in order.
+</ParamField>
+
+<ParamField body name="projectId" type="string" required>
+The canvas project id.
+</ParamField>
+
+<ParamField body name="userIntent" type="string" required>
+A short description of what this edit does (for attribution).
+</ParamField>
+
+<ParamField body name="expectedRevision" type="integer">
+The revision from get_project; rejects with a conflict if a concurrent edit landed.
+</ParamField>
+
+<ParamField body name="includeRenderUrl" type="boolean">
+Also return a preview still URL of the resulting composition.
+</ParamField>
+
+### `get_transcript`
+
+<Badge>read</Badge>
+
+Read an EDITOR project's transcript mapped to its timeline clips, so you can do content-aware editing. Returns one segment per transcribable clip in timeline order, each carrying the words spoken within it plus its current state ([disabled] = cut/excluded from the render, [enabled] = kept) and its exact clipId. Use this to read what is said, see which parts are already disabled, then target the exact clipId(s) or source-time ranges with update_timeline (disable_ranges to non-destructively cut, set_disabled to toggle a whole clip). Pass `granularity: 'word'` to also get, per segment: word-level timing with ABSOLUTE timeline frames (so split / range ops are exact), per-word confidence + speaker, the derived silence gaps (for dead-air removal; already inset to the cuttable region so cutting them keeps breathing room), and the non-speech audio events (e.g. "[chuckles]"); plus the distinct speaker set at the top level. Word mode can be large, so scope it with `search` (a phrase to find) or `startMs`/`endMs` (a source-media window, which also clips the returned words) to page a long clip. Also returns the project's current `revision` so you can edit right away without a separate get_project: pass it as update_timeline's expectedRevision for a concurrency-safe edit, or omit expectedRevision to just apply to the current state. Returns mediaTranscribed:false when the media has not been transcribed yet. Requires the editor:read scope.
+
+<ParamField body name="projectId" type="string" required>
+The editor project id.
+</ParamField>
+
+<ParamField body name="endMs" type="integer">
+Source-media end time in ms; companion to startMs.
+</ParamField>
+
+<ParamField body name="granularity" type="`clip` \| `word`">
+'clip' (default) returns text per clip; 'word' adds word timing + absolute timeline frames + confidence + speaker, derived silences, and audio events.
+</ParamField>
+
+<ParamField body name="paceThresholdMs" type="integer">
+Word mode: minimum pause (ms) to report as a silence / dead-air region ("Pace"). Defaults to the project's saved pace, else 500.
+</ParamField>
+
+<ParamField body name="paddingEndMs" type="integer">
+Word mode: breathing room (ms) kept before speech at a silence end edge (negative tightens). Defaults to the saved padding, else 200.
+</ParamField>
+
+<ParamField body name="paddingStartMs" type="integer">
+Word mode: breathing room (ms) kept after speech at a silence start edge (negative tightens). Defaults to the saved padding, else 200.
+</ParamField>
+
+<ParamField body name="search" type="string">
+Case-insensitive substring; returns only clip segments whose text contains it.
+</ParamField>
+
+<ParamField body name="startMs" type="integer">
+Source-media start time in ms; with endMs, returns only segments overlapping this window (and, in word mode, clips the returned words to it).
+</ParamField>
+
+### `list_elements`
+
+<Badge>read</Badge>
+
+List the account's saved reference elements: reusable named groups of images (a character, prop, location) addressable in a Kling prompt as @name. Reference one in a generation by elementId.
+
+Takes no parameters.
+
+### `get_element`
+
+<Badge>read</Badge>
+
+Get one saved reference element by id: its name, category, description, and images.
+
+<ParamField body name="elementId" type="string" required>
+The element id.
+</ParamField>
+
+### `create_element`
+
+<Badge>write</Badge>
+
+Create a reusable reference element from 2-4 images (or 1 video) of one entity (a character, prop, location). Images may be URLs or output-id tokens, so you can generate the angle shots first and assemble an element from them. Reference it later in a Kling 3.0 generation via references.elements [\{ elementId \}] and @name in the prompt.
+
+<ParamField body name="description" type="string" required>
+What the element represents (required).
+</ParamField>
+
+<ParamField body name="name" type="string" required>
+Referenced in the prompt as @name.
+</ParamField>
+
+<ParamField body name="category" type="`auto` \| `character` \| `location` \| `prop`">
+Kind of entity (default 'auto').
+</ParamField>
+
+<ParamField body name="images" type="string[]">
+2-4 image URLs or output-id tokens.
+</ParamField>
+
+<ParamField body name="video" type="string">
+A single video URL or output-id token (alternative to images).
+</ParamField>
+
+### `update_element`
+
+<Badge>write</Badge>
+
+Update a saved element's name, description, or category.
+
+<ParamField body name="elementId" type="string" required>
+The element id.
+</ParamField>
+
+<ParamField body name="category" type="`auto` \| `character` \| `location` \| `prop`">
+
+</ParamField>
+
+<ParamField body name="description" type="string">
+
+</ParamField>
+
+<ParamField body name="name" type="string">
+
+</ParamField>
+
+### `delete_element`
+
+<Badge>write</Badge>
+
+Delete a saved reference element.
+
+<ParamField body name="elementId" type="string" required>
+The element id.
+</ParamField>
+
