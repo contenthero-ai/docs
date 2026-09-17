@@ -198,7 +198,7 @@ Filter by a stage id, slug, or name. Resolved within the chosen space.
 
 <Badge>read</Badge>
 
-Get one post in full: its fields (title, description, script, notes, status, stage, schedule), plus its publish posts and attached assets.
+Get one CARD in full: its fields (title, description, script, notes, status, stage, schedule), plus its posts (one per platform, which is how it publishes) and its attached assets in carousel order.
 
 <ParamField body name="cardId" type="string" required>
 The card id from list_cards.
@@ -265,11 +265,11 @@ Public URL for the post cover.
 </ParamField>
 
 <ParamField body name="notes" type="string">
-
+Working notes on the card. Plain text or markdown; tables render here. No emojis.
 </ParamField>
 
 <ParamField body name="platform" type="`youtube` \| `instagram` \| `tiktok` \| `facebook` \| `linkedin` \| `x` \| `threads` \| `general`">
-
+The card's primary platform. This is a label on the card; what actually publishes is its posts.
 </ParamField>
 
 <ParamField body name="posts" type="object[]">
@@ -281,7 +281,7 @@ ISO time to publish. Sets the card AND every post. null clears the schedule.
 </ParamField>
 
 <ParamField body name="script" type="string">
-
+The spoken or written script for this card. The content itself, not a note about it.
 </ParamField>
 
 <ParamField body name="spaceId" type="string">
@@ -289,7 +289,7 @@ Move the card to a different space (id or slug). Without a stage, it lands in th
 </ParamField>
 
 <ParamField body name="stage" type="string">
-Move the post to this stage (id, slug, or name).
+Move the card to this stage (id, slug, or name).
 </ParamField>
 
 <ParamField body name="tags" type="string[]">
@@ -297,7 +297,7 @@ Tag names to set on the post (must already exist; replaces the set). Omit to lea
 </ParamField>
 
 <ParamField body name="title" type="string">
-
+Rename the card. Keep it short: a long title wraps and makes the column unreadable.
 </ParamField>
 
 ### `list_tags`

@@ -18,6 +18,7 @@
 import { Client } from '@modelcontextprotocol/sdk/client/index.js'
 import { InMemoryTransport } from '@modelcontextprotocol/sdk/inMemory.js'
 import { buildServer } from '@contenthero/mcp/dist/server.js'
+import { TOOL_GROUPS, assertGroupsCoverTools } from '@contenthero/mcp/dist/groups.js'
 import { execFileSync } from 'node:child_process'
 import { mkdirSync, writeFileSync, readFileSync, existsSync, rmSync } from 'node:fs'
 import { join, dirname } from 'node:path'
@@ -37,94 +38,16 @@ const OUT = CHECK ? join(tmpdir(), `ch-reference-check-${process.pid}`) : REPO
 /**
  * Which reference page each tool lands on.
  *
- * Hand-authored on purpose. Grouping is an editorial judgement about what a reader
- * is looking for, and deriving it from the tool name would produce a taxonomy that
- * reshuffles itself every time a tool is renamed. The GUARD below fails the build
- * when a tool exists that no group claims, so this list cannot silently fall behind.
+ * This list USED TO LIVE HERE. It now comes from the published @contenthero/mcp, which is
+ * the package that defines the tools, because three artifacts needed the same grouping:
+ * these docs, the ContentHero agent skill, and the MCP package's own tool-list test. Three
+ * hand-maintained copies of 88 names is three chances to disagree and nothing that notices.
+ *
+ * Grouping is still EDITORIAL (deriving it from tool names would reshuffle the docs on
+ * every rename), it just has one home now, and that home is next to the definitions. Its
+ * completeness is proven by a test inside that package, before publish, and re-checked
+ * here against the surface this generator actually read.
  */
-const GROUPS = [
-  {
-    slug: 'generate',
-    title: 'Generate',
-    blurb: 'Create images, video, audio and boards, upscale them, and check what a generation is doing.',
-    tools: [
-      'generate_image', 'generate_video', 'generate_audio', 'generate_board',
-      'generate_lip_sync', 'upscale', 'edit_audio', 'transcribe',
-      'get_generation_status', 'create_preview', 'get_preview',
-      'list_models', 'get_model', 'get_layer_types', 'get_timeline_types',
-    ],
-  },
-  {
-    slug: 'media',
-    title: 'Media',
-    blurb: 'The library: browse, search, import and upload the media an account owns.',
-    tools: [
-      'list_media', 'get_media', 'search_media', 'import_media',
-      'create_media_upload', 'complete_media_upload',
-      'list_folders', 'get_folder', 'create_folder', 'update_folder', 'delete_folder',
-      'favorite', 'archive',
-    ],
-  },
-  {
-    slug: 'characters',
-    title: 'Avatars and voices',
-    blurb: 'The identity layer: avatars with their looks, and the voices they speak with.',
-    tools: [
-      'list_avatars', 'get_avatar', 'create_avatar', 'update_avatar', 'delete_avatar',
-      'list_voices', 'get_voice',
-    ],
-  },
-  {
-    slug: 'planner',
-    title: 'Planner',
-    blurb: 'Spaces, stages and cards: the content pipeline, and publishing from it.',
-    tools: [
-      'list_spaces', 'get_space', 'create_space', 'update_space', 'delete_space',
-      'list_stages', 'create_stage', 'update_stage', 'delete_stage',
-      'list_cards', 'get_card', 'create_card', 'update_card',
-      'list_tags', 'create_tag', 'update_tag', 'delete_tag',
-      'publish_post', 'list_connected_accounts', 'get_connected_account',
-    ],
-  },
-  {
-    slug: 'brand',
-    title: 'Brand',
-    blurb: 'Brand kits and the knowledge base that grounds generations in your voice.',
-    tools: [
-      'list_brand_kits', 'get_brand_kit', 'create_brand_kit', 'update_brand_kit',
-      'list_brand_knowledge', 'get_brand_knowledge', 'add_brand_knowledge',
-      'remove_brand_knowledge', 'search_brand_knowledge',
-    ],
-  },
-  {
-    slug: 'editor',
-    title: 'Editor and canvas',
-    blurb: 'Projects, their timelines and canvases, the elements on them, and exports.',
-    tools: [
-      'list_projects', 'get_project', 'create_project', 'delete_project',
-      'import_project', 'export_project', 'get_export', 'get_export_formats',
-      'update_timeline', 'update_canvas', 'get_transcript',
-      'list_elements', 'get_element', 'create_element', 'update_element', 'delete_element',
-    ],
-  },
-  {
-    slug: 'inspiration',
-    title: 'Inspiration',
-    blurb: 'The research surface: the social accounts you track, and their posts ranked by outlier score.',
-    // list_accounts and get_account are TRACKED SOCIAL ACCOUNTS, not the ContentHero
-    // account you are signed in as. list_accounts: "TWO KINDS, in one list: accountType
-    // 'inspiration' is the creators and competitors they watch, 'brand' is their OWN
-    // profiles." Filing them under an "Account" page misreads the entire research
-    // surface, which is what the first draft of this list did.
-    tools: ['list_accounts', 'get_account', 'list_content', 'get_content'],
-  },
-  {
-    slug: 'account',
-    title: 'Account',
-    blurb: 'Your balance and tier, the platforms available to publish to, and what the user is looking at.',
-    tools: ['get_balance', 'get_context', 'list_platforms', 'get_platform'],
-  },
-]
 
 /* -------------------------------------------------------------------- render */
 
@@ -278,26 +201,21 @@ const { tools } = await mcp.listTools()
 
 const byName = new Map(tools.map((t) => [t.name, t]))
 
-// GUARD: every tool must belong to exactly one group, and no group may name a tool
-// that no longer exists. This is what stops the grouping list rotting the way the
-// hand-written docs did.
-const claimed = GROUPS.flatMap((g) => g.tools)
-const dupes = claimed.filter((n, i) => claimed.indexOf(n) !== i)
-const unclaimed = tools.map((t) => t.name).filter((n) => !claimed.includes(n))
-const phantom = claimed.filter((n) => !byName.has(n))
-const problems = []
-if (dupes.length) problems.push(`tools claimed by two groups: ${dupes.join(', ')}`)
-if (unclaimed.length) problems.push(`tools in no group: ${unclaimed.join(', ')}`)
-if (phantom.length) problems.push(`groups name tools that do not exist: ${phantom.join(', ')}`)
-if (problems.length) {
-  console.error('Grouping is out of date:\n  ' + problems.join('\n  '))
+// GUARD: every tool belongs to exactly one group, and no group names a tool that no
+// longer exists. The check ships WITH the grouping now, so the docs and the skill cannot
+// drift apart by each fixing it differently.
+try {
+  assertGroupsCoverTools(tools.map((t) => t.name))
+} catch (err) {
+  console.error(String(err.message))
+  console.error('\nThe grouping lives in @contenthero/mcp (src/groups.ts). Fix it there and republish.')
   process.exit(1)
 }
 
 mkdirSync(join(OUT, 'mcp/tools'), { recursive: true })
 mkdirSync(join(OUT, 'cli'), { recursive: true })
 
-for (const g of GROUPS) {
+for (const g of TOOL_GROUPS) {
   const list = g.tools.map((n) => byName.get(n))
   writeFileSync(join(OUT, `mcp/tools/${g.slug}.mdx`), renderToolPage(g, list))
 }
@@ -318,13 +236,13 @@ rmSync(schemaPath, { force: true })
 writeFileSync(join(OUT, 'cli/reference.mdx'), renderCliPage(cliSchema.commands, cliSchema.globalOptions))
 
 const written = [
-  ...GROUPS.map((g) => `mcp/tools/${g.slug}.mdx`),
+  ...TOOL_GROUPS.map((g) => `mcp/tools/${g.slug}.mdx`),
   'cli/reference.mdx',
 ]
 
 if (!CHECK) {
   console.log(
-    `Generated ${GROUPS.length} MCP tool pages (${tools.length} tools) and 1 CLI page (${cliSchema.commands.length} commands).`,
+    `Generated ${TOOL_GROUPS.length} MCP tool pages (${tools.length} tools) and 1 CLI page (${cliSchema.commands.length} commands).`,
   )
   process.exit(0)
 }

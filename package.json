@@ -10,8 +10,8 @@
     "check": "npm run check:reference && npm run check:tool-names"
   },
   "devDependencies": {
-    "@contenthero/cli": "0.3.4",
-    "@contenthero/mcp": "0.4.5",
+    "@contenthero/cli": "0.3.5",
+    "@contenthero/mcp": "0.4.6",
     "@modelcontextprotocol/sdk": "^1.0.0"
   }
 }

@@ -38,7 +38,7 @@ The brand kit id from list_brand_kits.
 
 <Badge>write</Badge>
 
-Create a brand kit. THREE SOURCES, chosen by what you pass: (1) EMPTY, just a name, then fill it in with update_brand_kit; or FROM A SOCIAL PROFILE, pass its url in brandAccounts (your own) or inspirationAccounts (a creator you watch) with no name at all, and the kit is named after the handle and starts ingesting that account's posts if it is YouTube or Instagram; (2) FROM A WEBSITE, pass websiteUrl + extract:true and ContentHero scrapes that site and fills in business name, positioning, voice, colours, typography, logos and assets by itself, which is by far the fastest way to get a real kit; (3) A COPY, pass duplicateFrom with an existing kit id, which copies its sections and brand media (assets re-link rather than duplicate, so a copy costs no storage). A brand with NO WEBSITE (so nothing to extract) is built by passing its fields directly, including logos, whose entries may name outputId to bring in a generation you just made rather than a url. With extract it RETURNS IMMEDIATELY, before the kit has any content: that empty kit is the handle, and the fields fill in over the next minute or two, so poll extractionStatus with get_brand_kit rather than assuming it failed. name is OPTIONAL when websiteUrl or a social profile url is given: it defaults to the site's hostname or the @handle, a placeholder extraction or you overwrite later. Brand kits are capped by plan, so this fails with a limit error near the cap, and a duplicate counts against it like any other kit. Requires the brandkit:write scope.
+Create a brand kit. THREE SOURCES, chosen by what you pass: (1) EMPTY, just a name, then fill it in with update_brand_kit; or FROM A SOCIAL PROFILE, pass its url in brandAccounts (your own) or inspirationAccounts (a creator you watch) with no name at all, and the kit is named after the handle and starts ingesting that account's posts if it is YouTube or Instagram; (2) FROM A WEBSITE, pass websiteUrl + extract:true and ContentHero scrapes that site and fills in business name, positioning, voice, colors, typography, logos and assets by itself, which is by far the fastest way to get a real kit; (3) A COPY, pass duplicateFrom with an existing kit id, which copies its sections and brand media (assets re-link rather than duplicate, so a copy costs no storage). A brand with NO WEBSITE (so nothing to extract) is built by passing its fields directly, including logos, whose entries may name outputId to bring in a generation you just made rather than a url. With extract it RETURNS IMMEDIATELY, before the kit has any content: that empty kit is the handle, and the fields fill in over the next minute or two, so poll extractionStatus with get_brand_kit rather than assuming it failed. name is OPTIONAL when websiteUrl or a social profile url is given: it defaults to the site's hostname or the @handle, a placeholder extraction or you overwrite later. Brand kits are capped by plan, so this fails with a limit error near the cap, and a duplicate counts against it like any other kit. Requires the brandkit:write scope.
 
 <ParamField body name="assets" type="object[]">
 The kit's brand assets, each \{ url | outputId, name? \}.
@@ -53,7 +53,7 @@ The account owner's OWN profiles. A tracked-account id, or \{ platform?, handleO
 </ParamField>
 
 <ParamField body name="businessName" type="string">
-
+The business or creator name this kit represents.
 </ParamField>
 
 <ParamField body name="contentStrategy" type="object">
@@ -61,7 +61,7 @@ Content strategy object (free-form).
 </ParamField>
 
 <ParamField body name="designPrinciples" type="string[]">
-
+Design rules to hold to, one per entry. REPLACES the list; [] clears it.
 </ParamField>
 
 <ParamField body name="duplicateFrom" type="string">
@@ -85,7 +85,7 @@ The kit's name. Optional when websiteUrl is given.
 </ParamField>
 
 <ParamField body name="nicheDefinition" type="string">
-
+The niche this brand operates in. Keeps generated angles on-topic.
 </ParamField>
 
 <ParamField body name="positioning" type="object">
@@ -93,7 +93,7 @@ Positioning object (free-form).
 </ParamField>
 
 <ParamField body name="primaryOffer" type="string">
-
+What this business sells, in one line. Grounds copy in what is actually being promoted.
 </ParamField>
 
 <ParamField body name="sections" type="object[]">
@@ -101,7 +101,7 @@ The kit's curated sections, each \{ tab, sectionName, sortOrder?, fields? \}. Ar
 </ParamField>
 
 <ParamField body name="visualStyle" type="string">
-
+The look in words, e.g. 'warm film grain, muted earth tones'. Grounds image and video prompts.
 </ParamField>
 
 <ParamField body name="voiceProfile" type="object">
@@ -135,7 +135,7 @@ The brand kit id. Omit ONLY when reordering with orderedIds.
 </ParamField>
 
 <ParamField body name="businessName" type="string">
-
+The business or creator name this kit represents.
 </ParamField>
 
 <ParamField body name="contentStrategy" type="object">
@@ -143,7 +143,7 @@ Content strategy object (free-form).
 </ParamField>
 
 <ParamField body name="designPrinciples" type="string[]">
-
+Design rules to hold to, one per entry. REPLACES the list; [] clears it.
 </ParamField>
 
 <ParamField body name="extract" type="boolean">
@@ -163,11 +163,11 @@ The kit's logos, each \{ url | outputId, name?, is_primary?, layout?: horizontal
 </ParamField>
 
 <ParamField body name="name" type="string">
-
+Rename the kit. This is the label in the UI, not the business name.
 </ParamField>
 
 <ParamField body name="nicheDefinition" type="string">
-
+The niche this brand operates in. Keeps generated angles on-topic.
 </ParamField>
 
 <ParamField body name="orderedIds" type="string[]">
@@ -179,7 +179,7 @@ Positioning object (free-form).
 </ParamField>
 
 <ParamField body name="primaryOffer" type="string">
-
+What this business sells, in one line. Grounds copy in what is actually being promoted.
 </ParamField>
 
 <ParamField body name="sections" type="object[]">
@@ -187,7 +187,7 @@ The kit's curated sections, each \{ tab, sectionName, sortOrder?, fields? \}. RE
 </ParamField>
 
 <ParamField body name="visualStyle" type="string">
-
+The look in words, e.g. 'warm film grain, muted earth tones'. Grounds image and video prompts.
 </ParamField>
 
 <ParamField body name="voiceProfile" type="object">
@@ -195,7 +195,7 @@ Voice profile object (tone, style, ...).
 </ParamField>
 
 <ParamField body name="websiteUrl" type="string">
-
+The business website. Stored as a reference; it does not re-extract on its own.
 </ParamField>
 
 ### `list_brand_knowledge`

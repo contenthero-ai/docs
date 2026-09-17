@@ -76,7 +76,7 @@ Maximum number of assets to return (default 12, max 50).
 
 <Badge>write</Badge>
 
-Import a remote URL as first-class media: the server fetches and re-hosts it, returning its outputId + public URL (referenceable by outputId in generate_* and add_post_asset). Use this for a file already on a public URL, or from a hosted client that cannot read local files. Requires the assets:write scope.
+Import a remote URL as first-class media: the server fetches and re-hosts it, returning its outputId + public URL (referenceable by outputId in generate_* and as an asset on a card via update_card). Use this for a file already on a public URL, or from a hosted client that cannot read local files. Requires the assets:write scope.
 
 <ParamField body name="url" type="string" required>
 A public http(s) URL to fetch and re-host.
@@ -94,7 +94,7 @@ Optional file name (used for its extension).
 
 <Badge>write</Badge>
 
-Upload a local file as first-class media (phase 1 of 2). Returns a signed uploadUrl and the exact headers to send; PUT the file bytes to that URL with those headers unchanged, then call complete_media_upload with the returned outputId. The finished media is referenceable by outputId in generate_* and add_post_asset. For a file already on a public URL, use import_media instead. Requires the assets:write scope.
+Upload a local file as first-class media (phase 1 of 2). Returns a signed uploadUrl and the exact headers to send; PUT the file bytes to that URL with those headers unchanged, then call complete_media_upload with the returned outputId. The finished media is referenceable by outputId in generate_* and as an asset on a card via update_card. For a file already on a public URL, use import_media instead. Requires the assets:write scope.
 
 <ParamField body name="contentType" type="string" required>
 The file MIME type, e.g. "image/png" or "video/mp4".
