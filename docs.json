@@ -82,20 +82,21 @@
           {
             "group": "Set up your host",
             "pages": [
-              "mcp/claude-code",
               "mcp/claude-desktop",
+              "mcp/claude-code",
               "mcp/chatgpt",
               "mcp/codex",
+              "mcp/gemini",
+              "mcp/gemini-cli",
+              "mcp/antigravity",
+              "mcp/grok",
               "mcp/cursor",
               "mcp/vscode",
               "mcp/windsurf",
-              "mcp/antigravity",
-              "mcp/cline",
-              "mcp/gemini-cli",
-              "mcp/grok",
-              "mcp/perplexity",
               "mcp/openclaw",
               "mcp/hermes",
+              "mcp/cline",
+              "mcp/perplexity",
               "mcp/trae",
               "mcp/other-hosts"
             ]

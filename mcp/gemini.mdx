@@ -1,0 +1,47 @@
+---
+title: "Gemini"
+description: "Connect ContentHero to the Gemini app as a custom connected app over OAuth."
+---
+
+The Gemini app connects to remote MCP servers as **custom connected apps**, inside Gemini Spark.
+
+<Warning>
+**Check these first.** Custom apps are hidden, not disabled, when any of these is unmet, and Gemini does not say which one you are missing.
+
+- A **personal** Google account. A work or school (Workspace) account shows Connected Apps but never the Custom apps section.
+- **Google AI Pro or Ultra.** A free account has no Connected Apps entry at all, and AI Plus does not add one.
+- **Spark**, not Chat. The section only appears after you switch modes in the sidebar.
+
+Using the Gemini **CLI** instead? That has no such requirements. See [Gemini CLI](/mcp/gemini-cli).
+</Warning>
+
+## Add the connected app
+
+<Steps>
+  <Step title="Switch to Spark">
+    In the Gemini sidebar, switch the toggle from **Chat** to **Spark**, then open **Connected Apps**.
+  </Step>
+  <Step title="Enter the server">
+    Scroll to **Custom apps**, paste the MCP server URL, and click **Next**:
+
+    ```
+    https://mcp.contenthero.ai
+    ```
+
+    Click through the defaults. The OAuth **Client ID** and **Client secret** fields stay blank; ContentHero registers itself.
+  </Step>
+  <Step title="Authorize">
+    Accept the risk notice, then **Connect**. Gemini sends you to ContentHero to approve. Sign in if you are not already, then click **Authorize**. No API key needed.
+  </Step>
+  <Step title="Save">
+    Gemini shows the connection named **ContentHero** with its available actions. Click **Connect** to save it.
+  </Step>
+</Steps>
+
+## Verify
+
+In a Spark task with the app enabled, ask Gemini to read your ContentHero balance. It calls `get_balance` and returns your credits.
+
+<Note>
+**Generated media appears as links, not inline.** Gemini runs every ContentHero tool and saves results to your library, but it does not render the generation card that Claude and ChatGPT show. Gemini may still describe a "widget" or "media viewer" in its reply; that is the model narrating, not something on your screen. Open the links, or your [ContentHero library](https://app.contenthero.ai/studio), to see the results.
+</Note>
