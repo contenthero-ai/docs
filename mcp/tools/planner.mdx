@@ -208,7 +208,7 @@ The card id from list_cards.
 
 <Badge>write</Badge>
 
-Create a card, the container in the content pipeline. A card holds the work (title, script, notes, cover) and the posts that publish it. Attach posts and media by passing `posts` and `assets` to update_card, then publish with publish_post. ⚠️ WITHOUT spaceId THIS LANDS ON THE ACCOUNT'S DEFAULT BOARD, which is rarely what you want once more than one space exists, so call list_spaces first. `stage` accepts a stage id/slug/name and DECIDES the space when it is an id; a spaceId that disagrees with it is rejected rather than guessed. Requires a key with the planner:write scope.
+Create a card, the container in the content pipeline. A card holds the work (title, notes, cover) and the posts that publish it. Attach posts and media by passing `posts` and `assets` to update_card, then publish with publish_post. ⚠️ WITHOUT spaceId THIS LANDS ON THE ACCOUNT'S DEFAULT BOARD, which is rarely what you want once more than one space exists, so call list_spaces first. `stage` accepts a stage id/slug/name and DECIDES the space when it is an id; a spaceId that disagrees with it is rejected rather than guessed. Requires a key with the planner:write scope.
 
 <ParamField body name="platform" type="`youtube` \| `instagram` \| `tiktok` \| `facebook` \| `linkedin` \| `x` \| `threads` \| `general`" required>
 Primary platform for the post.
@@ -242,7 +242,7 @@ Tag names to set on the post (must already exist; see list_tags / create_tag). R
 
 <Badge>write</Badge>
 
-Update a card: its fields (title, description, script, notes, platform, cover, stage), its POSTS (one per platform, which is how it publishes), its ASSETS (the media on it, in order), and its SCHEDULE. posts and assets are DECLARATIVE: pass the WHOLE set, because anything you leave out is removed. Posts key on platform. Assets key on id, and THE ARRAY ORDER IS THE carousel ORDER, so reordering is just sending the same ids in a different order; keep an existing asset by id, add a new one by assetUrl or outputId. scheduledAt sets the time on the card AND every post (pass null to clear); give a post its own scheduledAt to override it for that platform. To publish NOW, use publish_post. Pass spaceId to MOVE the card to another space; without a stage it lands in the target space's stage whose slug matches its current one, or that space's first stage. Pass cardIds to update several cards at once, which crossed with spaceId is how a selection moves in one call; fields that describe ONE card (title, notes, script, cover) still need exactly one. Requires the planner:write scope.
+Update a card: its fields (title, notes, platform, cover, stage), its POSTS (one per platform, which is how it publishes), its ASSETS (the media on it, in order), and its SCHEDULE. posts and assets are DECLARATIVE: pass the WHOLE set, because anything you leave out is removed. Posts key on platform. Assets key on id, and THE ARRAY ORDER IS THE carousel ORDER, so reordering is just sending the same ids in a different order; keep an existing asset by id, add a new one by assetUrl or outputId. scheduledAt sets the time on the card AND every post (pass null to clear); give a post its own scheduledAt to override it for that platform. To publish NOW, use publish_post. Pass spaceId to MOVE the card to another space; without a stage it lands in the target space's stage whose slug matches its current one, or that space's first stage. Pass cardIds to update several cards at once, which crossed with spaceId is how a selection moves in one call; fields that describe ONE card (title, notes, cover) still need exactly one. WRITING notes REQUIRES expectedRevision: read the card first and pass the revision it reported, or the call is refused. Requires the planner:write scope.
 
 <ParamField body name="cardId" type="string" required>
 The card id.
@@ -253,7 +253,7 @@ The post's assets IN ORDER, each \{ id \} to keep an existing one or \{ assetUrl
 </ParamField>
 
 <ParamField body name="cardIds" type="string[]">
-Update several cards at once. Fields that describe ONE card (title, notes, script, cover) still require exactly one.
+Update several cards at once. Fields that describe ONE card (title, notes, cover) still require exactly one.
 </ParamField>
 
 <ParamField body name="coverOutputId" type="string">
@@ -262,6 +262,10 @@ A media token (output id, first-8, or "-N") for the cover, resolved to its URL.
 
 <ParamField body name="coverUrl" type="string">
 Public URL for the post cover.
+</ParamField>
+
+<ParamField body name="expectedRevision" type="integer">
+REQUIRED when writing notes: the revision get_card reported for this card. A card's notes have four independent writers, each reading the whole document and writing it back, so without this the last writer silently erases the others and still gets a success. If the card changed since you read it, the call fails with a conflict carrying the current notes and revision: merge onto those and retry with the revision they came with. Never guess it or add one to it, because it only advances when notes actually change.
 </ParamField>
 
 <ParamField body name="notes" type="string">
@@ -278,10 +282,6 @@ The card's posts, each \{ platform, format?, connectedAccountId?, platformSpecif
 
 <ParamField body name="scheduledAt" type="string,null">
 ISO time to publish. Sets the card AND every post. null clears the schedule.
-</ParamField>
-
-<ParamField body name="script" type="string">
-The spoken or written script for this card. The content itself, not a note about it.
 </ParamField>
 
 <ParamField body name="spaceId" type="string">

@@ -15,10 +15,18 @@
  * the prose. That is what lets CI regenerate and diff to catch drift.
  */
 
+import { createRequire } from 'node:module'
 import { Client } from '@modelcontextprotocol/sdk/client/index.js'
 import { InMemoryTransport } from '@modelcontextprotocol/sdk/inMemory.js'
-import { buildServer } from '@contenthero/mcp/dist/server.js'
-import { TOOL_GROUPS, assertGroupsCoverTools } from '@contenthero/mcp/dist/groups.js'
+/**
+ * ⚠️ IMPORTED FROM THE PACKAGE ENTRYPOINT, NOT FROM `dist/server.js` AND `dist/groups.js`.
+ * Those deep paths existed in `@contenthero/mcp@0.4.6` and do NOT exist in `0.4.13`, which bundles
+ * to a single `dist/index.js`. Reaching past a package's public entrypoint into its build layout
+ * makes every internal reorganization a breaking change for this script, and it broke exactly that
+ * way the first time these pins were brought current. `buildServer`, `TOOL_GROUPS` and
+ * `assertGroupsCoverTools` are all exported from the entrypoint, which is the supported surface.
+ */
+import { buildServer, TOOL_GROUPS, assertGroupsCoverTools } from '@contenthero/mcp'
 import { execFileSync } from 'node:child_process'
 import { mkdirSync, writeFileSync, readFileSync, existsSync, rmSync } from 'node:fs'
 import { join, dirname } from 'node:path'
@@ -30,6 +38,32 @@ import { tmpdir } from 'node:os'
  * reference cannot drift from the packages without CI going red.
  */
 const CHECK = process.argv.includes('--check')
+
+/**
+ * ⚠️ THE VERSIONS THIS GENERATED FROM, PRINTED ON EVERY RUN.
+ *
+ * 🚨 `--check` REGENERATES FROM THE SAME INSTALL IT THEN DIFFS AGAINST, so it is green by
+ * construction and CANNOT detect staleness. On 2026-09-21 it reported "Reference is current" while
+ * the docs described `@contenthero/mcp@0.4.6` and the published package was `0.4.13` -- seven
+ * patches of tool descriptions, including a renamed render mode, missing from the docs with a
+ * passing check. The check proves the docs match node_modules; it says nothing about whether
+ * node_modules matches the product.
+ *
+ * Printing the version is the cheap half of the fix: "Reference is current (from mcp@0.4.6)" reads
+ * very differently from "Reference is current". The other half is a release step -- bump these pins
+ * when the packages publish, then regenerate.
+ */
+function generatedFrom() {
+  const v = (name) => {
+    try {
+      return createRequire(import.meta.url)(`${name}/package.json`).version
+    } catch {
+      return 'unresolved'
+    }
+  }
+  return `mcp@${v('@contenthero/mcp')}, cli@${v('@contenthero/cli')}`
+}
+
 const REPO = dirname(import.meta.dirname)
 const OUT = CHECK ? join(tmpdir(), `ch-reference-check-${process.pid}`) : REPO
 
@@ -242,7 +276,7 @@ const written = [
 
 if (!CHECK) {
   console.log(
-    `Generated ${TOOL_GROUPS.length} MCP tool pages (${tools.length} tools) and 1 CLI page (${cliSchema.commands.length} commands).`,
+    `Generated ${TOOL_GROUPS.length} MCP tool pages (${tools.length} tools) and 1 CLI page (${cliSchema.commands.length} commands) from ${generatedFrom()}.`,
   )
   process.exit(0)
 }
@@ -262,5 +296,5 @@ if (drifted.length) {
   console.error('\nRun `npm run generate:reference` and commit the result.')
   process.exit(1)
 }
-console.log(`Reference is current: ${written.length} generated files match the packages.`)
+console.log(`Reference is current: ${written.length} generated files match the INSTALLED packages (${generatedFrom()}). Run check:currency to confirm those are the PUBLISHED versions; this check alone cannot.`)
 process.exit(0)

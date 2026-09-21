@@ -23,7 +23,7 @@
 
 import { Client } from '@modelcontextprotocol/sdk/client/index.js'
 import { InMemoryTransport } from '@modelcontextprotocol/sdk/inMemory.js'
-import { buildServer } from '@contenthero/mcp/dist/server.js'
+import { buildServer } from '@contenthero/mcp'
 import { execFileSync } from 'node:child_process'
 import { readFileSync, readdirSync, statSync, rmSync } from 'node:fs'
 import { join, dirname, relative } from 'node:path'

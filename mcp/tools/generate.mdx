@@ -6,7 +6,7 @@ description: "Create images, video, audio and boards, upscale them, and check wh
 {/* GENERATED FILE. Do not edit by hand. */}
 {/* Regenerate with `npm run generate:reference` in contenthero-docs. */}
 
-Create images, video, audio and boards, upscale them, and check what a generation is doing. 15 tools.
+Create images, video, audio and boards, upscale them, and check what a generation is doing. 14 tools.
 
 Every tool below is exposed by the hosted MCP server at `https://mcp.contenthero.ai` and by the `@contenthero/mcp` npm package. A <Badge>write</Badge> tool changes your account; a <Badge>read</Badge> tool does not.
 
@@ -14,7 +14,7 @@ Every tool below is exposed by the hosted MCP server at `https://mcp.contenthero
 
 <Badge>write</Badge>
 
-Generate one or more images from a text prompt (optionally image-to-image with reference images). Waits for the result and returns the image URLs. Optionally pass projectId to place the generated image onto that project in the same call, controlled by an optional placement: a VIDEO timeline places a clip on a track, a CANVAS design places a layer on a slide (defaulting to the slide the user is focused on). Omit projectId to save a standalone library output. SPENDS CREDITS: pass getCost to preview the price first, which runs nothing and charges nothing.
+Generate one or more images from a text prompt (optionally image-to-image with reference images). Waits for the result and returns the image URLs. Optionally pass projectId to place the generated image onto that project in the same call, controlled by an optional placement: a VIDEO timeline places a clip on a track, a CANVAS design places a layer on a slide (defaulting to the slide the user is focused on). Omit projectId to save a standalone library output. The result LINKS each output so the user sees it inline; to SEE it yourself (judge a face, check legibility, pick between variations) call get_media with the outputId. SPENDS CREDITS: pass getCost to preview the price first, which runs nothing and charges nothing.
 
 <ParamField body name="modelId" type="`nano-banana-2` \| `nano-banana` \| `nano-banana-pro` \| `seedream-5-lite` \| `gpt-image-2` \| `flux-2-pro` \| `flux-1-kontext`" required>
 nano-banana-2 = strong general default (1K/2K/4K). gpt-image-2 = best text rendering (resolution 1K/2K/4K, no quality param). flux-2-pro (mode pro|flex) / seedream-5-lite / nano-banana-pro = alternatives. flux-1-kontext (mode pro|max) = edit/recreate. Pass referenceImages for image-to-image / editing; pass mode for flux models.
@@ -72,7 +72,7 @@ Seed for reproducibility.
 
 <Badge>write</Badge>
 
-Generate a video from a text prompt (optionally from a start/end frame or reference images/videos/audio). Waits up to ~50s; if the render is still running it returns an outputId to poll with get_generation_status. Seedance 2.0 has two input modes selected by which references you pass: a startFrame (and optional endFrame) runs start/end-frame mode; referenceImages / referenceVideos / referenceAudio (without a startFrame) run references mode. Optionally pass projectId to place the generated video onto that project in the same call, controlled by an optional placement: a VIDEO timeline places a clip on a track, a CANVAS design places a layer on a slide (defaulting to the slide the user is focused on). Omit projectId to save a standalone library output. SPENDS CREDITS: pass getCost to preview the price first, which runs nothing and charges nothing.
+Generate a video from a text prompt (optionally from a start/end frame or reference images/videos/audio). Waits up to ~50s; if the render is still running it returns an outputId to poll with get_generation_status. Seedance 2.0 has two input modes selected by which references you pass: a startFrame (and optional endFrame) runs start/end-frame mode; referenceImages / referenceVideos / referenceAudio (without a startFrame) run references mode. Optionally pass projectId to place the generated video onto that project in the same call, controlled by an optional placement: a VIDEO timeline places a clip on a track, a CANVAS design places a layer on a slide (defaulting to the slide the user is focused on). Omit projectId to save a standalone library output. The result LINKS each output so the user sees it inline; to SEE it yourself (judge a face, check legibility, pick between variations) call get_media with the outputId. SPENDS CREDITS: pass getCost to preview the price first, which runs nothing and charges nothing.
 
 <ParamField body name="modelId" type="`veo-3.1-fast` \| `veo-3.1-quality` \| `seedance-2` \| `seedance-2-fast` \| `kling-3.0` \| `kling-2.6` \| `kling-3.0-motion-control` \| `kling-2.6-motion-control` \| `wan-2.6`" required>
 veo-3.1-fast / veo-3.1-quality = high quality clips with audio. seedance-2 / seedance-2-fast = multimodal references; startFrame(+endFrame) = frame mode, referenceImages/Videos/Audio = references mode. kling-3.0 (per-shot via shots) / kling-2.6 = strong motion. wan-2.6 (multiShot for multi-shot mode) = alternative. The motion-control variants require an input image plus an input video.
@@ -162,7 +162,7 @@ First frame: an image URL or a previous output id (e.g. "\<id\>-2") to chain (e.
 
 <Badge>write</Badge>
 
-Generate audio with ElevenLabs: speech (TTS), music, or a sound effect. Returns the audio URL directly (synchronous, no polling). Optionally pass projectId to place the generated audio onto that editor project's timeline in the same call, controlled by an optional placement; omit projectId to save a standalone library output. SPENDS CREDITS: pass getCost to preview the price first, which runs nothing and charges nothing.
+Generate audio with ElevenLabs: speech (TTS), music, or a sound effect. Returns the audio URL directly (synchronous, no polling). Optionally pass projectId to place the generated audio onto that editor project's timeline in the same call, controlled by an optional placement; omit projectId to save a standalone library output. The result LINKS each output so the user sees it inline; to SEE it yourself (judge a face, check legibility, pick between variations) call get_media with the outputId. SPENDS CREDITS: pass getCost to preview the price first, which runs nothing and charges nothing.
 
 <ParamField body name="modelId" type="`elevenlabs-tts` \| `elevenlabs-music` \| `elevenlabs-sound-effects`" required>
 elevenlabs-tts = text to speech (needs text + voiceId). elevenlabs-music = music from a prompt. elevenlabs-sound-effects = a sound effect from a prompt.
@@ -358,7 +358,7 @@ FILE mode: the audio file to process, as a URL or a previous output id. Omit in 
 
 ### `transcribe`
 
-<Badge>read</Badge>
+<Badge>write</Badge>
 
 Transcribe an audio URL to text (speech-to-text). Returns the transcript directly (synchronous, no polling). SPENDS CREDITS, metered per minute of audio, and the cost cannot be previewed: the result reports the credits it cost after the fact. Zero only when the account runs on its own ElevenLabs key.
 
@@ -388,36 +388,18 @@ Check one or more in-progress generations (outputIds from generate_image / gener
 Block until terminal (up to ~50s), the default. false = an instant snapshot.
 </ParamField>
 
-### `create_preview`
-
-<Badge>read</Badge>
-
-Create an async PREVIEW of your work (ephemeral, never stored, not a deliverable). Currently a short low-res COMPOSED VIDEO of an editor range, so you can assess motion, cuts, transitions, and pacing that a still cannot show. This is a JOB: it returns a renderId + bucketName; poll get_preview with those until it is done, then fetch the returned url. To see a single frame or a few frames instead (cheaper, instant), use get_context render. Requires the context:read scope.
-
-<ParamField body name="projectId" type="string" required>
-The editor project to preview.
-</ParamField>
-
-<ParamField body name="fromFrame" type="integer">
-Start timeline frame of the range. Omit to start at the beginning.
-</ParamField>
-
-<ParamField body name="toFrame" type="integer">
-End timeline frame. Omit to run to the end (capped to a short preview length).
-</ParamField>
-
 ### `get_preview`
 
 <Badge>read</Badge>
 
-Poll a preview started with create_preview. While rendering, returns the progress; when done, returns a short-lived url to the ephemeral preview output (plus the estimated cost). Requires the context:read scope.
+Poll a preview started by get_context with mode="video". While rendering, returns the progress; when done, returns a short-lived url to the ephemeral preview output (plus the estimated cost). Requires the context:read scope.
 
 <ParamField body name="bucketName" type="string" required>
-The bucketName returned by create_preview.
+The bucketName returned by get_context with mode="video".
 </ParamField>
 
 <ParamField body name="renderId" type="string" required>
-The renderId returned by create_preview.
+The renderId returned by get_context with mode="video".
 </ParamField>
 
 ### `list_models`

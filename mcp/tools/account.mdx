@@ -29,19 +29,19 @@ Also return a screenshot of the user's live viewport (their SCREEN), captured at
 </ParamField>
 
 <ParamField body name="count" type="integer">
-filmstrip: how many frames to return. Omit for a proportional default.
+mode='image': how many frames to return across the range. Omit for one frame at the focus point, or a proportional default when a range is given.
 </ParamField>
 
 <ParamField body name="frame" type="integer">
-still (editor): which timeline frame to render. Omit to render the current playhead frame.
+mode='image' (editor): which single timeline frame to render. Omit to render the current playhead frame.
 </ParamField>
 
 <ParamField body name="fromFrame" type="integer">
-filmstrip: start timeline frame of the range. Omit to start at the beginning.
+Start timeline frame of the range, for several frames or a video. Omit to start at the beginning.
 </ParamField>
 
-<ParamField body name="mode" type="`still` \| `filmstrip`">
-Render tier (inferred from the params if omitted): 'still' = one composed editor frame / canvas slide; 'filmstrip' = several composed frames across an editor range (judge motion / flow / cut placement).
+<ParamField body name="mode" type="`image` \| `video`">
+What MEDIUM to render (default 'image'). 'image' returns composed frames INLINE: one by default, or several across a range when you pass count with fromFrame/toFrame, to judge motion, flow and cut placement. 'video' returns the range actually playing, as a short low-res composed clip, for timing a cut or a beat that separate frames cannot show; it is a JOB, returning a renderId to poll with get_preview, because it has to be rendered.
 </ParamField>
 
 <ParamField body name="projectId" type="string">
@@ -49,23 +49,23 @@ Scope to a specific project (editor/canvas). Omit for the user's most-recent-act
 </ParamField>
 
 <ParamField body name="render" type="boolean">
-Also return an inline render (image[s]) of your work, so you can visually verify edits. Ephemeral, stored nowhere, counts against no quota, works without a live tab. render=true alone renders the current focus point as a still. Use mode=filmstrip for several frames across a range. Use this to check your work, not export_project. To watch a RAW source clip use get_media with a video item; for a composed VIDEO of a range use create_preview.
+Also render your work so you can visually verify edits. Ephemeral, stored nowhere, counts against no quota, works without a live tab. render=true alone renders the current focus point as one image; add count with fromFrame/toFrame for several across a range; mode=video returns a short playable clip of that range. Use this to check your work, not export_project, which produces a file the user KEEPS. To watch a RAW source clip instead of your composition, use get_media with a video item.
 </ParamField>
 
 <ParamField body name="slideId" type="string">
-still (canvas): the id of the slide to render. Omit to render the focused slide.
+mode='image' (canvas): the id of the slide to render. Omit to render the focused slide.
 </ParamField>
 
 <ParamField body name="slideIndex" type="integer">
-still (canvas): the 1-based slide index to render (alternative to slideId).
+mode='image' (canvas): the 1-based slide index to render (alternative to slideId).
 </ParamField>
 
 <ParamField body name="toFrame" type="integer">
-filmstrip: end timeline frame of the range. Omit to run to the end.
+End timeline frame of the range. Omit to run to the end.
 </ParamField>
 
 <ParamField body name="width" type="integer">
-still: render at an explicit DISPLAY width in pixels, to judge legibility at the size the output will actually be seen (a course tile, a thumbnail, a feed card) rather than at full resolution, where small type always looks fine. Height follows the composition aspect ratio and is not settable. Clamped; the size produced is reported back on rendered.
+mode='image': render at an explicit DISPLAY width in pixels, to judge legibility at the size the output will actually be seen (a course tile, a thumbnail, a feed card) rather than at full resolution, where small type always looks fine. Height follows the composition aspect ratio and is not settable. Clamped; the size produced is reported back on rendered.
 </ParamField>
 
 ### `list_platforms`

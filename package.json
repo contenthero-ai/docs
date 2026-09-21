@@ -7,11 +7,12 @@
     "generate:reference": "node scripts/generate-reference.mjs",
     "check:reference": "node scripts/generate-reference.mjs --check",
     "check:tool-names": "node scripts/check-tool-names.mjs",
-    "check": "npm run check:reference && npm run check:tool-names"
+    "check": "npm run check:currency && npm run check:reference && npm run check:tool-names",
+    "check:currency": "node scripts/check-package-currency.mjs"
   },
   "devDependencies": {
-    "@contenthero/cli": "0.3.5",
-    "@contenthero/mcp": "0.4.6",
+    "@contenthero/cli": "^0.3.6",
+    "@contenthero/mcp": "^0.4.13",
     "@modelcontextprotocol/sdk": "^1.0.0"
   }
 }

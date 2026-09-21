@@ -400,9 +400,9 @@ Update a post's fields, including its stage (requires planner:write)
 | `--platform <platform>` |  |
 | `--stage <stage>` | move the post to this stage (id, slug, or name) |
 | `--space <space>` | move the card to another space (id or slug); without --stage it lands in that space's matching stage, or its first |
-| `--also <id>` | another card id to apply this to; repeatable. Fields describing ONE card (title, notes, script, cover) still need exactly one |
-| `--script <text>` |  |
-| `--notes <text>` |  |
+| `--also <id>` | another card id to apply this to; repeatable. Fields describing ONE card (title, notes, cover) still need exactly one |
+| `--notes <text>` | working notes; REQUIRES --expected-revision, from `card get` |
+| `--expected-revision <n>` | the revision `card get` reported. Required with --notes: a card's notes have several independent writers, and a write that cannot name the revision it read would silently erase the others |
 | `--cover-url <url>` | public URL for the post cover |
 | `--cover-output-id <id>` | media token (output id, first-8, or "-N") for the cover |
 | `--tags <list>` | comma-separated tag names (replaces the set; must exist) |
