@@ -198,7 +198,7 @@ Filter by a stage id, slug, or name. Resolved within the chosen space.
 
 <Badge>read</Badge>
 
-Get one CARD in full: its fields (title, description, script, notes, status, stage, schedule), plus its posts (one per platform, which is how it publishes) and its attached assets in carousel order.
+Get one CARD in full: its fields (title, description, script, notes, status, stage, schedule), plus its posts (one per platform, which is how it publishes) and its attached assets in carousel order. An [inspiration] asset is a tracked post attached as a reference; its line already carries the headline metrics (creator, outlier score, views, likes, duration) plus transcript and breakdown availability, and a content id to pass to get_content for the transcript and the full Break It Down analysis.
 
 <ParamField body name="cardId" type="string" required>
 The card id from list_cards.

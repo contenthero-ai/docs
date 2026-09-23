@@ -11,8 +11,8 @@
     "check:currency": "node scripts/check-package-currency.mjs"
   },
   "devDependencies": {
-    "@contenthero/cli": "^0.3.6",
-    "@contenthero/mcp": "^0.4.13",
+    "@contenthero/cli": "^0.3.8",
+    "@contenthero/mcp": "^0.4.17",
     "@modelcontextprotocol/sdk": "^1.0.0"
   }
 }

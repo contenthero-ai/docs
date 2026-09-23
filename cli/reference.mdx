@@ -447,11 +447,11 @@ List connected accounts (default first)
 
 ### `contenthero content get <id>`
 
-Get one tracked post in full (engagement, hashtags, optional transcript)
+Get one tracked post in full (engagement, hashtags, optional transcript and Break It Down analysis)
 
 | Argument | Required | Purpose |
 | --- | --- | --- |
-| `id` | yes | the content id (from content list, or a tracked account) |
+| `id` | yes | the content id (from content list, a tracked account, or a card inspiration asset) |
 
 | Option | Purpose |
 | --- | --- |
@@ -459,6 +459,8 @@ Get one tracked post in full (engagement, hashtags, optional transcript)
 | `--start-ms <n>` | transcript window start, ms into the media |
 | `--end-ms <n>` | transcript window end, ms into the media |
 | `--transcript-search <text>` | only the transcript segments containing this phrase |
+| `--analysis` | include the full Break It Down analysis (availability always reports) |
+| `--analysis-sections <list>` | only these analysis sections, comma-separated (names come from the availability line) |
 
 ### `contenthero content list`
 
@@ -500,16 +502,15 @@ Read what the user is currently viewing in the open app (requires context:read)
 | --- | --- |
 | `--project <id>` | scope to a specific project (editor/canvas) |
 | `--capture` | also capture a fresh screenshot of the live viewport (the user's screen; slower) |
-| `--render` | also render your work inline; ephemeral. Use --mode filmstrip for several frames |
-| `--mode <mode>` | render tier: still (default) | filmstrip |
-| `--frame <n>` | still (editor): which timeline frame (omit for the current playhead) |
-| `--slide <id>` | still (canvas): which slide id (omit for the focused slide) |
-| `--slide-index <n>` | still (canvas): 1-based slide index (alternative to --slide) |
-| `--from-frame <n>` | filmstrip: start timeline frame of the range |
-| `--to-frame <n>` | filmstrip: end timeline frame of the range |
-| `--count <n>` | filmstrip: how many frames |
+| `--render` | also render your work inline (images); ephemeral. Add --count with a range for several frames. For a composed VIDEO use `context preview` |
+| `--frame <n>` | image: which single timeline frame (omit for the current playhead) |
+| `--slide <id>` | image (canvas): which slide id (omit for the focused slide) |
+| `--slide-index <n>` | image (canvas): 1-based slide index (alternative to --slide) |
+| `--from-frame <n>` | start timeline frame of the range (several frames, or a video) |
+| `--to-frame <n>` | end timeline frame of the range |
+| `--count <n>` | how many frames across the range (omit for one at the focus point) |
 | `--width <n>` | still: render at this DISPLAY width in px, to judge legibility at real size (height follows the aspect ratio) |
-| `--save <path>` | write the produced image(s) to this file (filmstrip appends -1, -2, ...) |
+| `--save <path>` | write the produced image(s) to this file (several frames append -1, -2, ...) |
 
 ## `element`
 
@@ -679,9 +680,7 @@ Generate one or more images from a prompt (optionally image-to-image)
 | `-m, --model <id>` | image model id (see `contenthero model list --type image`) |
 | `--aspect <ratio>` | aspect ratio, e.g. 16:9, 1:1, 9:16 |
 | `--resolution <res>` | resolution, e.g. 1K, 2K, 4K (model-dependent) |
-| `--mode <mode>` | variant mode for models that expose one (e.g. flux-2-pro: pro/flex) |
 | `-n, --num <count>` | number of variations (1-4) |
-| `--seed <seed>` | seed for reproducibility |
 | `--ref <urlOrId>` | reference image (URL or output id); repeatable |
 | `--avatar <id>` | file the result onto this avatar as a new look (see `contenthero avatar list`) |
 | `--cost` | estimate the credit cost instead of generating (nothing runs, nothing is charged) |
@@ -727,7 +726,6 @@ Generate a video from a prompt (optionally with frames / references)
 | `--audio` | enable generated audio (models that support it) |
 | `-n, --num <count>` | number of variations (1-4) |
 | `--negative <text>` | what to avoid (models that support it) |
-| `--seed <seed>` | seed for reproducibility |
 | `--start-frame <urlOrId>` | first frame (image URL or output id) |
 | `--end-frame <urlOrId>` | last frame (image URL or output id) |
 | `--ref <urlOrId>` | reference image (URL or output id); repeatable |
