@@ -7,16 +7,21 @@ Your brand kit is the context that makes everything else on-brand. These tools r
 
 ## The brand kit
 
-A brand kit has structured sections covering positioning, audience, voice, visual identity, and content strategy.
+A brand kit's content lives in **fields**, grouped into sections on two tabs (overview and voice). Each field has a stable **key**, a **role** that says what it means and is the same in every kit (`voice.core`, `audience.profile`, ...), and a **load tier**: `core` fields always belong in context, `contextual` ones when relevant, `reference` ones only on request.
 
 | What | MCP tool |
 | --- | --- |
-| List and read | `list_brand_kits`, `get_brand_kit` |
-| Edit identity | `update_brand_kit` |
+| List | `list_brand_kits` |
+| See what a kit holds, without values | `get_brand_kit` with `detail: "summary"` |
+| Read just the fields a task needs | `get_brand_kit` with `keys`, `roles`, `sections`, `tabs` or `tiers` (add `history: true` for earlier versions) |
+| Read the whole kit | `get_brand_kit` with nothing else |
+| Write field content | `update_brand_kit` with `fields` |
 | Add or edit sections | `update_brand_kit` with `sections` (replaces the set; a section left out is archived) |
 | Archive a kit (reversible) | `archive` with `assetType: "brand_kit"` |
 
-Edits need `brandkit:write`. Read the current value, modify it, and write the whole object back rather than sending a partial that would drop fields. Archiving is a soft delete; there is no hard delete.
+Start with the summary: it is small, and it tells you which fields exist and which are filled, so the next read pulls only what the task needs.
+
+Edits need `brandkit:write`. Field writes are by key and **all or nothing**: pass each field's `version` as `expectedVersion`, and if anyone changed a field since you read it, nothing is written and the error returns each stale field's current value, so you re-read and reapply rather than overwrite. `revertTo` restores an earlier version as a new one. Archiving is a soft delete; there is no hard delete.
 
 ## The knowledge base
 
@@ -51,5 +56,5 @@ When grounding any on-brand decision, a knowledge search is often the single hig
 ## The hard line
 
 <Warning>
-Never silently change the brand document or knowledge base. Reads and summaries are free. Any write (an identity edit, a new section, a knowledge add or remove) is confirmed with the user first.
+Never silently change the brand document or knowledge base. Reads and summaries are free. Any write (a field edit, a new section, a knowledge add or remove) is confirmed with the user first.
 </Warning>
