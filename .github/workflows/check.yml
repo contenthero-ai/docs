@@ -7,6 +7,10 @@ on:
   push:
     branches: [main]
 
+permissions:
+  contents: read
+  packages: read
+
 jobs:
   reference:
     name: Reference matches the published packages
@@ -16,13 +20,15 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 22
+      # `.npmrc` reads the private @contenthero-ai scope (connect, which skills/install.mdx is generated
+      # from) with NPM_TOKEN. GITHUB_TOKEN reads it once the package grants this repository Actions access.
       - run: npm install
+        env:
+          NPM_TOKEN: ${{ secrets.PACKAGES_READ_TOKEN || secrets.GITHUB_TOKEN }}
 
-      # Fails when a generated page differs from what the published @contenthero/mcp
-      # and @contenthero/cli actually expose. Regenerate and commit to fix.
-      - run: npm run check:reference
-
-      # Fails when a hand-written page names a tool or command that does not exist.
-      # This is the guard for the drift that went unnoticed for three months: 65 dead
-      # references across 10 files, survivors of the post-to-card rename.
-      - run: npm run check:tool-names
+      # ONE command, the same one run locally: currency (installed = published), the generated reference,
+      # the generated skill install page, and tool names in hand-written pages. Listing the steps here
+      # separately is how check:currency and check:skill-install existed for days without CI running them.
+      - run: npm run check
+        env:
+          NPM_TOKEN: ${{ secrets.PACKAGES_READ_TOKEN || secrets.GITHUB_TOKEN }}
