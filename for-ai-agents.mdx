@@ -40,15 +40,15 @@ Pick one transport at the start of a session. Never mix, never switch mid-sessio
 
 Do not hand the user a `curl` script as a substitute for doing the work. If you can see MCP tools, call them. If the CLI is installed and authed, run it. A script that the user cannot run because no key was ever provisioned is not a deliverable. Verify auth, then execute.
 
-## Install the agent skills
+## Install the agent skill
 
-The fastest way to drive ContentHero well is to install the official skills, which encode the workflows and our model-specific prompt craft.
+The fastest way to drive ContentHero well is to install the official skill, which encodes the workflows and our model-specific prompt craft. In a terminal agent, paste this. In a chat app, follow [Install the Skill](/skills/install) instead: chat apps install by upload.
 
 ```
 Read https://raw.githubusercontent.com/contenthero-ai/skills/main/INSTALL_FOR_AGENTS.md and follow it. Ask me for any API keys you need.
 ```
 
-The skill repo is [`contenthero-ai/skills`](https://github.com/contenthero-ai/skills). It holds ONE skill, `contenthero`, covering the whole surface: generating media, the planner and publishing, brand context and its knowledge base, research by outlier score, the media library, and the editor. Its CI checks that every tool this reference advertises is reachable through one of its workflows, so the skill cannot fall behind the API.
+The skill repo is [`contenthero-ai/skills`](https://github.com/contenthero-ai/skills). It holds ONE skill, `contenthero`, covering the whole product: generating media, the planner and publishing, brand context and its knowledge base, research by outlier score, the media library, and the editor. Its CI checks that every tool this reference advertises is reachable through one of its workflows, so the skill cannot fall behind the API.
 
 ## Async, chaining, and scopes
 

@@ -4,7 +4,7 @@
 
 - This is the ContentHero developer documentation, built on [Mintlify](https://mintlify.com), published at `docs.contenthero.ai`.
 - Pages are MDX files with YAML frontmatter. Configuration lives in `docs.json`.
-- ContentHero is the context and execution layer for AI content creation. The user's own LLM is the brain. The docs must carry that thesis: ContentHero never generates copy server-side; agents may draft only when grounded in the user's real context and approved.
+- The user's own AI assistant writes every word, grounded in the user's real context; ContentHero supplies that context and does the work. The docs must carry that thesis: ContentHero never generates copy server-side; agents may draft only when grounded in the user's real context and approved.
 - Source material lives in the skills repo [`contenthero-ai/skills`](https://github.com/contenthero-ai/skills) (auth ladder, per-domain workflows, cookbook) and the packages `@contenthero/sdk`, `@contenthero/mcp`, `@contenthero/cli`. Author from those rather than inventing.
 
 ## Terminology

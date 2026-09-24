@@ -2,7 +2,7 @@
   "$schema": "https://mintlify.com/docs.json",
   "theme": "mint",
   "name": "ContentHero",
-  "description": "The context and execution layer for AI content creation. Generate media, ground posts in your brand voice, and publish, all driven by your own agent.",
+  "description": "Create, edit, schedule, and publish content from your AI assistant. Generate images, video, and voiceovers, plan your content calendar, and draft on-brand copy, from hooks and scripts to captions and ads, grounded in what already performs for you.",
   "colors": {
     "primary": "#d4af37",
     "light": "#e0c25a",
