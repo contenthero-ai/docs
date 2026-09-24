@@ -23,6 +23,10 @@
  */
 import { createRequire } from 'node:module'
 import { execFileSync } from 'node:child_process'
+import { readFileSync } from 'node:fs'
+import { join } from 'node:path'
+
+const ROOT = new URL('..', import.meta.url).pathname
 
 const require = createRequire(import.meta.url)
 const pkg = require('../package.json')
@@ -36,9 +40,14 @@ if (deps.length === 0) {
   process.exit(1)
 }
 
+/**
+ * ⚠️ READ THE FILE, NOT `require('<name>/package.json')`. A package whose `exports` map does not list
+ * `./package.json` (our own `@contenthero-ai/connect` does not) throws ERR_PACKAGE_PATH_NOT_EXPORTED
+ * there, which this check reported as "not installed" while it was installed.
+ */
 const installed = (name) => {
   try {
-    return require(`${name}/package.json`).version
+    return JSON.parse(readFileSync(join(ROOT, 'node_modules', name, 'package.json'), 'utf8')).version
   } catch {
     return null
   }

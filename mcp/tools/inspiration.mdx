@@ -38,7 +38,7 @@ The account id from list_accounts.
 
 <Badge>read</Badge>
 
-The core research read: social posts this account tracks, ranked by OUTLIER SCORE (how far a post overperformed its own creator's baseline, so a small account's hit still surfaces). SPANS BOTH the creators they watch and their OWN posts by default; set scope to narrow, and every row carries isOwn either way. This is how you answer both "what is working for the people I watch" and "how did my own posts do" without picking a subsystem first. Filter by platform, content type, a published window (publicationDate like 'week' or 'month', or exact publishedAfter/publishedBefore), and ranges over score, views, duration and follower count. Call get_content for one post in full, including its transcript.
+The core research read: social posts this account tracks, ranked by OUTLIER SCORE (how far a post overperformed its own creator's baseline, so a small account's hit still surfaces), or by relevance when you pass search. SPANS BOTH the creators they watch and their OWN posts by default; set scope to narrow, and every row carries isOwn either way. This is how you answer both "what is working for the people I watch" and "how did my own posts do" without picking a subsystem first. Filter by platform, content type, a published window (publicationDate like 'week' or 'month', or exact publishedAfter/publishedBefore), and ranges over score, views, duration and follower count. Call get_content for one post in full, including its transcript.
 
 <ParamField body name="accountIds" type="string[]">
 Limit to these tracked account ids (from list_accounts).
@@ -105,11 +105,11 @@ ISO timestamp.
 </ParamField>
 
 <ParamField body name="search" type="string">
-Text search across title, creator, handle, and description.
+Finds posts by meaning and by keyword across title, creator, description and transcript, ranked by relevance. Returns only the posts judged relevant, so an empty result means nothing matched.
 </ParamField>
 
-<ParamField body name="sortBy" type="`score` \| `date` \| `views` \| `engagement`">
-Sort field (default 'score').
+<ParamField body name="sortBy" type="`relevance` \| `score` \| `date` \| `views` \| `engagement`">
+Sort field. Default 'relevance' when search is set, otherwise 'score'. Any other field reorders the same relevant set.
 </ParamField>
 
 <ParamField body name="sortOrder" type="`asc` \| `desc`">

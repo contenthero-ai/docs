@@ -200,13 +200,20 @@ Create a brand kit: empty, from a website, or as a copy (requires brandkit:write
 | `--website-url <url>` | the business website |
 | `--extract` | scrape --website-url and fill the kit in automatically (returns immediately) |
 | `--duplicate-from <id>` | copy an existing brand kit instead of starting empty |
+| `--sections <json>` | curated sections as JSON: [\{ tab, sectionName, sortOrder?, fields? \}] |
 | `--business-name <text>` |  |
 | `--primary-offer <text>` |  |
 | `--niche <text>` | niche definition |
 | `--visual-style <text>` |  |
+| `--positioning <json>` | positioning object (JSON) |
+| `--audience <json>` | audience object (JSON) |
+| `--voice-profile <json>` | voice profile object (JSON) |
+| `--content-strategy <json>` | content strategy object (JSON) |
+| `--design-principle <text>` | a design principle; repeatable |
+| `--brand-account <ref>` | the owner's OWN profile: a tracked-account id, or a profile url / platform:handle to ADD one. Repeatable |
+| `--inspiration-account <ref>` | a competitor/creator profile: same forms as --brand-account. Repeatable |
 | `--logo <ref>` | a logo: a url, or a generation id to copy in (e.g. out9-2). Repeatable; the first is primary |
 | `--asset <ref>` | a brand asset: a url, or a generation id to copy in. Repeatable |
-| `--sections <json>` | curated sections as JSON: [\{ tab, sectionName, sortOrder?, fields? \}] |
 
 ### `contenthero brand-kit extract <id>`
 
@@ -315,8 +322,10 @@ Update a brand kit's identity fields (requires brandkit:write)
 | Option | Purpose |
 | --- | --- |
 | `--name <text>` |  |
-| `--business-name <text>` |  |
 | `--website-url <url>` |  |
+| `--default` | make this the default brand kit, un-defaulting every other |
+| `--sections <json>` | curated sections as JSON. REPLACES the set, keyed by (tab, sectionName); one left out is ARCHIVED |
+| `--business-name <text>` |  |
 | `--primary-offer <text>` |  |
 | `--niche <text>` | niche definition |
 | `--visual-style <text>` |  |
@@ -324,13 +333,11 @@ Update a brand kit's identity fields (requires brandkit:write)
 | `--audience <json>` | audience object (JSON) |
 | `--voice-profile <json>` | voice profile object (JSON) |
 | `--content-strategy <json>` | content strategy object (JSON) |
-| `--design-principle <text>` | a design principle; repeatable |
-| `--default` | make this the default brand kit, un-defaulting every other |
+| `--design-principle <text>` | a design principle; repeatable. REPLACES the list |
 | `--brand-account <ref>` | the owner's OWN profile: a tracked-account id, or a profile url / platform:handle to ADD one. Repeatable. REPLACES the list |
 | `--inspiration-account <ref>` | a competitor/creator profile: same forms as --brand-account. Repeatable. REPLACES the list |
 | `--logo <ref>` | a logo: a url, or a generation id to copy in (e.g. out9-2). Repeatable; the first is primary. REPLACES the list |
 | `--asset <ref>` | a brand asset: a url, or a generation id to copy in. Repeatable. REPLACES the list |
-| `--sections <json>` | curated sections as JSON. REPLACES the set, keyed by (tab, sectionName); one left out is ARCHIVED |
 
 ## `card`
 
@@ -464,7 +471,7 @@ Get one tracked post in full (engagement, hashtags, optional transcript and Brea
 
 ### `contenthero content list`
 
-List tracked content, ranked by outlier score
+List tracked content, ranked by outlier score, or by relevance when you pass --search
 
 | Option | Purpose |
 | --- | --- |
@@ -482,8 +489,8 @@ List tracked content, ranked by outlier score
 | `--since <window>` | published within: week, month, 3months, 6months, year, 2years |
 | `--published-after <iso>` | published on or after this ISO timestamp (wins over --since) |
 | `--published-before <iso>` | published on or before this ISO timestamp |
-| `--search <text>` | text search across title, creator, handle, description |
-| `--sort <sort>` | sort field: score, date, views, engagement (default score) |
+| `--search <text>` | finds posts by meaning and by keyword across title, creator, description and transcript, ranked by relevance; returns only the posts judged relevant, so no rows means nothing matched |
+| `--sort <sort>` | sort field: relevance, score, date, views, engagement (default relevance with --search, otherwise score) |
 | `--asc` | sort ascending (default descending) |
 | `--account <id>` | limit to this tracked account; repeatable |
 | `--added-by-you` | only the one-off posts saved by url |
@@ -624,6 +631,7 @@ Rename, move, re-query a folder, and file or unfile items (requires assets:write
 | --- | --- |
 | `--name <text>` | a new name |
 | `--parent <id>` | move under this folder id, or "none" for the top level |
+| `--text <text>` | a smart folder's new semantic query text (the same query `folder create --smart --text` sets) |
 | `--also <id>` | apply to this folder too; repeatable. Name and query still need exactly one |
 | `--add <ref>` | file an item: sourceTable:sourceRecordId[:variant]. Repeatable |
 | `--remove <ref>` | unfile an item: sourceTable:sourceRecordId[:variant]. Repeatable |
@@ -921,6 +929,7 @@ Apply a batch of ops to a project composition. Ops both CREATE (create_clip, ins
 | `--ops-file <path>` | read the ops JSON array from a file |
 | `--intent <text>` | a short description of the edit (for attribution) |
 | `--expected-revision <n>` | revision for optimistic concurrency (from `project get`) |
+| `--include-render-url` | also return a preview still URL of the resulting composition |
 
 ### `contenthero project create`
 
@@ -933,6 +942,7 @@ Create a project (requires editor:write)
 | `--orientation <ratio>` | e.g. 16:9, 9:16, 1:1 (default: 16:9) |
 | `--width <n>` | pixel width (default: from orientation) |
 | `--height <n>` | pixel height (default: from orientation) |
+| `--brand-kit <id>` | associate this brand kit with the project |
 
 ### `contenthero project delete <projectId>`
 
@@ -991,6 +1001,7 @@ Read a project's composition + revision (summary by default; requires editor:rea
 | `--to <frame>` | timeline only: end frame of the window |
 | `--track <trackId>` | timeline only: scope to one track by id |
 | `--slide <slideId>` | canvas only: scope to one slide by id (applies to --detail full too) |
+| `--include-render-url` | also return a preview still URL of the current composition (renders one only if it changed) |
 
 ### `contenthero project import`
 
