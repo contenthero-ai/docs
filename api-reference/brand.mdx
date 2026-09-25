@@ -10,7 +10,7 @@ Base URL `https://app.contenthero.ai/api/v1`. All endpoints take a bearer API ke
 | Method | Path | Scope | Purpose |
 | --- | --- | --- | --- |
 | `GET` | `/brand-kits` | `brandkit:read` | List your brand kits. |
-| `POST` | `/brand-kits` | `brandkit:write` | Create a brand kit: empty, from a website (`websiteUrl` with `extract: true`), from a social profile, or as a copy. Every new kit starts with the eight starter sections. |
+| `POST` | `/brand-kits` | `brandkit:write` | Create a brand kit: empty, imported (`websiteUrls` and/or its own accounts in `brandAccounts`, with `extract: true`), from a social profile, or as a copy. Every new kit starts with the eight starter sections. An import returns at once; poll `analysisStatus` and `extractionStatus`. |
 | `GET` | `/brand-kits/{brandKitId}` | `brandkit:read` | Read one brand kit, three ways (below). |
 | `PATCH` | `/brand-kits/{brandKitId}` | `brandkit:write` | Update the kit: section content (`sections`), media, colors, typography and linked accounts. Send `{ "archive": true }` to archive (reversible). |
 
