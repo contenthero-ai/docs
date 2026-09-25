@@ -57,6 +57,13 @@ const HISTORICAL = ['changelog.mdx']
 const ALLOWED = new Set([
   // An API key prefix, not an operation.
   'ch_live_',
+  // Brand kit section keys and roles: values of get_brand_kit's `keys`/`roles` filters, not operations. The
+  // server refuses an unknown one with the valid list, so a renamed role fails loudly there.
+  'content_strategy',
+  'voice_and_tone',
+  'writing_style',
+  'speaking_style',
+  'design_guidelines',
 ])
 
 function mdxFiles(dir) {

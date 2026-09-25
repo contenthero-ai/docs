@@ -10,20 +10,27 @@ Base URL `https://app.contenthero.ai/api/v1`. All endpoints take a bearer API ke
 | Method | Path | Scope | Purpose |
 | --- | --- | --- | --- |
 | `GET` | `/brand-kits` | `brandkit:read` | List your brand kits. |
-| `POST` | `/brand-kits` | `brandkit:write` | Create a brand kit: empty, from a website (`websiteUrl` with `extract: true`), from a social profile, or as a copy. New kits start from the `standard` template. |
+| `POST` | `/brand-kits` | `brandkit:write` | Create a brand kit: empty, from a website (`websiteUrl` with `extract: true`), from a social profile, or as a copy. Every new kit starts with the eight starter sections. |
 | `GET` | `/brand-kits/{brandKitId}` | `brandkit:read` | Read one brand kit, three ways (below). |
-| `PATCH` | `/brand-kits/{brandKitId}` | `brandkit:write` | Update the kit: field content (`fields`), visual style, media, linked accounts and sections. Send `{ "archive": true }` to archive (reversible). |
-| `GET` | `/brand-kit-templates` | `brandkit:read` | The templates a kit's layout comes from, and the role and load-tier vocabulary their fields use. |
+| `PATCH` | `/brand-kits/{brandKitId}` | `brandkit:write` | Update the kit: section content (`sections`), media, colors, typography and linked accounts. Send `{ "archive": true }` to archive (reversible). |
 
-### Fields, roles and tiers
+### Sections
 
-A brand kit's content lives in **fields**, grouped into sections. Every field has:
+A brand kit's content is a set of **sections**, each one Markdown document. Every kit starts with eight:
 
-- a **key**: stable and unique within the kit. Address fields by key; the user can rename a field's label, never its key.
-- a **role**: what the field means (`voice.core`, `audience.profile`, `positioning.offer`, ...). Roles are the contract: the same role means the same thing in every kit, whatever the layout. `GET /brand-kit-templates` lists them all.
-- a **load tier**: how eagerly it belongs in an AI's context. `core` always, `contextual` when relevant to the task, `reference` only on request.
-- a **type**: `text` (a line), `textarea` (prose) or `list` (an array of strings).
-- a **version**: it increments on every change. Send it back as `expectedVersion` to write safely.
+| Tab | Key (and role) | Default name |
+| --- | --- | --- |
+| `overview` | `about`, `audience`, `offer`, `content_strategy` | About, Audience, Offer, Content Strategy |
+| `voice` | `voice_and_tone`, `writing_style`, `speaking_style` | Voice & Tone, Writing Style, Speaking Style |
+| `visual` | `design_guidelines` | Design Guidelines |
+
+The user can rename a section and add their own. Every section has:
+
+- a **key**: stable and unique within the kit. Address sections by key; the user renames `sectionName`, never the key.
+- a **role**: what a starter section means, the same in every kit whatever it is named. A section the user added has none.
+- a **body**: Markdown, in the user's own structure.
+- a **width**: `full` or `half`, how wide its card is on the brand page.
+- a **version**: it increments on every body change. Send it back as `expectedVersion` to write safely.
 
 ### Reading a kit
 
@@ -31,29 +38,35 @@ A brand kit's content lives in **fields**, grouped into sections. Every field ha
 
 | Query | Returns |
 | --- | --- |
-| `detail=summary` | Every section and field with its key, role, tier, version and length, and **no values**. The cheap first read. |
-| any of `keys`, `roles`, `sections`, `tabs`, `tiers` (comma-separated, combined with AND) | Just those fields, with values. Add `history=true` for each field's earlier versions, newest first. |
-| nothing | The whole kit: sections and fields, visual identity, linked accounts and a knowledge preview. |
+| `detail=summary` | Every section with its key, role, version, length (`charCount`) and outline (its own headings), and **no bodies**. The cheap first read. |
+| any of `keys`, `roles`, `tabs` (comma-separated, combined with AND) | Just those sections, with bodies. Add `history=true` for each section's earlier versions, newest first. |
+| nothing | The whole kit: every section, visual identity, linked accounts and a knowledge preview. |
 
-`detail=summary` with a filter, `history` without one, and any unknown role, tier or tab are refused with a `400` naming the valid values.
+`detail=summary` with a filter, `history` without one, and any unknown role or tab are refused with a `400` naming the valid values.
 
-### Writing fields
+### Writing sections
 
-Send `fields` in the `PATCH` body. Each entry is `{ key, value, expectedVersion }`, or `{ key, revertTo, expectedVersion }` to restore an earlier version (it lands as a new version, so a revert can itself be reverted). A `value` of `null` clears the field.
+Send `sections` in the `PATCH` body, naming only the sections you change. An entry with a `key` edits that section:
 
-The write is **all or nothing**, and it lands before anything else in the patch. If any field has changed since the `expectedVersion` you sent, nothing is written and the response is a `409`:
+- `body` replaces its whole content;
+- `revertTo` restores an earlier version (it lands as a new version, so a revert can itself be reverted);
+- `sectionName` renames it; `width` sets `full` or `half`.
+
+An entry without a `key` adds a section of your own, and needs `sectionName` and `tab`. To remove a section, archive it through `POST /archive` with `assetType: "brand_kit_section"`.
+
+The write is **all or nothing**, and it lands before anything else in the patch. If any section has changed since the `expectedVersion` you sent, nothing is written and the response is a `409`:
 
 ```json
 {
-  "error": "1 field(s) changed since the version you read; nothing was written",
-  "conflicts": [{ "key": "summary", "version": 4, "value": "The current text." }]
+  "error": "1 section(s) changed since the version you read; nothing was written",
+  "conflicts": [{ "key": "voice_and_tone", "version": 4, "body": "## Personality\n\nThe current text." }]
 }
 ```
 
-Re-read, reapply your change to the current value, and send the new version.
+Re-read, reapply your change to the current body, and send the new version.
 
 <Note>
-**Removed inputs.** `businessName`, `primaryOffer`, `nicheDefinition`, `positioning`, `audience`, `voiceProfile` and `contentStrategy` are no longer accepted or returned. Sending one is a `400` that names the replacement: write the matching field with `fields`, using the keys from a `detail=summary` read.
+**Removed inputs.** `businessName`, `primaryOffer`, `nicheDefinition`, `positioning`, `audience`, `voiceProfile`, `contentStrategy`, `visualStyle`, `designPrinciples` and `fields` are no longer accepted or returned, and `GET /brand-kit-templates` is gone. Sending a removed input is a `400` that names the replacement: write the matching section with `sections`, using the keys from a `detail=summary` read. Visual style and design principles belong in the `design_guidelines` section.
 </Note>
 
 ## Knowledge base

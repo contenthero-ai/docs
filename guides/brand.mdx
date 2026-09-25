@@ -7,21 +7,21 @@ Your brand kit is the context that makes everything else on-brand. These tools r
 
 ## The brand kit
 
-A brand kit's content lives in **fields**, grouped into sections on two tabs (overview and voice). Each field has a stable **key**, a **role** that says what it means and is the same in every kit (`voice.core`, `audience.profile`, ...), and a **load tier**: `core` fields always belong in context, `contextual` ones when relevant, `reference` ones only on request.
+A brand kit's content is a set of **sections**, each one Markdown document. Every kit starts with eight across three tabs: About, Audience, Offer and Content Strategy (overview); Voice & Tone, Writing Style and Speaking Style (voice); Design Guidelines (visual). The user can rename them and add their own. Each section has a stable **key**, and a starter section has a **role** that says what it means and is the same in every kit, whatever it is named (`voice_and_tone`, `audience`, ...).
 
 | What | MCP tool |
 | --- | --- |
 | List | `list_brand_kits` |
-| See what a kit holds, without values | `get_brand_kit` with `detail: "summary"` |
-| Read just the fields a task needs | `get_brand_kit` with `keys`, `roles`, `sections`, `tabs` or `tiers` (add `history: true` for earlier versions) |
+| See what a kit holds, without bodies | `get_brand_kit` with `detail: "summary"` |
+| Read just the sections a task needs | `get_brand_kit` with `keys`, `roles` or `tabs` (add `history: true` for earlier versions) |
 | Read the whole kit | `get_brand_kit` with nothing else |
-| Write field content | `update_brand_kit` with `fields` |
-| Add or edit sections | `update_brand_kit` with `sections` (replaces the set; a section left out is archived) |
+| Edit or add sections | `update_brand_kit` with `sections` |
+| Archive a section (reversible) | `archive` with `assetType: "brand_kit_section"` |
 | Archive a kit (reversible) | `archive` with `assetType: "brand_kit"` |
 
-Start with the summary: it is small, and it tells you which fields exist and which are filled, so the next read pulls only what the task needs.
+Start with the summary: it is small, and each section's outline (its own headings) and length tell you which sections the task needs, so the next read pulls only those.
 
-Edits need `brandkit:write`. Field writes are by key and **all or nothing**: pass each field's `version` as `expectedVersion`, and if anyone changed a field since you read it, nothing is written and the error returns each stale field's current value, so you re-read and reapply rather than overwrite. `revertTo` restores an earlier version as a new one. Archiving is a soft delete; there is no hard delete.
+Edits need `brandkit:write`. Section writes are by key and **all or nothing**, naming only the sections you change. A `body` replaces the whole section in Markdown, so read it, change what needs changing, and send the whole body back. Pass each section's `version` as `expectedVersion`: if anyone changed it since you read it, nothing is written and the error returns its current body, so you re-read and reapply rather than overwrite. `revertTo` restores an earlier version as a new one. Archiving is a soft delete; there is no hard delete.
 
 ## The knowledge base
 
@@ -50,11 +50,11 @@ The knowledge base is most valuable when it grows as you work. When the user lea
 Confirm before adding, give it a clear title, and tell the user it is now searchable. Remove an item with `remove_brand_knowledge` on user request only.
 
 <Note>
-When grounding any on-brand decision, a knowledge search is often the single highest-leverage read. Do not skip it because the structured fields looked sufficient; the knowledge base holds what the fields do not.
+When grounding any on-brand decision, a knowledge search is often the single highest-leverage read. Do not skip it because the kit's sections looked sufficient; the knowledge base holds what the sections do not.
 </Note>
 
 ## The hard line
 
 <Warning>
-Never silently change the brand document or knowledge base. Reads and summaries are free. Any write (a field edit, a new section, a knowledge add or remove) is confirmed with the user first.
+Never silently change the brand document or knowledge base. Reads and summaries are free. Any write (a section edit, a new section, a knowledge add or remove) is confirmed with the user first.
 </Warning>
