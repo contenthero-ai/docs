@@ -3,6 +3,16 @@ title: "Changelog"
 description: "Updates to the ContentHero developer platform: SDK, MCP, CLI, and skills."
 ---
 
+<Update label="2026-09-26" tags={["Brand", "SDK", "MCP", "CLI"]}>
+  **Brand kits are Markdown sections.** A brand kit is now a set of named sections (About, Audience, Offer, Content Strategy, Voice & Tone, Writing Style, Speaking Style, Design Guidelines), each one Markdown document with a version and history. `getBrandKit` reads a summary (each section's outline and length), a filtered set by key, role or tab, or the whole kit. `updateBrandKit({ sections })` writes only the sections it names, all or nothing, and a stale `version` returns a `ConflictError` carrying the current body. See [Brand](/guides/brand).
+
+  **Imports analyze every source.** A kit's websites are one list, `websiteUrls`, primary first. Extracting a kit starts two jobs: visuals from the first website, and an analysis of every website plus the kit's own YouTube and Instagram accounts, which writes only empty sections. `getBrandKit` reports `analysisStatus` beside `extractionStatus`; `createBrandKit({ extract })` and `extractBrandKit` return both jobs' states.
+
+  **Breaking:** the field model is gone. Removed: field types, templates and `listBrandKitTemplates`, load tiers, `visualStyle` and `designPrinciples`; in the CLI, `--fields`, `--visual-style` and `--design-principle`. Use sections instead.
+
+  Packages: `sdk 0.4.14`, `mcp 0.4.19`, `cli 0.3.10`.
+</Update>
+
 <Update label="2026-06-19" tags={["Skills"]}>
   **Agent skills released.** The [`contenthero-ai/skills`](https://github.com/contenthero-ai/skills) repo includes three installable skills: `contenthero-generate`, `contenthero-pipeline` (the hero), and `contenthero-brand`. They encode the workflows and our model-specific prompt craft, including grounded voice-synthesis. See [Skills](/skills/overview).
 
