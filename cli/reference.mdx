@@ -192,24 +192,15 @@ Rename an avatar, or set its default look or voice
 
 ### `contenthero brand-kit create`
 
-Create a brand kit: empty, from a website, or as a copy (requires brandkit:write)
+Create a brand kit: empty, imported from its websites and accounts, or as a copy (requires brandkit:write)
 
 | Option | Purpose |
 | --- | --- |
 | `--name <text>` | the kit's name; optional when a website or social profile url is given |
-| `--website-url <url>` | the business website |
-| `--extract` | scrape --website-url and fill the kit in automatically (returns immediately) |
+| `--website-url <url>` | one of the brand's websites. Repeatable; the first is the primary site |
+| `--extract` | import the kit from its websites and own --brand-account profiles (returns immediately) |
 | `--duplicate-from <id>` | copy an existing brand kit instead of starting empty |
-| `--sections <json>` | curated sections as JSON: [\{ tab, sectionName, sortOrder?, fields? \}] |
-| `--business-name <text>` |  |
-| `--primary-offer <text>` |  |
-| `--niche <text>` | niche definition |
-| `--visual-style <text>` |  |
-| `--positioning <json>` | positioning object (JSON) |
-| `--audience <json>` | audience object (JSON) |
-| `--voice-profile <json>` | voice profile object (JSON) |
-| `--content-strategy <json>` | content strategy object (JSON) |
-| `--design-principle <text>` | a design principle; repeatable |
+| `--sections <json>` | section content as JSON: [\{ key, body \}] to fill a starter section, [\{ sectionName, tab, body? \}] to add one |
 | `--brand-account <ref>` | the owner's OWN profile: a tracked-account id, or a profile url / platform:handle to ADD one. Repeatable |
 | `--inspiration-account <ref>` | a competitor/creator profile: same forms as --brand-account. Repeatable |
 | `--logo <ref>` | a logo: a url, or a generation id to copy in (e.g. out9-2). Repeatable; the first is primary |
@@ -217,7 +208,7 @@ Create a brand kit: empty, from a website, or as a copy (requires brandkit:write
 
 ### `contenthero brand-kit extract <id>`
 
-Re-run website extraction for an existing kit (returns immediately)
+Re-run a kit's import from its websites and own accounts (returns immediately)
 
 | Argument | Required | Purpose |
 | --- | --- | --- |
@@ -225,11 +216,19 @@ Re-run website extraction for an existing kit (returns immediately)
 
 ### `contenthero brand-kit get <id>`
 
-Get one brand kit in full (the whole brand document)
+Get one brand kit: --detail summary lists every section without its body; a section filter returns just those sections with their bodies (add --history for earlier versions); neither returns the whole kit
 
 | Argument | Required | Purpose |
 | --- | --- | --- |
 | `id` | yes | the brand kit id |
+
+| Option | Purpose |
+| --- | --- |
+| `--detail <level>` | 'summary' (every section, no bodies) or 'full' (the default); not with a filter |
+| `--keys <list>` | section keys, comma-separated |
+| `--roles <list>` | section roles, comma-separated |
+| `--tabs <list>` | 'overview', 'voice' and/or 'visual', comma-separated |
+| `--history` | with a filter, also return each section's earlier versions |
 
 ### `contenthero brand-kit knowledge add <brandKitId>`
 
@@ -313,7 +312,7 @@ Reorder every brand kit. Pass ALL ids, in the order you want them
 
 ### `contenthero brand-kit update <id>`
 
-Update a brand kit's identity fields (requires brandkit:write)
+Update a brand kit: section content, media and accounts (requires brandkit:write)
 
 | Argument | Required | Purpose |
 | --- | --- | --- |
@@ -322,18 +321,9 @@ Update a brand kit's identity fields (requires brandkit:write)
 | Option | Purpose |
 | --- | --- |
 | `--name <text>` |  |
-| `--website-url <url>` |  |
+| `--website-url <url>` | one of the brand's websites. Repeatable; the first is the primary site. Replaces the list |
 | `--default` | make this the default brand kit, un-defaulting every other |
-| `--sections <json>` | curated sections as JSON. REPLACES the set, keyed by (tab, sectionName); one left out is ARCHIVED |
-| `--business-name <text>` |  |
-| `--primary-offer <text>` |  |
-| `--niche <text>` | niche definition |
-| `--visual-style <text>` |  |
-| `--positioning <json>` | positioning object (JSON) |
-| `--audience <json>` | audience object (JSON) |
-| `--voice-profile <json>` | voice profile object (JSON) |
-| `--content-strategy <json>` | content strategy object (JSON) |
-| `--design-principle <text>` | a design principle; repeatable. REPLACES the list |
+| `--sections <json>` | section writes as JSON, only the sections you change, all or nothing: [\{ key, body, expectedVersion \}] edits one (or revertTo, sectionName, width); [\{ sectionName, tab, body? \}] adds one |
 | `--brand-account <ref>` | the owner's OWN profile: a tracked-account id, or a profile url / platform:handle to ADD one. Repeatable. REPLACES the list |
 | `--inspiration-account <ref>` | a competitor/creator profile: same forms as --brand-account. Repeatable. REPLACES the list |
 | `--logo <ref>` | a logo: a url, or a generation id to copy in (e.g. out9-2). Repeatable; the first is primary. REPLACES the list |
