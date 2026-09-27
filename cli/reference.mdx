@@ -345,7 +345,7 @@ Create a post (requires planner:write)
 | `--space <space>` | which space's board (from `contenthero space list`); default space if omitted |
 | `--stage <stage>` | stage id, slug, or name (defaults to the first stage) |
 | `--cover-url <url>` | public URL for the post cover |
-| `--cover-output-id <id>` | media token (output id, first-8, or "-N") for the cover |
+| `--cover-output-id <id>` | media token (short id, output id or first 8 characters, optionally with "-N") for the cover |
 | `--tags <list>` | comma-separated tag names (must exist; see `tag list`) |
 
 ### `contenthero card get <id>`
@@ -401,7 +401,7 @@ Update a post's fields, including its stage (requires planner:write)
 | `--notes <text>` | working notes; REQUIRES --expected-revision, from `card get` |
 | `--expected-revision <n>` | the revision `card get` reported. Required with --notes: a card's notes have several independent writers, and a write that cannot name the revision it read would silently erase the others |
 | `--cover-url <url>` | public URL for the post cover |
-| `--cover-output-id <id>` | media token (output id, first-8, or "-N") for the cover |
+| `--cover-output-id <id>` | media token (short id, output id or first 8 characters, optionally with "-N") for the cover |
 | `--tags <list>` | comma-separated tag names (replaces the set; must exist) |
 | `--schedule <when>` | ISO-8601 publish time for the card AND its posts, or "clear" |
 | `--posts <json>` | the card's posts as JSON. REPLACES the set, keyed by platform; [] detaches all |
@@ -778,7 +778,7 @@ Get one media item by id (studio output, or an upload/stock item with --source)
 
 | Argument | Required | Purpose |
 | --- | --- | --- |
-| `id` | yes | media id (full or first-8); creations also accept a "-N" variation suffix |
+| `id` | yes | media id (short id, full id or first 8 characters); creations also accept a "-N" variation suffix |
 
 | Option | Purpose |
 | --- | --- |
@@ -844,7 +844,7 @@ Watch a VIDEO as low-res keyframes across a time window (inspect raw footage)
 
 | Argument | Required | Purpose |
 | --- | --- | --- |
-| `idOrUrl` | yes | a studio output id (first-8 ok) OR a media URL on our storage |
+| `idOrUrl` | yes | a studio output id (short id, full id or first 8 characters) OR a media URL on our storage |
 
 | Option | Purpose |
 | --- | --- |
