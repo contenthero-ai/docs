@@ -198,7 +198,7 @@ Filter by a stage id, slug, or name. Resolved within the chosen space.
 
 <Badge>read</Badge>
 
-Get one CARD in full: its fields (title, description, script, notes, status, stage, schedule), plus its posts (one per platform, which is how it publishes) and its attached assets in carousel order. An [inspiration] asset is a tracked post attached as a reference; its line already carries the headline metrics (creator, outlier score, views, likes, duration) plus transcript and breakdown availability, and a content id to pass to get_content for the transcript and the full Break It Down analysis.
+Get one CARD in full: its fields (title, description, script, notes, status, stage, schedule), plus its posts (one per platform, which is how it publishes) and its attached assets in carousel order. An [inspiration] asset is a tracked post attached as a reference; its line already carries the headline metrics (creator, outlier score, views, likes, duration) plus transcript and breakdown availability, and a content id to pass to get_content for the transcript and the full Break It Down analysis. To attach one, add \{ contentId \} to the assets list of update_card; a linked editor or canvas project is added the same way with \{ projectId \}.
 
 <ParamField body name="cardId" type="string" required>
 The card id from list_cards.
@@ -231,7 +231,7 @@ Which board to create the card on, from list_spaces. Omit only when you mean the
 </ParamField>
 
 <ParamField body name="stage" type="string">
-Pipeline stage id, slug, or name. Defaults to the first stage.
+Stage id, slug, or name. Defaults to the first stage.
 </ParamField>
 
 <ParamField body name="tags" type="string[]">
@@ -242,14 +242,14 @@ Tag names to set on the post (must already exist; see list_tags / create_tag). R
 
 <Badge>write</Badge>
 
-Update a card: its fields (title, notes, platform, cover, stage), its POSTS (one per platform, which is how it publishes), its ASSETS (the media on it, in order), and its SCHEDULE. posts and assets are DECLARATIVE: pass the WHOLE set, because anything you leave out is removed. Posts key on platform. Assets key on id, and THE ARRAY ORDER IS THE carousel ORDER, so reordering is just sending the same ids in a different order; keep an existing asset by id, add a new one by assetUrl or outputId. scheduledAt sets the time on the card AND every post (pass null to clear); give a post its own scheduledAt to override it for that platform. To publish NOW, use publish_post. Pass spaceId to MOVE the card to another space; without a stage it lands in the target space's stage whose slug matches its current one, or that space's first stage. Pass cardIds to update several cards at once, which crossed with spaceId is how a selection moves in one call; fields that describe ONE card (title, notes, cover) still need exactly one. WRITING notes REQUIRES expectedRevision: read the card first and pass the revision it reported, or the call is refused. Requires the planner:write scope.
+Update a card: its fields (title, notes, platform, cover, stage), its POSTS (one per platform, which is how it publishes), its ASSETS (its files, links, linked projects and inspiration posts, in order), and its SCHEDULE. posts and assets are DECLARATIVE: pass the WHOLE set, because anything you leave out is removed. Posts key on platform. Assets key on id, and THE ARRAY ORDER IS THE carousel ORDER, so reordering is just sending the same ids in a different order; keep an existing asset by id, and add a new one by EXACTLY ONE reference: outputId (media: a generation, an upload or an import), assetUrl (a link), contentId (an inspiration post, shown on the card's Inspiration tab; get_card reads it back with that id as assetId) or projectId (an editor or canvas project). To attach one thing, read the card, append the entry to its assets, and send the whole list back. scheduledAt sets the time on the card AND every post (pass null to clear); give a post its own scheduledAt to override it for that platform. To publish NOW, use publish_post. Pass spaceId to MOVE the card to another space; without a stage it lands in the target space's stage whose slug matches its current one, or that space's first stage. Pass cardIds to update several cards at once, which crossed with spaceId is how a selection moves in one call; fields that describe ONE card (title, notes, cover) still need exactly one. WRITING notes REQUIRES expectedRevision: read the card first and pass the revision it reported, or the call is refused. Requires the planner:write scope.
 
 <ParamField body name="cardId" type="string" required>
 The card id.
 </ParamField>
 
 <ParamField body name="assets" type="object[]">
-The post's assets IN ORDER, each \{ id \} to keep an existing one or \{ assetUrl | outputId, assetType?, displayName? \} to add. REPLACES the list; [] clears it.
+The post's assets IN ORDER, each \{ id \} to keep an existing one or ONE of \{ outputId \} | \{ assetUrl, assetType? \} | \{ contentId \} | \{ projectId \} to add. REPLACES the list; [] clears it.
 </ParamField>
 
 <ParamField body name="cardIds" type="string[]">

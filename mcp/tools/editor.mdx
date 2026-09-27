@@ -70,10 +70,14 @@ Timeline only: scope the read to a single track by id.
 
 <Badge>write</Badge>
 
-Create a new project. `surface` picks where it lives: 'editor' (video timeline) or 'canvas' (slides/layers). All fields are optional; defaults match the in-app new-project flow (16:9 landscape, editor surface). A new canvas starts with one empty slide already, so add content to it with update_canvas create_layer (use create_slide only to add MORE slides); a new editor starts with an empty timeline. Returns the new project id + revision. Requires the editor:write scope.
+Create a new project. `surface` picks where it lives: 'editor' (video timeline) or 'canvas' (slides/layers). All fields are optional; defaults match the in-app new-project flow (16:9 landscape, editor surface). A new canvas starts with one empty slide already, so add content to it with update_canvas create_layer (use create_slide only to add MORE slides); a new editor starts with an empty timeline. When the project is for a planned piece, pass cardId to link it to that card in the same call. Returns the new project id + revision. Requires the editor:write scope (and planner:write with cardId).
 
 <ParamField body name="brandKitId" type="string">
 Optional brand kit to associate.
+</ParamField>
+
+<ParamField body name="cardId" type="string">
+The card this project is for: the new project is linked to it in the same call (it shows among the card's assets), so the card opens the edit from the moment it exists. Also needs the planner:write scope.
 </ParamField>
 
 <ParamField body name="height" type="number">
@@ -118,10 +122,14 @@ The project id to permanently delete.
 
 <Badge>write</Badge>
 
-Import a PowerPoint / Google Slides file (by URL) or a Canva design (by id) into a NEW canvas project with editable layers. Set sourceType to 'pptx' and pass fileUrl (a URL to a .pptx / slides file), or set sourceType to 'canva' and pass designId (uses the account's Canva connection; fails with canva_not_connected if not linked). Returns the new project id + revision. Requires the editor:write scope.
+Import a PowerPoint / Google Slides file (by URL) or a Canva design (by id) into a NEW canvas project with editable layers. Set sourceType to 'pptx' and pass fileUrl (a URL to a .pptx / slides file), or set sourceType to 'canva' and pass designId (uses the account's Canva connection; fails with canva_not_connected if not linked). Pass cardId to link the new project to its card in the same call. Returns the new project id + revision. Requires the editor:write scope (and planner:write with cardId).
 
 <ParamField body name="sourceType" type="`pptx` \| `canva`" required>
 'pptx' for a file URL, 'canva' for a Canva design id.
+</ParamField>
+
+<ParamField body name="cardId" type="string">
+The card this project is for: the new project is linked to it in the same call (it shows among the card's assets), so the card opens the edit from the moment it exists. Also needs the planner:write scope.
 </ParamField>
 
 <ParamField body name="designId" type="string">

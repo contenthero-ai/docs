@@ -405,7 +405,7 @@ Update a post's fields, including its stage (requires planner:write)
 | `--tags <list>` | comma-separated tag names (replaces the set; must exist) |
 | `--schedule <when>` | ISO-8601 publish time for the card AND its posts, or "clear" |
 | `--posts <json>` | the card's posts as JSON. REPLACES the set, keyed by platform; [] detaches all |
-| `--assets <json>` | the post's assets as JSON, IN ORDER. REPLACES the list; [] clears it |
+| `--assets <json>` | the card's assets as JSON, IN ORDER: [\{"id":...\}] keeps one; add one with exactly one of \{"outputId"\} (media: generated, uploaded or imported), \{"assetUrl"\} (a link), \{"contentId"\} (an inspiration post) or \{"projectId"\} (an editor or canvas project). REPLACES the list; [] clears it |
 
 ## `config`
 
@@ -933,6 +933,7 @@ Create a project (requires editor:write)
 | `--width <n>` | pixel width (default: from orientation) |
 | `--height <n>` | pixel height (default: from orientation) |
 | `--brand-kit <id>` | associate this brand kit with the project |
+| `--card <id>` | link the new project to this card in the same call (also needs planner:write) |
 
 ### `contenthero project delete <projectId>`
 
@@ -1003,6 +1004,7 @@ Import a PPTX/Slides file URL or a Canva design into a new canvas project (requi
 | `--file-url <url>` | PPTX / slides file URL (when --source-type pptx) |
 | `--design-id <id>` | Canva design id (when --source-type canva) |
 | `--title <text>` | title for the created project |
+| `--card <id>` | link the new project to this card in the same call (also needs planner:write) |
 
 ### `contenthero project layer-types`
 

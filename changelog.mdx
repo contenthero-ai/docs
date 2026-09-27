@@ -3,6 +3,18 @@ title: "Changelog"
 description: "Updates to the ContentHero developer platform: SDK, MCP, CLI, and skills."
 ---
 
+<Update label="2026-09-27" tags={["Pipeline", "SDK", "MCP", "CLI"]}>
+  **Attach anything a card can hold.** A card's `assets` add one thing per entry by exactly one reference: `outputId` (media, whether generated, uploaded or imported), `assetUrl` (a link), `contentId` (an inspiration post, shown on the card's Inspiration tab) or `projectId` (an editor or canvas project). `get_card` reads each back with the same id. An `assetType` of `inspiration` with a url is now refused, naming `contentId`, instead of being saved as a plain link. See [What a card can hold](/guides/pipeline).
+
+  **Link a project when you make it.** `create_project` and `import_project` (and `createProject` / `importProject`, and `project create|import --card`) take a `cardId`: the new project is linked to that card in the same call. It also needs the `planner:write` scope.
+
+  **Stages are stages.** `list_stages` is titled "List Stages", and no tool text says "pipeline stage" anymore.
+
+  **Leaner full kit read.** The full `get_brand_kit` read shows linked accounts by id, platform, name, handle and follower count, without avatar links.
+
+  Packages: `sdk 0.4.15`, `mcp 0.4.20`, `cli 0.3.11`.
+</Update>
+
 <Update label="2026-09-26" tags={["Brand", "SDK", "MCP", "CLI"]}>
   **Brand kits are Markdown sections.** A brand kit is now a set of named sections (About, Audience, Offer, Content Strategy, Voice & Tone, Writing Style, Speaking Style, Design Guidelines), each one Markdown document with a version and history. `getBrandKit` reads a summary (each section's outline and length), a filtered set by key, role or tab, or the whole kit. `updateBrandKit({ sections })` writes only the sections it names, all or nothing, and a stale `version` returns a `ConflictError` carrying the current body. See [Brand](/guides/brand).
 
