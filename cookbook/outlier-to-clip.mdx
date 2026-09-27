@@ -16,7 +16,7 @@ Research to published, end to end. This is the [pipeline](/guides/pipeline) in f
     `generate_image` for the key frame, then chain its output id into `generate_video` as the start frame. Ground the visual in the brand's visual style.
   </Step>
   <Step title="Assemble">
-    `create_card`, `update_card` with `assets` (the video), `posts` (platform, format, connected account).
+    `create_card`, then `update_card` with `assets`: the video by `{ outputId }` and the outlier it came from by `{ contentId }`, so it sits on the card's Inspiration tab. Add `posts` (platform, format, connected account).
   </Step>
   <Step title="Publish">
     `update_card` with `scheduledAt`, after confirming destinations and timing.

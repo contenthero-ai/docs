@@ -1,39 +1,69 @@
 ---
 title: "Pipeline"
-description: "Posts, destinations, assets, scheduling, publishing, pipeline stages, and connected accounts endpoints."
+description: "Spaces, stages and cards, the posts that publish a card, what a card can hold, scheduling, publishing, and connected accounts."
 ---
 
-Base URL `https://app.contenthero.ai/api/v1`. All endpoints take a bearer API key.
+Base URL `https://app.contenthero.ai/api/v1`. All endpoints take a bearer API key. Reads need no scope; writes need the scope listed.
 
-## Posts
+## Spaces and stages
 
-| Method | Path | Scope | Purpose |
-| --- | --- | --- | --- |
-| `GET` | `/posts` | read | List your posts. |
-| `POST` | `/posts` | `pipeline:write` | Create a post. Resolves a pipeline stage by id, slug, or name. |
-| `GET` | `/posts/{id}` | read | Get a post with its destinations and assets. |
-| `PATCH` | `/posts/{id}` | `pipeline:write` | Update a post. Set status to `archived` to archive it (reversible). |
-
-## Destinations and assets
+A space is a board; each space has its own stages, in order.
 
 | Method | Path | Scope | Purpose |
 | --- | --- | --- | --- |
-| `POST` | `/posts/{id}/destinations` | `pipeline:write` | Add a platform destination (platform, format, connected account). |
-| `PATCH` | `/posts/{id}/destinations` | `pipeline:write` | Update a destination. |
-| `POST` | `/posts/{id}/assets` | `assets:write` | Attach a media asset by URL. |
+| `GET` | `/spaces` | read | List your spaces. |
+| `POST` | `/spaces` | `planner:write` | Create a space. |
+| `GET` | `/spaces/{id}` | read | Get one space. |
+| `PATCH` | `/spaces/{id}` | `planner:write` | Update a space. |
+| `DELETE` | `/spaces/{id}` | `planner:write` | Delete a space. |
+| `GET` | `/stages` | read | List a space's stages, in order. |
+| `POST` | `/stages` | `planner:write` | Create a stage. |
+| `PATCH` | `/stages/{id}` | `planner:write` | Update a stage. |
+| `DELETE` | `/stages/{id}` | `planner:write` | Delete a stage. |
 
-## Schedule and publish
+## Cards
+
+A card is the unit of work: its title, notes and cover, the posts that publish it (one per platform), and what it holds (its assets).
 
 | Method | Path | Scope | Purpose |
 | --- | --- | --- | --- |
-| `POST` | `/posts/{id}/schedule` | `pipeline:write` | Schedule the post and its destinations for a future time. |
-| `POST` | `/posts/{id}/publish` | `publish:write` | Publish now to the post's destinations. Returns per-destination results. |
+| `GET` | `/cards` | read | List a space's cards. |
+| `POST` | `/cards` | `planner:write` | Create a card. Without a space it lands on your default board. |
+| `GET` | `/cards/{id}` | read | Get a card with its posts and assets. |
+| `PATCH` | `/cards/{id}` | `planner:write` | Update a card: its fields, its `posts`, its `assets` and its schedule. |
+| `POST` | `/cards/{id}/publish` | `publish:write` | Publish now, to every post on the card or to one platform. |
 
-## Pipeline stages
+To archive a card, `POST /archive` with `assetType: "card"`. Scheduling is the `scheduledAt` field on `PATCH /cards/{id}`: it sets the card and every post, and a post can carry its own to override it.
 
-| Method | Path | Scope | Purpose |
-| --- | --- | --- | --- |
-| `GET` | `/pipeline-stages` | read | List your pipeline stages (seeds the defaults if none exist). |
+## What a card can hold
+
+`posts` and `assets` on `PATCH /cards/{id}` are **declarative**: send the whole list you want to end up with, because anything left out is removed. Read the card first, append, then send it all back. The order of `assets` is the carousel order, so reordering is sending the same ids in a new sequence.
+
+Each entry in `assets` either keeps one already on the card, `{ "id": "<asset id>" }`, or adds one by **exactly one** reference:
+
+| To add | Entry | The id comes from |
+| --- | --- | --- |
+| Media: a generation, an upload or an import | `{ "outputId": "<id>" }`, or `"<id>-2"` for variation 2 | the generate call, `POST /media/uploads` then `POST /media/uploads/{outputId}/complete`, or `POST /media/imports` |
+| A link | `{ "assetUrl": "https://..." }` | any web address; nothing is copied |
+| An inspiration post (the card's Inspiration tab) | `{ "contentId": "<id>" }` | `GET /content`, `GET /content/{id}`, or an inspiration asset on `GET /cards/{id}` (its `assetId`) |
+| An editor or canvas project | `{ "projectId": "<id>" }` | `GET /projects` for one that exists; a new one is linked in the same call by `cardId` on `POST /projects` or `POST /projects/import` |
+
+An entry naming two references, or none, is refused with a `400`. An inspiration post is attached by `contentId`, never by its permalink: `assetType: "inspiration"` with an `assetUrl` is refused with a `400` that names `contentId`. A post you cannot see, or a project that is not yours, answers `404`.
+
+```json
+PATCH /cards/{id}
+{
+  "assets": [
+    { "id": "8f0c...e21" },
+    { "contentId": "236e7611-4afe-4485-ba95-f86568a6bbd6" },
+    { "projectId": "6a830d19-eb85-45b9-be59-ccbdfcfac101" }
+  ]
+}
+```
+
+**Link a new project when you make it.** `POST /projects` and `POST /projects/import` take an optional `cardId`: the project is linked to that card in the same call, and the reply carries `linkedCardId`. Linking writes to the card, so it also needs `planner:write`; a card that is not yours answers `404` before any project is made.
+
+`GET /cards/{id}` reads each kind back: an inspiration asset has `assetType: "inspiration"` and `assetId` set to its content id, with its creator, outlier score and views.
 
 ## Connected accounts
 
@@ -43,7 +73,7 @@ Base URL `https://app.contenthero.ai/api/v1`. All endpoints take a bearer API ke
 | `GET` | `/connected-accounts/{id}` | read | Get one connected account with its enabled capabilities. |
 
 <Note>
-Encrypted credential fields on a connected account are never exposed through the API. You reference an account by id when adding a destination.
+Encrypted credential fields on a connected account are never exposed through the API. A post names the connected account it publishes through.
 </Note>
 
-See the [Pipeline guide](/guides/pipeline) for the five-phase workflow.
+See the [Pipeline guide](/guides/pipeline) for the workflow end to end.

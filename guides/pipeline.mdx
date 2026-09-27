@@ -44,7 +44,7 @@ So a card is the thing you make, and its posts are the ways it goes out. Publish
     Generate the media with the [generate](/guides/generate) tools. A common chain is `generate_image` for the key frame, then its output id into `generate_video` as the start frame, grounded in the brand's visual style.
   </Step>
   <Step title="Assemble">
-    `create_card` with the approved title, then one `update_card` call carrying the caption, the `assets`, and the `posts` for each platform.
+    `create_card` with the approved title, then one `update_card` call carrying the caption, the `assets`, and the `posts` for each platform. Put the outlier posts the idea came from in `assets` by `contentId`, so they show on the card's Inspiration tab, and when you start the edit, pass the card's id as `cardId` to `create_project` so the new project is linked to the card in the same call and the card opens the edit in progress.
   </Step>
   <Step title="Publish">
     `update_card` with `scheduledAt` for a future slot, or `publish_post` to go now, only after the user confirms platforms and timing.
@@ -55,13 +55,31 @@ So a card is the thing you make, and its posts are the ways it goes out. Publish
 **`posts` and `assets` are declarative.** Each one replaces the whole set, so send the full list every time. Passing a single post to add a platform removes every other platform's post. Read the card first, append, then send it all back.
 </Warning>
 
+## What a card can hold
+
+A card's `assets` hold four kinds of thing, and each new one names **exactly one** reference. The same list, and the same rules, apply over MCP, the CLI (`--assets`), the SDK and the [REST API](/api-reference/pipeline).
+
+| To attach | Entry | The id comes from |
+| --- | --- | --- |
+| Media: a generation, a file uploaded from a device, or a file imported from the web | `{ "outputId": "<id>" }` | the generate call; `create_media_upload` then `complete_media_upload`; `import_media` |
+| A link | `{ "assetUrl": "https://..." }` | any web address; nothing is copied |
+| An inspiration post, on the card's Inspiration tab | `{ "contentId": "<id>" }` | `list_content`, `get_content`, or an inspiration asset's `assetId` on `get_card` |
+| An editor or canvas project | `{ "projectId": "<id>" }` | `list_projects` for one that exists; a new one is linked in the same call by passing `cardId` to `create_project` or `import_project` |
+
+<Warning>
+**An inspiration post is attached by `contentId`, never by its url.** A permalink sent as `assetUrl` becomes a plain link, and `assetType: "inspiration"` with a url is refused. A project is linked by `projectId`, never the editor's url.
+</Warning>
+
 ## Operations
 
 | What | MCP tool |
 | --- | --- |
 | Create, read, update a card | `create_card`, `get_card`, `update_card`, `list_cards` |
 | Archive a card | `archive` with `assetType: "card"` |
-| Attach media | `update_card` with `assets` |
+| Attach media (generated, uploaded or imported) | `update_card` with `assets`: `{ outputId }` |
+| Attach a link | `update_card` with `assets`: `{ assetUrl }` |
+| Attach an inspiration post | `update_card` with `assets`: `{ contentId }` |
+| Link an editor or canvas project | `create_project` or `import_project` with `cardId` for a new one; `update_card` with `assets`: `{ projectId }` for one that exists |
 | Configure platforms | `update_card` with `posts` |
 | Schedule | `update_card` with `scheduledAt` |
 | Publish now | `publish_post` |
