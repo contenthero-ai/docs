@@ -3,6 +3,18 @@ title: "Changelog"
 description: "Updates to the ContentHero developer platform: SDK, MCP, CLI, and skills."
 ---
 
+<Update label="2026-09-27 (2)" tags={["Inspiration", "Editor", "Pipeline", "SDK", "MCP", "CLI"]}>
+  **One outlier score.** A post's outlier score is its performance divided by the median of the previous 20 posts in the same format on the same account, as of publication (the 20 nearest when fewer than 5 came before). Performance is views for anything that plays and likes plus comments for images, carousels and Threads posts. The score is computed in one place for every surface, so `list_content`, `get_content` and `get_card` always agree, and a creator's typical post now scores about 1x in every format.
+
+  **One post, one record.** An Instagram post reached through a connected account and through tracking is now the same post, keyed by its shortcode. Content ids are unchanged, except that 67 duplicate records were merged into the originals they copied.
+
+  **A project has a `type`.** `editor` or `canvas`, on every project read and as the `list_projects` filter and `create_project` input (`--type` in the CLI). `surface` and `kind` are still accepted and returned, deprecated. The `list_projects` type filter is fixed: the SDK used to drop it. Placement results, the type catalogs and export formats carry `projectType` / `projectTypes`.
+
+  **Card assets name what they point at.** `get_card` returns an inspiration post's `contentId` and a linked project's `projectId`, the same fields that attach them (`assetId` stays, deprecated), and prints a linked project's id. An `assets` list that names the same thing twice is refused.
+
+  Packages: `sdk 0.4.16`, `mcp 0.4.21`, `cli 0.3.12`.
+</Update>
+
 <Update label="2026-09-27" tags={["Pipeline", "SDK", "MCP", "CLI"]}>
   **Attach anything a card can hold.** A card's `assets` add one thing per entry by exactly one reference: `outputId` (media, whether generated, uploaded or imported), `assetUrl` (a link), `contentId` (an inspiration post, shown on the card's Inspiration tab) or `projectId` (an editor or canvas project). `get_card` reads each back with the same id. An `assetType` of `inspiration` with a url is now refused, naming `contentId`, instead of being saved as a plain link. See [What a card can hold](/guides/pipeline).
 

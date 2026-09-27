@@ -63,11 +63,11 @@ A card's `assets` hold four kinds of thing, and each new one names **exactly one
 | --- | --- | --- |
 | Media: a generation, a file uploaded from a device, or a file imported from the web | `{ "outputId": "<id>" }` | the generate call; `create_media_upload` then `complete_media_upload`; `import_media` |
 | A link | `{ "assetUrl": "https://..." }` | any web address; nothing is copied |
-| An inspiration post, on the card's Inspiration tab | `{ "contentId": "<id>" }` | `list_content`, `get_content`, or an inspiration asset's `assetId` on `get_card` |
+| An inspiration post, on the card's Inspiration tab | `{ "contentId": "<id>" }` | `list_content`, `get_content`, or an inspiration asset's `contentId` on `get_card` |
 | An editor or canvas project | `{ "projectId": "<id>" }` | `list_projects` for one that exists; a new one is linked in the same call by passing `cardId` to `create_project` or `import_project` |
 
 <Warning>
-**An inspiration post is attached by `contentId`, never by its url.** A permalink sent as `assetUrl` becomes a plain link, and `assetType: "inspiration"` with a url is refused. A project is linked by `projectId`, never the editor's url.
+**An inspiration post is attached by `contentId`, never by its url.** A permalink sent as `assetUrl` becomes a plain link, and `assetType: "inspiration"` with a url is refused. A project is linked by `projectId`, never the editor's url. Naming the same thing twice in one list is refused.
 </Warning>
 
 ## Operations

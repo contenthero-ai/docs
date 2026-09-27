@@ -45,10 +45,10 @@ Each entry in `assets` either keeps one already on the card, `{ "id": "<asset id
 | --- | --- | --- |
 | Media: a generation, an upload or an import | `{ "outputId": "<id>" }`, or `"<id>-2"` for variation 2 | the generate call, `POST /media/uploads` then `POST /media/uploads/{outputId}/complete`, or `POST /media/imports` |
 | A link | `{ "assetUrl": "https://..." }` | any web address; nothing is copied |
-| An inspiration post (the card's Inspiration tab) | `{ "contentId": "<id>" }` | `GET /content`, `GET /content/{id}`, or an inspiration asset on `GET /cards/{id}` (its `assetId`) |
+| An inspiration post (the card's Inspiration tab) | `{ "contentId": "<id>" }` | `GET /content`, `GET /content/{id}`, or an inspiration asset's `contentId` on `GET /cards/{id}` |
 | An editor or canvas project | `{ "projectId": "<id>" }` | `GET /projects` for one that exists; a new one is linked in the same call by `cardId` on `POST /projects` or `POST /projects/import` |
 
-An entry naming two references, or none, is refused with a `400`. An inspiration post is attached by `contentId`, never by its permalink: `assetType: "inspiration"` with an `assetUrl` is refused with a `400` that names `contentId`. A post you cannot see, or a project that is not yours, answers `404`.
+An entry naming two references, or none, is refused with a `400`, and so is a list that names the same post, project, file or asset `id` twice. An inspiration post is attached by `contentId`, never by its permalink: `assetType: "inspiration"` with an `assetUrl` is refused with a `400` that names `contentId`. A post you cannot see, or a project that is not yours, answers `404`.
 
 ```json
 PATCH /cards/{id}
@@ -63,7 +63,7 @@ PATCH /cards/{id}
 
 **Link a new project when you make it.** `POST /projects` and `POST /projects/import` take an optional `cardId`: the project is linked to that card in the same call, and the reply carries `linkedCardId`. Linking writes to the card, so it also needs `planner:write`; a card that is not yours answers `404` before any project is made.
 
-`GET /cards/{id}` reads each kind back: an inspiration asset has `assetType: "inspiration"` and `assetId` set to its content id, with its creator, outlier score and views.
+`GET /cards/{id}` reads each kind back under the field that attached it: an inspiration asset carries `contentId` (with its creator, outlier score and views), and a linked project carries `projectId`. `assetId` is still returned as a deprecated alias.
 
 ## Connected accounts
 

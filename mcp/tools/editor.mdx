@@ -14,14 +14,14 @@ Every tool below is exposed by the hosted MCP server at `https://mcp.contenthero
 
 <Badge>read</Badge>
 
-List the account's editor (video timeline) and canvas (slides/layers) projects. Filter by state (archived / favorited), by surface (editor / canvas), or by a title search. Returns lightweight summaries; call get_project for a single project's full composition. Requires the editor:read scope.
+List the account's editor (video timeline) and canvas (slides/layers) projects. Filter by state (archived / favorited), by type (editor / canvas), or by a title search. Returns lightweight summaries; call get_project for a single project's full composition. Requires the editor:read scope.
 
 <ParamField body name="filter" type="`archived` \| `favorited`">
 archived -\> only archived; favorited -\> favorited and not archived; omitted -\> active (not archived).
 </ParamField>
 
 <ParamField body name="kind" type="`editor` \| `canvas`">
-Deprecated alias for `surface`. Prefer `surface`; this is accepted for one release window.
+Deprecated alias for `type`, accepted for one release window.
 </ParamField>
 
 <ParamField body name="search" type="string">
@@ -29,7 +29,11 @@ Case-insensitive title search.
 </ParamField>
 
 <ParamField body name="surface" type="`editor` \| `canvas`">
-Restrict to one surface; omitted returns both.
+Deprecated alias for `type`, accepted for one release window.
+</ParamField>
+
+<ParamField body name="type" type="`editor` \| `canvas`">
+Restrict to one project type; omitted returns both.
 </ParamField>
 
 ### `get_project`
@@ -70,7 +74,7 @@ Timeline only: scope the read to a single track by id.
 
 <Badge>write</Badge>
 
-Create a new project. `surface` picks where it lives: 'editor' (video timeline) or 'canvas' (slides/layers). All fields are optional; defaults match the in-app new-project flow (16:9 landscape, editor surface). A new canvas starts with one empty slide already, so add content to it with update_canvas create_layer (use create_slide only to add MORE slides); a new editor starts with an empty timeline. When the project is for a planned piece, pass cardId to link it to that card in the same call. Returns the new project id + revision. Requires the editor:write scope (and planner:write with cardId).
+Create a new project. `type` picks what it is: 'editor' (video timeline) or 'canvas' (slides/layers). All fields are optional; defaults match the in-app new-project flow (16:9 landscape, an editor project). A new canvas starts with one empty slide already, so add content to it with update_canvas create_layer (use create_slide only to add MORE slides); a new editor starts with an empty timeline. When the project is for a planned piece, pass cardId to link it to that card in the same call. Returns the new project id + revision. Requires the editor:write scope (and planner:write with cardId).
 
 <ParamField body name="brandKitId" type="string">
 Optional brand kit to associate.
@@ -85,7 +89,7 @@ Pixel height. Defaults from the orientation.
 </ParamField>
 
 <ParamField body name="kind" type="`editor` \| `canvas`">
-Deprecated alias for `surface`. Prefer `surface`; accepted for one release window.
+Deprecated alias for `type`, accepted for one release window.
 </ParamField>
 
 <ParamField body name="orientation" type="string">
@@ -93,11 +97,15 @@ Aspect ratio, e.g. '16:9', '9:16', '1:1'. Defaults to '16:9'.
 </ParamField>
 
 <ParamField body name="surface" type="`editor` \| `canvas`">
-The surface. Defaults to 'editor'.
+Deprecated alias for `type`, accepted for one release window.
 </ParamField>
 
 <ParamField body name="title" type="string">
 Project title. Defaults to 'Untitled'.
+</ParamField>
+
+<ParamField body name="type" type="`editor` \| `canvas`">
+The project type. Defaults to 'editor'.
 </ParamField>
 
 <ParamField body name="width" type="number">
@@ -148,14 +156,14 @@ Title for the created project. Defaults to 'Imported deck'.
 
 <Badge>write</Badge>
 
-Export (render) a project's saved composition to a downloadable file the user KEEPS: a permanent deliverable that counts against the user's storage. To preview or verify a frame or slide while editing, do NOT export; use get_context with render (ephemeral, stored nowhere). format 'mp4' works for both editor and canvas (a video render; may take a while). 'png' / 'jpg' work for both surfaces too: a canvas project renders one image per slide (multiple slides come back as a zip), while an editor project renders a single composited frame of the timeline (pick which frame with `frame`; defaults to frame 0). Canvas projects additionally support 'pdf' and 'pptx'. Resolution and watermark apply to EVERY format, not just mp4: a free account never exports above 720p and never removes the watermark, on any format or surface. `quality` is mp4 only. Returns the download URL when the render finishes in time, otherwise an exportId to poll with get_export. Requires the editor:write scope.
+Export (render) a project's saved composition to a downloadable file the user KEEPS: a permanent deliverable that counts against the user's storage. To preview or verify a frame or slide while editing, do NOT export; use get_context with render (ephemeral, stored nowhere). format 'mp4' works for both editor and canvas (a video render; may take a while). 'png' / 'jpg' work for both project types too: a canvas project renders one image per slide (multiple slides come back as a zip), while an editor project renders a single composited frame of the timeline (pick which frame with `frame`; defaults to frame 0). Canvas projects additionally support 'pdf' and 'pptx'. Resolution and watermark apply to EVERY format, not just mp4: a free account never exports above 720p and never removes the watermark, on any format or project type. `quality` is mp4 only. Returns the download URL when the render finishes in time, otherwise an exportId to poll with get_export. Requires the editor:write scope.
 
 <ParamField body name="projectId" type="string" required>
 The project to export.
 </ParamField>
 
 <ParamField body name="format" type="`mp4` \| `png` \| `jpg` \| `pdf` \| `pptx`">
-Output format. Defaults to 'mp4'. mp4/png/jpg work for both surfaces (png/jpg on an editor project render one timeline frame); pdf/pptx are canvas-only.
+Output format. Defaults to 'mp4'. mp4/png/jpg work for both project types (png/jpg on an editor project render one timeline frame); pdf/pptx are canvas-only.
 </ParamField>
 
 <ParamField body name="frame" type="integer">
@@ -188,7 +196,7 @@ The export id returned by export_project.
 
 <Badge>read</Badge>
 
-List the export formats (and their options) available per project surface, so you know what export_project accepts. Requires the editor:read scope.
+List the export formats (and their options) available per project type, so you know what export_project accepts. Requires the editor:read scope.
 
 Takes no parameters.
 

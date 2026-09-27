@@ -927,7 +927,8 @@ Create a project (requires editor:write)
 
 | Option | Purpose |
 | --- | --- |
-| `--surface <surface>` | editor | canvas (default: editor) |
+| `--type <type>` | editor | canvas (default: editor) |
+| `--surface <type>` | deprecated alias for --type |
 | `--title <text>` | project title (default: Untitled) |
 | `--orientation <ratio>` | e.g. 16:9, 9:16, 1:1 (default: 16:9) |
 | `--width <n>` | pixel width (default: from orientation) |
@@ -949,7 +950,7 @@ PERMANENTLY delete a project, irreversible (requires editor:write)
 
 ### `contenthero project export <projectId>`
 
-Export a project to a file (mp4/png/jpg both surfaces; pdf/pptx canvas) (requires editor:write)
+Export a project to a file (mp4/png/jpg both project types; pdf/pptx canvas) (requires editor:write)
 
 | Argument | Required | Purpose |
 | --- | --- | --- |
@@ -1017,7 +1018,8 @@ List projects, both editor + canvas (requires editor:read)
 | Option | Purpose |
 | --- | --- |
 | `--filter <state>` | archived | favorited (omitted = active) |
-| `--surface <surface>` | editor | canvas (omitted = both) |
+| `--type <type>` | editor | canvas (omitted = both) |
+| `--surface <type>` | deprecated alias for --type |
 | `--search <text>` | case-insensitive title search |
 
 ### `contenthero project timeline-types`
