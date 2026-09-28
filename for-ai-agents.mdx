@@ -35,7 +35,7 @@ Pick one transport at the start of a session. Never mix, never switch mid-sessio
 3. **Never publish or schedule without explicit approval** of the final content.
 4. **Preview cost before a large or batched generation** and show it. MCP passes `getCost: true` on the generate call. CLI uses `--cost`. It charges nothing.
 5. **Be concise.** Report the result (the media, the post link, the cost), not the plumbing (output ids, raw payloads, transport choice).
-6. **Link what you name.** Every item the API returns carries `appUrl`, the address that opens it in the ContentHero app. Make the item's name a clickable link to that value rather than printing it bare, and never build a URL from an id.
+6. **Link what you name.** Every item the API returns carries `appUrl`, the address that opens it in the ContentHero app; make the item's name a clickable link to it. To link anything else, such as a tab, a filtered view, or an item you only hold an id for, build the address from the link contract (`get_schema` kind `link`, or `GET /api/v1/link-formats`): one grammar, plus the nouns, tabs and parameters it lists. Use only what it lists.
 
 ## The failure mode to avoid
 
