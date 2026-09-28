@@ -18,7 +18,8 @@ They mean opposite things, which is why the distinction is worth keeping straigh
 | Tracked accounts, either kind | `list_accounts` (filter with `accountType`) |
 | One account's performance | `get_account` |
 | Posts, ranked by outlier score | `list_content` |
-| One post in full, with transcript | `get_content` |
+| One post in full: transcript, analysis, scenes | `get_content` |
+| A post's Break It Down, or its scenes | `analyze_content` (`kind: "breakdown"` or `"scenes"`) |
 
 All reads need `brandkit:read`. Full parameters are in the [inspiration tool reference](/mcp/tools/inspiration).
 
@@ -41,7 +42,7 @@ Outliers carry the signal that makes a draft perform. List them, then go deep on
     `list_content` (scoped with `brandKitId`) to find the top performers, already ranked by outlier score.
   </Step>
   <Step title="Get content">
-    `get_content` on the top few for the full detail: hashtags, keywords, audio, and the structure you want to learn from. The transcript is **opt-in**, because a long video is a large document: pass `transcript: "text"` for the whole thing or `"segments"` for timed slices, then narrow with `startMs`, `endMs` or `transcriptSearch`.
+    `get_content` on the top few for the full detail: hashtags, keywords, audio, and the structure you want to learn from. The transcript is **opt-in**, because a long video is a large document: pass `transcript: "text"` for the whole thing or `"segments"` for timed slices, then narrow with `startMs`, `endMs` or `transcriptSearch`. To see a video, not only read it, run `analyze_content` with `kind: "scenes"` once, then pass `scenes: "frames"` to `get_content`. Each scene comes with its time range, what happens, what is said, and a frame; narrow with `startMs`/`endMs`. Scenes cost credits per minute of video the first time and are free to read after that.
   </Step>
 </Steps>
 
