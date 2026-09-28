@@ -6,9 +6,9 @@ description: "Every ContentHero CLI command, its arguments and its options."
 {/* GENERATED FILE. Do not edit by hand. */}
 {/* Regenerate with `npm run generate:reference` in contenthero-docs. */}
 
-Every command the CLI exposes, grouped by resource. 101 commands.
+Every command the CLI exposes, grouped by resource. 97 commands.
 
-Run `contenthero schema` to get this same information as JSON, which is the discovery path for agents.
+Run `contenthero schema commands` to get this same information as JSON, which is the discovery path for agents.
 
 ## Global options
 
@@ -442,6 +442,21 @@ List connected accounts (default first)
 
 ## `content`
 
+### `contenthero content analyze <id>`
+
+Analyze a tracked post: Break It Down, or its scenes with --kind scenes. Free when the result exists, otherwise it spends credits (see --cost)
+
+| Argument | Required | Purpose |
+| --- | --- | --- |
+| `id` | yes | the content id (from content list, a tracked account, or a card inspiration asset) |
+
+| Option | Purpose |
+| --- | --- |
+| `--kind <kind>` | breakdown (default) or scenes (the scene map and a frame of each scene, priced per minute of video) |
+| `--cost` | show the credit cost instead of analyzing (nothing runs, nothing is charged) |
+| `--no-wait` | return at once instead of waiting for a running analysis |
+| `--timeout <sec>` | how long to wait for a running analysis (default 600) |
+
 ### `contenthero content get <id>`
 
 Get one tracked post in full (engagement, hashtags, optional transcript and Break It Down analysis)
@@ -458,6 +473,7 @@ Get one tracked post in full (engagement, hashtags, optional transcript and Brea
 | `--transcript-search <text>` | only the transcript segments containing this phrase |
 | `--analysis` | include the full Break It Down analysis (availability always reports) |
 | `--analysis-sections <list>` | only these analysis sections, comma-separated (names come from the availability line) |
+| `--scenes <grain>` | the post's scenes: map, or frames (the same map with each scene's frame url); --start-ms/--end-ms narrow them |
 
 ### `contenthero content list`
 
@@ -791,12 +807,14 @@ Import a remote URL as first-class media (requires assets:write)
 
 | Argument | Required | Purpose |
 | --- | --- | --- |
-| `url` | yes | public http(s) URL to fetch and re-host |
+| `url` | yes | public https URL to fetch and re-host |
 
 | Option | Purpose |
 | --- | --- |
 | `--content-type <mime>` | MIME type override (else taken from the response) |
 | `--name <name>` | file name override (used for the extension) |
+| `--no-wait` | return the outputId immediately instead of waiting for the import |
+| `--timeout <seconds>` | how long to wait before handing back the outputId Defaults to `600`. |
 
 ### `contenthero media list`
 
@@ -871,24 +889,6 @@ List the models available to this key (the discovery catalog)
 | --- | --- |
 | `--type <type>` | filter by content type: image, video, or audio |
 
-## `platform`
-
-### `contenthero platform get <platform>`
-
-Get one platform's full publishing shape (the fields a post requires)
-
-| Argument | Required | Purpose |
-| --- | --- | --- |
-| `platform` | yes | platform id (from `platform list`) |
-
-| Option | Purpose |
-| --- | --- |
-| `--format <format>` | narrow to one format (e.g. reel, short, story, thread) |
-
-### `contenthero platform list`
-
-List the platforms you can publish to (formats + connected flag)
-
 ## `preview`
 
 ### `contenthero preview`
@@ -907,7 +907,7 @@ Render a short composed video of an editor range (ephemeral preview), polling un
 
 ### `contenthero project apply <projectId>`
 
-Apply a batch of ops to a project composition. Ops both CREATE (create_clip, insert_track, insert_prebuilt_track, add_transition) and EDIT (move_clip, trim_clip, update_clip, delete_clip, remove_background, disable_ranges, update_transition, remove_transition, ...). One-shot cleanups: remove_silence, remove_filler_words, extract_audio (see `project timeline-types` for shapes). Build items from the `example` skeletons in `project timeline-types` / `layer-types`; run `project get` first for the current revision and pass it as --expected-revision for safe concurrent edits. Requires editor:write.
+Apply a batch of ops to a project composition. Ops both CREATE (create_clip, insert_track, insert_prebuilt_track, add_transition) and EDIT (move_clip, trim_clip, update_clip, delete_clip, remove_background, disable_ranges, update_transition, remove_transition, ...). One-shot cleanups: remove_silence, remove_filler_words, extract_audio (see `schema timeline` for shapes). Build items from the `example` skeletons in `schema timeline` / `schema layer`; run `project get` first for the current revision and pass it as --expected-revision for safe concurrent edits. Requires editor:write.
 
 | Argument | Required | Purpose |
 | --- | --- | --- |
@@ -966,10 +966,6 @@ Export a project to a file (mp4/png/jpg both project types; pdf/pptx canvas) (re
 | `--wait` | poll until the export finishes and print the URL |
 | `--timeout <ms>` | max wait when --wait (default 600000) |
 
-### `contenthero project export-formats`
-
-List available export formats (requires editor:read)
-
 ### `contenthero project export-status <exportId>`
 
 Poll an export job by id (requires editor:read)
@@ -1007,10 +1003,6 @@ Import a PPTX/Slides file URL or a Canva design into a new canvas project (requi
 | `--title <text>` | title for the created project |
 | `--card <id>` | link the new project to this card in the same call (also needs planner:write) |
 
-### `contenthero project layer-types`
-
-List canvas layer types + editable props (requires editor:read)
-
 ### `contenthero project list`
 
 List projects, both editor + canvas (requires editor:read)
@@ -1021,10 +1013,6 @@ List projects, both editor + canvas (requires editor:read)
 | `--type <type>` | editor | canvas (omitted = both) |
 | `--surface <type>` | deprecated alias for --type |
 | `--search <text>` | case-insensitive title search |
-
-### `contenthero project timeline-types`
-
-List editor timeline clip + track types with editable props. Each clip type also carries a copy-pasteable `example` clip skeleton, and the catalog carries a `creation` section documenting the CREATE ops (create_clip, insert_track, insert_prebuilt_track, add_transition). Read this before building any clip with `project apply`; use --json for the full skeletons. Requires editor:read.
 
 ### `contenthero project transcript <projectId>`
 
@@ -1046,13 +1034,19 @@ Read a project's transcript mapped to its timeline clips (requires editor:read)
 
 ## `schema`
 
-### `contenthero schema [command]...`
+### `contenthero schema <kind> [command]...`
 
-Dump the input schema of the CLI commands as JSON (for agents)
+Read a vocabulary another command accepts: commands, platform, timeline, layer, export or link
 
 | Argument | Required | Purpose |
 | --- | --- | --- |
-| `command` | no | a command path to scope the dump, e.g. "generate image" |
+| `kind` | yes | which vocabulary: commands, platform, timeline, layer, export, link |
+| `command` | no | kind commands only: a command path to scope the dump, e.g. "generate image" |
+
+| Option | Purpose |
+| --- | --- |
+| `--platform <platform>` | kind platform only: the platform to read; omit to list every platform |
+| `--format <format>` | kind platform with --platform only: narrow to one format (e.g. reel, short, story) |
 
 ## `space`
 

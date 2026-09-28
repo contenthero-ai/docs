@@ -89,7 +89,7 @@ Maximum number of assets to return (default 12, max 50).
 Import a remote URL as first-class media: the server fetches and re-hosts it, returning its outputId + public URL (referenceable by outputId in generate_* and as an asset on a card via update_card). Use this for a file already on a public URL, or from a hosted client that cannot read local files. Requires the assets:write scope.
 
 <ParamField body name="url" type="string" required>
-A public http(s) URL to fetch and re-host.
+A public https URL to fetch and re-host.
 </ParamField>
 
 <ParamField body name="contentType" type="string">

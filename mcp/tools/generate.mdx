@@ -6,7 +6,7 @@ description: "Create images, video, audio and boards, upscale them, and check wh
 {/* GENERATED FILE. Do not edit by hand. */}
 {/* Regenerate with `npm run generate:reference` in contenthero-docs. */}
 
-Create images, video, audio and boards, upscale them, and check what a generation is doing. 14 tools.
+Create images, video, audio and boards, upscale them, and check what a generation is doing. 12 tools.
 
 Every tool below is exposed by the hosted MCP server at `https://mcp.contenthero.ai` and by the `@contenthero/mcp` npm package. A <Badge>write</Badge> tool changes your account; a <Badge>read</Badge> tool does not.
 
@@ -409,20 +409,4 @@ Get one model's full request shape by id: the exact parameters it accepts (input
 <ParamField body name="modelId" type="string" required>
 The model id, e.g. from list_models (such as "veo-3.1-fast").
 </ParamField>
-
-### `get_layer_types`
-
-<Badge>read</Badge>
-
-List the CANVAS layer types (image, text, solid/shape, video, graphic) and their editable props, so you know what update_canvas ops can create and set. Also returns shared prop groups (transform, decoration, adjust). Requires the editor:read scope.
-
-Takes no parameters.
-
-### `get_timeline_types`
-
-<Badge>read</Badge>
-
-List the EDITOR timeline clip types (video, image, text, solid, audio, graphic) with their editable props, plus the track types (media, audio, text) and what each holds. Each clip type also carries a copy-pasteable `example` clip skeleton, and the catalog carries a `creation` section documenting the CREATE ops (create_clip, insert_track, insert_prebuilt_track) - so this one call tells you both what you can create (and the exact clip shape to pass) and what you can set. Read this before building any clip with update_timeline. Requires the editor:read scope.
-
-Takes no parameters.
 

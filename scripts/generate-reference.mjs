@@ -27,10 +27,10 @@ import { InMemoryTransport } from '@modelcontextprotocol/sdk/inMemory.js'
  * `assertGroupsCoverTools` are all exported from the entrypoint, which is the supported surface.
  */
 import { buildServer, TOOL_GROUPS, assertGroupsCoverTools } from '@contenthero/mcp'
-import { execFileSync } from 'node:child_process'
 import { mkdirSync, writeFileSync, readFileSync, existsSync, rmSync } from 'node:fs'
 import { join, dirname } from 'node:path'
 import { tmpdir } from 'node:os'
+import { readCliSchema } from './cli-schema.mjs'
 
 /**
  * `--check` regenerates into a throwaway directory and diffs against what is
@@ -180,7 +180,7 @@ function renderCliPage(commands, globals) {
     '',
     `Every command the CLI exposes, grouped by resource. ${commands.length} commands.`,
     '',
-    'Run `contenthero schema` to get this same information as JSON, which is the discovery path for agents.',
+    'Run `contenthero schema commands` to get this same information as JSON, which is the discovery path for agents.',
     '',
     '## Global options',
     '',
@@ -254,19 +254,7 @@ for (const g of TOOL_GROUPS) {
   writeFileSync(join(OUT, `mcp/tools/${g.slug}.mdx`), renderToolPage(g, list))
 }
 
-// The CLI's schema output goes to a FILE, not a pipe, and that is not a style choice.
-// `contenthero schema` calls process.exit() while stdout still holds buffered data, and
-// Node's stdout is async for pipes, so a piped read is silently truncated at the 64KB pipe
-// buffer: 65,536 bytes captured against 93,998 written. Measured 2026-09-17 on cli 0.3.4.
-// A file redirect is synchronous and complete. Remove this once the CLI sets
-// process.exitCode instead of calling process.exit().
-const schemaPath = join(tmpdir(), `ch-cli-schema-${process.pid}.json`)
-execFileSync('sh', [
-  '-c',
-  `node ${JSON.stringify(join(REPO, 'node_modules/@contenthero/cli/dist/index.js'))} schema > ${JSON.stringify(schemaPath)}`,
-])
-const cliSchema = JSON.parse(readFileSync(schemaPath, 'utf8'))
-rmSync(schemaPath, { force: true })
+const cliSchema = readCliSchema(REPO)
 writeFileSync(join(OUT, 'cli/reference.mdx'), renderCliPage(cliSchema.commands, cliSchema.globalOptions))
 
 const written = [

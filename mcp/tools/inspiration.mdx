@@ -6,7 +6,7 @@ description: "The research surface: the social accounts you track, and their pos
 {/* GENERATED FILE. Do not edit by hand. */}
 {/* Regenerate with `npm run generate:reference` in contenthero-docs. */}
 
-The research surface: the social accounts you track, and their posts ranked by outlier score. 4 tools.
+The research surface: the social accounts you track, and their posts ranked by outlier score. 5 tools.
 
 Every tool below is exposed by the hosted MCP server at `https://mcp.contenthero.ai` and by the `@contenthero/mcp` npm package. A <Badge>write</Badge> tool changes your account; a <Badge>read</Badge> tool does not.
 
@@ -136,14 +136,14 @@ Only content at or above this view count.
 
 <Badge>read</Badge>
 
-Get one tracked post in full: engagement stats, outlier score, hashtags, keywords, mentions and audio info. Works for a creator's post and for the owner's own. THE TRANSCRIPT IS OPT-IN because a long video is a large document: pass transcript='text' for the whole thing, or transcript='segments' for timed slices, and then narrow with startMs/endMs or transcriptSearch to pull only the part that matters. The transcript reports a status: 'complete', 'not_applicable' (there is nothing to transcribe), 'failed' (it will be retried), 'processing', or 'absent' (never attempted), so an empty result is never ambiguous. THE BREAK IT DOWN ANALYSIS IS OPT-IN THE SAME WAY: availability (status + section names) is always reported; pass analysis='full' for every section, or analysisSections for only the ones the task needs. transcriptSegments is excluded from 'full' because the transcript params above are the one transcript path.
+Get one tracked post in full: engagement stats, outlier score, hashtags, keywords, mentions and audio info. Works for a creator's post and for the owner's own. THE TRANSCRIPT IS OPT-IN because a long video is a large document: pass transcript='text' for the whole thing, or transcript='segments' for timed slices, and then narrow with startMs/endMs or transcriptSearch to pull only the part that matters. The transcript reports a status: 'complete', 'not_applicable' (there is nothing to transcribe), 'failed' (it will be retried), 'processing', or 'absent' (never attempted), so an empty result is never ambiguous. THE BREAK IT DOWN ANALYSIS IS OPT-IN THE SAME WAY: availability (status + section names) is always reported; pass analysis='full' for every section, or analysisSections for only the ones the task needs. SCENES ARE OPT-IN THE SAME WAY: availability is always reported; pass scenes='map' for each scene's time range, what happens in it and what is said, or scenes='frames' to also see a frame of each scene. startMs/endMs narrow either. Scenes exist once analyze_content has run with kind scenes. transcriptSegments is excluded from 'full' because the transcript params above are the one transcript path.
 
 <ParamField body name="contentId" type="string" required>
 The content id from list_content, get_account, or a get_card inspiration asset.
 </ParamField>
 
 <ParamField body name="analysis" type="`none` \| `full`">
-How much of the owner's Break It Down analysis to include. Default 'none' (availability + section names still report).
+How much of the post's Break It Down analysis to include. Default 'none' (availability + section names still report).
 </ParamField>
 
 <ParamField body name="analysisSections" type="string[]">
@@ -151,11 +151,15 @@ Only these analysis sections (names come from the availability line, e.g. conten
 </ParamField>
 
 <ParamField body name="endMs" type="number">
-Window end, ms from the start of the media. Implies segments.
+Window end, ms from the start of the media. Narrows transcript segments and scenes.
+</ParamField>
+
+<ParamField body name="scenes" type="`none` \| `map` \| `frames`">
+How much of the post's scene map to include. Default 'none' (availability still reports). 'frames' adds an image of each scene, as many as fit this result; the rest are listed as links.
 </ParamField>
 
 <ParamField body name="startMs" type="number">
-Window start, ms from the start of the media. Implies segments.
+Window start, ms from the start of the media. Narrows transcript segments and scenes.
 </ParamField>
 
 <ParamField body name="transcript" type="`none` \| `text` \| `segments`">
@@ -164,5 +168,23 @@ How much transcript to include. Default 'none'.
 
 <ParamField body name="transcriptSearch" type="string">
 Return only the segments containing this phrase. Implies segments.
+</ParamField>
+
+### `analyze_content`
+
+<Badge>write</Badge>
+
+Analyze a tracked post, as one of two kinds. breakdown (default) runs Break It Down: why it works, from the hook and structure to visuals, audio, the call to action, and steps to recreate it. scenes prepares the post to be seen: a map of every scene with what happens and what is said in it, and a frame of each, which get_content then returns. Viewing an existing result is free; creating one spends credits, so pass getCost to see the price first. If it returns pending, call it again for the result.
+
+<ParamField body name="contentId" type="string" required>
+The content id from list_content, get_account, or a get_card inspiration asset.
+</ParamField>
+
+<ParamField body name="getCost" type="boolean">
+Return the credit cost instead of analyzing (nothing runs, nothing is charged). 0 when the result already exists.
+</ParamField>
+
+<ParamField body name="kind" type="`breakdown` \| `scenes`">
+breakdown (default): the Break It Down analysis. scenes: the scene map and a frame of each scene, priced per minute of video.
 </ParamField>
 

@@ -24,10 +24,9 @@
 import { Client } from '@modelcontextprotocol/sdk/client/index.js'
 import { InMemoryTransport } from '@modelcontextprotocol/sdk/inMemory.js'
 import { buildServer } from '@contenthero/mcp'
-import { execFileSync } from 'node:child_process'
-import { readFileSync, readdirSync, statSync, rmSync } from 'node:fs'
+import { readFileSync, readdirSync, statSync } from 'node:fs'
 import { join, dirname, relative } from 'node:path'
-import { tmpdir } from 'node:os'
+import { readCliSchema } from './cli-schema.mjs'
 
 const REPO = dirname(import.meta.dirname)
 
@@ -64,6 +63,11 @@ const ALLOWED = new Set([
   'writing_style',
   'speaking_style',
   'design_guidelines',
+  // REST query parameters (the v1 API's wire is snake_case in query strings), named on the API reference pages. The
+  // routes read them by these names; renaming one is a wire change, caught by the app's check:wire.
+  'account_type',
+  'start_ms',
+  'end_ms',
 ])
 
 function mdxFiles(dir) {
@@ -86,16 +90,7 @@ await Promise.all([server.connect(serverTransport), mcp.connect(clientTransport)
 const { tools } = await mcp.listTools()
 const liveTools = new Set(tools.map((t) => t.name))
 
-// Read the CLI schema through a FILE, not a pipe: `contenthero schema` calls
-// process.exit() while stdout still holds buffered data, and Node's stdout is async for
-// pipes, so a piped read truncates at 64KB. Measured on cli 0.3.4.
-const schemaPath = join(tmpdir(), `ch-cli-names-${process.pid}.json`)
-execFileSync('sh', [
-  '-c',
-  `node ${JSON.stringify(join(REPO, 'node_modules/@contenthero/cli/dist/index.js'))} schema > ${JSON.stringify(schemaPath)}`,
-])
-const cliSchema = JSON.parse(readFileSync(schemaPath, 'utf8'))
-rmSync(schemaPath, { force: true })
+const cliSchema = readCliSchema(REPO)
 const liveCommands = new Set(cliSchema.commands.map((c) => c.command))
 
 /* ------------------------------------------------------------------- the search */

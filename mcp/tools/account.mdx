@@ -6,7 +6,7 @@ description: "Your balance and tier, the platforms available to publish to, and 
 {/* GENERATED FILE. Do not edit by hand. */}
 {/* Regenerate with `npm run generate:reference` in contenthero-docs. */}
 
-Your balance and tier, the platforms available to publish to, and what the user is looking at. 4 tools.
+Your balance and tier, the platforms available to publish to, and what the user is looking at. 3 tools.
 
 Every tool below is exposed by the hosted MCP server at `https://mcp.contenthero.ai` and by the `@contenthero/mcp` npm package. A <Badge>write</Badge> tool changes your account; a <Badge>read</Badge> tool does not.
 
@@ -68,25 +68,21 @@ End timeline frame of the range. Omit to run to the end.
 mode='image': render at an explicit DISPLAY width in pixels, to judge legibility at the size the output will actually be seen (a course tile, a thumbnail, a feed card) rather than at full resolution, where small type always looks fine. Height follows the composition aspect ratio and is not settable. Clamped; the size produced is reported back on rendered.
 </ParamField>
 
-### `list_platforms`
+### `get_schema`
 
 <Badge>read</Badge>
 
-List the platforms this account can publish to (the discovery catalog): each platform's formats and whether a connected account exists for it. Use this to pick a platform and format, then call get_platform for the exact fields a post requires. Source of truth for valid platforms/formats; do not hardcode them.
+Get a vocabulary another call accepts, by kind. 'platform': with no platform, the platforms this account can publish to, each with its formats and whether a connected account exists; with a platform (and optionally a format), the fields, options (enums) and character limits a post requires per format. Ground a post's platformSettings against it instead of guessing the fields. 'timeline': the EDITOR timeline clip types (video, image, text, solid, audio, graphic) with their editable props, the track types and what each holds, a copy-pasteable `example` clip skeleton per type, and a `creation` section documenting the CREATE ops (create_clip, insert_track, insert_prebuilt_track); read it before building any clip with update_timeline. 'layer': the CANVAS layer types (image, text, solid/shape, video, graphic) with their editable props and the shared prop groups (transform, decoration, adjust), so you know what update_canvas ops can create and set. 'export': the export formats and their options per project type, so you know what export_project accepts. 'link': the grammar of app addresses and every noun and section it takes (what each opens, its tabs, what a tab's item names) plus the app's origin, so you can build a link to any item from its noun and id. 'timeline', 'layer' and 'export' require the editor:read scope.
 
-Takes no parameters.
-
-### `get_platform`
-
-<Badge>read</Badge>
-
-Get one platform's full publishing shape: the fields, options (enums), and character limits a post requires per format (post, reel, short, story, thread). Ground a post's platformSettings against this instead of guessing the fields. Optionally pass a format to narrow the result.
-
-<ParamField body name="platform" type="`youtube` \| `instagram` \| `tiktok` \| `facebook` \| `linkedin` \| `x` \| `threads` \| `general`" required>
-The platform id, e.g. from list_platforms (such as "instagram").
+<ParamField body name="kind" type="`platform` \| `timeline` \| `layer` \| `export` \| `link`" required>
+Which vocabulary to read.
 </ParamField>
 
 <ParamField body name="format" type="string">
-Optional format to narrow to (e.g. "reel", "short", "story", "thread").
+kind 'platform' with a platform only: a format to narrow to (e.g. "reel", "short", "story", "thread").
+</ParamField>
+
+<ParamField body name="platform" type="`youtube` \| `instagram` \| `tiktok` \| `facebook` \| `linkedin` \| `x` \| `threads` \| `general`">
+kind 'platform' only: the platform to read (such as "instagram"). Omit to list every platform.
 </ParamField>
 
