@@ -5,14 +5,15 @@ description: "Balance and account endpoints."
 
 Base URL `https://app.contenthero.ai/api/v1`. All endpoints take a bearer API key.
 
-## Balance
+## Your account
 
 | Method | Path | Purpose |
 | --- | --- | --- |
-| `GET` | `/account/balance` | Your current credit balance and plan tier. |
+| `GET` | `/account` | Your credit balance, what is available to spend, credits reserved for work in progress, what was spent this month, the monthly spend cap, the plan and auto top-up. |
+| `PATCH` | `/account` | Update your account. Only the fields you pass change. `spendCap` sets the monthly spend cap in credits, or `null` removes it; it needs the `billing:write` scope and the account's owner. |
 
 ```bash
-curl https://app.contenthero.ai/api/v1/account/balance \
+curl https://app.contenthero.ai/api/v1/account \
   -H "Authorization: Bearer $CONTENTHERO_API_KEY"
 ```
 

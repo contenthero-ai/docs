@@ -28,7 +28,7 @@ This opens the OAuth consent page in your browser. Sign in with your ContentHero
 
 ## Verify
 
-Start Codex and ask it to read your ContentHero balance. It calls `get_balance` and returns your credits.
+Start Codex and ask it to read your ContentHero balance. It calls `get_account` and returns your credits.
 
 <Note>
 Native remote MCP needs a current Codex CLI. If `codex mcp add --url` or `codex mcp login` is not recognized, update Codex. As a fallback for older builds, bridge over stdio: set the server `command` to `npx` with args `["-y", "mcp-remote", "https://mcp.contenthero.ai"]`.

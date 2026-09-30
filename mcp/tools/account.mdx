@@ -1,22 +1,32 @@
 ---
 title: "Account"
-description: "Your balance and tier, the platforms available to publish to, and what the user is looking at."
+description: "Your ContentHero account (balance, spend cap, plan), the platforms available to publish to, and what the user is looking at."
 ---
 
 {/* GENERATED FILE. Do not edit by hand. */}
 {/* Regenerate with `npm run generate:reference` in contenthero-docs. */}
 
-Your balance and tier, the platforms available to publish to, and what the user is looking at. 3 tools.
+Your ContentHero account (balance, spend cap, plan), the platforms available to publish to, and what the user is looking at. 4 tools.
 
 Every tool below is exposed by the hosted MCP server at `https://mcp.contenthero.ai` and by the `@contenthero/mcp` npm package. A <Badge>write</Badge> tool changes your account; a <Badge>read</Badge> tool does not.
 
-### `get_balance`
+### `get_account`
 
 <Badge>read</Badge>
 
-Get the current ContentHero credit balance, subscription tier, and auto-top-up state.
+Get your ContentHero account: the credit balance, what is available to spend, credits reserved for work in progress, what was spent this month, the monthly spend cap, the plan and auto top-up. For a tracked social account, use get_tracked_account.
 
 Takes no parameters.
+
+### `update_account`
+
+<Badge>write</Badge>
+
+Update your ContentHero account. Only the fields you pass change. spendCap sets the monthly spend cap in credits, or null removes it: every credit spent this month counts toward it, and anything that would cross it is refused until the cap resets on the 1st of the month (UTC). Changing it needs the billing:write scope and the account's owner. Returns the account as it now is.
+
+<ParamField body name="spendCap" type="integer or null">
+The monthly spend cap in credits, or null for no cap.
+</ParamField>
 
 ### `get_context`
 

@@ -36,7 +36,7 @@ import { ContentHero } from "@contenthero/sdk";
 
 const ch = new ContentHero({ apiKey: process.env.CONTENTHERO_API_KEY });
 
-const balance = await ch.getBalance();
+const account = await ch.getAccount();
 const result = await ch.generateImageAndWait({
   prompt: "a marble bust of an owl, studio light",
   modelId: "nano-banana-2",

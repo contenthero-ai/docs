@@ -9,7 +9,7 @@ The CLI prints JSON on stdout by default, so it composes with `jq` and shell pip
 
 ```bash
 contenthero model list | jq -r '.[].modelId'
-BAL=$(contenthero account balance | jq -r '.credits')
+BAL=$(contenthero account get | jq -r '.balance')
 ```
 
 ## Exit codes

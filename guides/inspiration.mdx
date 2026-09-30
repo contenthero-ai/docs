@@ -7,7 +7,7 @@ Inspiration is the research layer. It reads the social accounts you track and th
 
 ## Two kinds of tracked account, one list
 
-A tracked account is either **inspiration** (a creator or competitor you watch) or **brand** (one of your own profiles). Both live in `list_accounts`, and every row reports its own `accountType`, so omit the filter to see both and pass one to narrow.
+A tracked account is either **inspiration** (a creator or competitor you watch) or **brand** (one of your own profiles). Both live in `list_tracked_accounts`, and every row reports its own `accountType`, so omit the filter to see both and pass one to narrow.
 
 They mean opposite things, which is why the distinction is worth keeping straight: inspiration accounts tell you what works for other people, brand accounts tell you what works for you.
 
@@ -15,8 +15,8 @@ They mean opposite things, which is why the distinction is worth keeping straigh
 
 | What | MCP tool |
 | --- | --- |
-| Tracked accounts, either kind | `list_accounts` (filter with `accountType`) |
-| One account's performance | `get_account` |
+| Tracked accounts, either kind | `list_tracked_accounts` (filter with `accountType`) |
+| One account's performance | `get_tracked_account` |
 | Posts, ranked by outlier score | `list_content` |
 | One post in full: transcript, analysis, scenes | `get_content` |
 | A post's Break It Down, or its scenes | `analyze_content` (`kind: "breakdown"` or `"scenes"`) |
@@ -31,7 +31,7 @@ An outlier score measures how far a post overperformed **its own creator's basel
 
 ## Scoping to a brand kit
 
-`list_accounts` and `list_content` accept a `brandKitId` so you see only what is linked to one brand. If a scoped read comes back empty, the brand kit may have no linked accounts; check `get_brand_kit` for its `inspirationAccounts` and `brandAccounts`.
+`list_tracked_accounts` and `list_content` accept a `brandKitId` so you see only what is linked to one brand. If a scoped read comes back empty, the brand kit may have no linked accounts; check `get_brand_kit` for its `inspirationAccounts` and `brandAccounts`.
 
 ## Mining outliers (the two-step)
 

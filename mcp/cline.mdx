@@ -31,7 +31,7 @@ On connect, Cline runs the OAuth flow in your browser. Sign in with your Content
 
 ## Verify
 
-Ask Cline to read your ContentHero balance. It calls `get_balance` and returns your credits.
+Ask Cline to read your ContentHero balance. It calls `get_account` and returns your credits.
 
 <Note>
 OAuth for remote MCP needs a current Cline build. On an older version, use the local stdio path instead: set the server `command` to `npx` with args `["-y", "@contenthero/mcp"]`, and put your API key in `env.CONTENTHERO_API_KEY`. Get a key in the ContentHero app.

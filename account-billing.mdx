@@ -9,16 +9,16 @@ ContentHero bills generation in **credits**. Pricing is computed server-side per
 
 <Tabs>
   <Tab title="MCP">
-    Call `get_balance`. It returns your current credit balance.
+    Call `get_account`. It returns your current credit balance.
   </Tab>
   <Tab title="CLI">
     ```bash
-    contenthero account balance
+    contenthero account get
     ```
   </Tab>
   <Tab title="Raw API">
     ```bash
-    curl https://app.contenthero.ai/api/v1/account/balance \
+    curl https://app.contenthero.ai/api/v1/account \
       -H "Authorization: Bearer $CONTENTHERO_API_KEY"
     ```
   </Tab>

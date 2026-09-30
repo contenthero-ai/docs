@@ -6,7 +6,7 @@ description: "Every ContentHero CLI command, its arguments and its options."
 {/* GENERATED FILE. Do not edit by hand. */}
 {/* Regenerate with `npm run generate:reference` in contenthero-docs. */}
 
-Every command the CLI exposes, grouped by resource. 97 commands.
+Every command the CLI exposes, grouped by resource. 98 commands.
 
 Run `contenthero schema commands` to get this same information as JSON, which is the discovery path for agents.
 
@@ -24,9 +24,17 @@ These apply to every command.
 
 ## `account`
 
-### `contenthero account balance`
+### `contenthero account get`
 
-Show the credit balance, subscription tier, and auto-top-up state
+Show your balance, spend this month, monthly spend cap, plan and auto top-up
+
+### `contenthero account update`
+
+Change an account setting; only the flags you pass change
+
+| Option | Purpose |
+| --- | --- |
+| `--spend-cap <credits>` | monthly spend cap in credits, or "none" to remove it (owner only; needs billing:write) |
 
 ## `archive`
 
@@ -247,6 +255,7 @@ Add an item to a brand kit's knowledge base (requires brandkit:write)
 | `--file-url <url>` | add a hosted file by URL the server fetches (large files, video, audio) |
 | `--file-ext <ext>` | extension for --file-url when not in the URL, e.g. pdf |
 | `--title <title>` | optional title (else derived) |
+| `--cost` | estimate the credit cost instead of adding (video and audio are measured, not processed) |
 
 ### `contenthero brand-kit knowledge get <brandKitId> <knowledgeId>`
 
