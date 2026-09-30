@@ -185,7 +185,7 @@ For sfx: how literally to follow the prompt (0 to 1).
 </ParamField>
 
 <ParamField body name="text" type="string">
-For TTS (elevenlabs-tts): the words to speak.
+For TTS (elevenlabs-tts): the words to speak. Read the model's promptGuide with get_model before writing directions into it.
 </ParamField>
 
 <ParamField body name="voiceId" type="string">
@@ -265,7 +265,7 @@ e.g. 480p, 720p, 1080p. Model-dependent.
 </ParamField>
 
 <ParamField body name="script" type="string">
-Text for the subject to speak. Requires voiceId; synthesized to speech. Use this OR audioUrl.
+Text for the subject to speak. Requires voiceId; synthesized to speech. Use this OR audioUrl. Spoken by elevenlabs-tts: read its promptGuide with get_model before writing directions into the script.
 </ParamField>
 
 <ParamField body name="voiceId" type="string">
