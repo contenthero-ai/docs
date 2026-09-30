@@ -21,8 +21,12 @@ BAL=$(contenthero account balance | jq -r '.credits')
 | `2` | Usage error (bad flags or arguments) |
 | `3` | Auth error (no or invalid credentials) |
 | `4` | Timeout (work accepted but not finished in time) |
+| `5` | A limit refused it: credits, the monthly spend cap, storage, or a plan limit |
 
 Exit code `4` is not a failure: the generation was accepted and is still rendering. Poll it.
+
+Exit code `5` means nothing ran and nothing was charged. The message says why and lists the ways to continue; in JSON
+mode the error also carries its `code` and ranked `actions`.
 
 ## Cost preflight
 
