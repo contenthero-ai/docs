@@ -213,6 +213,9 @@ Create a brand kit: empty, imported from its websites and accounts, or as a copy
 | `--inspiration-account <ref>` | a competitor/creator profile: same forms as --brand-account. Repeatable |
 | `--logo <ref>` | a logo: a url, or a generation id to copy in (e.g. out9-2). Repeatable; the first is primary |
 | `--asset <ref>` | a brand asset: a url, or a generation id to copy in. Repeatable |
+| `--color <hex[:role[:name]]>` | a palette color, e.g. #1A2B3C:primary:Ocean, or #FFFFFF::Paper with no role. Role is primary, secondary, tertiary or accent, each held by one color. Repeatable |
+| `--title-font <family>` | the font family for titles |
+| `--body-font <family>` | the font family for body text |
 
 ### `contenthero brand-kit extract <id>`
 
@@ -321,7 +324,7 @@ Reorder every brand kit. Pass ALL ids, in the order you want them
 
 ### `contenthero brand-kit update <id>`
 
-Update a brand kit: section content, media and accounts (requires brandkit:write)
+Update a brand kit: section content, colors and fonts, media and accounts (requires brandkit:write)
 
 | Argument | Required | Purpose |
 | --- | --- | --- |
@@ -337,6 +340,9 @@ Update a brand kit: section content, media and accounts (requires brandkit:write
 | `--inspiration-account <ref>` | a competitor/creator profile: same forms as --brand-account. Repeatable. REPLACES the list |
 | `--logo <ref>` | a logo: a url, or a generation id to copy in (e.g. out9-2). Repeatable; the first is primary. REPLACES the list |
 | `--asset <ref>` | a brand asset: a url, or a generation id to copy in. Repeatable. REPLACES the list |
+| `--color <hex[:role[:name]]>` | a palette color, e.g. #1A2B3C:primary:Ocean, or #FFFFFF::Paper with no role. Role is primary, secondary, tertiary or accent, each held by one color. Repeatable. REPLACES the list; --color none clears it |
+| `--title-font <family>` | the font family for titles; none clears it |
+| `--body-font <family>` | the font family for body text; none clears it |
 
 ## `card`
 

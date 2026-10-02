@@ -68,6 +68,10 @@ The kit's brand assets, each \{ url | outputId, name? \}.
 The account owner's OWN profiles. A tracked-account id, or \{ platform?, handleOrUrl \} to ADD one and start ingesting it.
 </ParamField>
 
+<ParamField body name="brandColors" type="object[]">
+The kit's palette, each \{ hex, name?, role? \}.
+</ParamField>
+
 <ParamField body name="duplicateFrom" type="string">
 Copy an existing brand kit id instead of starting empty.
 </ParamField>
@@ -92,6 +96,10 @@ The kit's name. Optional when websiteUrls or a social profile is given.
 Section content, each \{ key, body \} to fill a starter section, or \{ sectionName, tab, body? \} to add your own.
 </ParamField>
 
+<ParamField body name="typography" type="object">
+The kit's fonts, \{ titleFont?, bodyFont? \}.
+</ParamField>
+
 <ParamField body name="websiteUrls" type="string[]">
 The brand's websites, primary first. The first gives the logos, colors and fonts; every one feeds the analysis.
 </ParamField>
@@ -100,7 +108,7 @@ The brand's websites, primary first. The first gives the logos, colors and fonts
 
 <Badge>write</Badge>
 
-Update a brand kit: its section content, brand media, which kit is the DEFAULT, and which tracked accounts it is LINKED to. Only what you pass changes. Get the current kit first with get_brand_kit. SECTION CONTENT is written with sections, naming only the sections you change, all or nothing. An entry with a key edits that section: body (Markdown) replaces the whole section, revertTo restores an earlier version as a new one, sectionName renames it, width sets its card to full or half. An entry without a key adds a section of your own, with sectionName and tab. Pass each edited section's version as expectedVersion: if any of them changed since you read it, NOTHING is written and the error lists each stale section's current version and body, so re-read, reapply your change, and retry. To remove a section, archive it with archive (assetType brand_kit_section). Requires the brandkit:write scope. THREE MODES, chosen by what you pass: (1) pass brandKitId to patch one kit; (2) pass orderedIds ALONE to reorder the whole set, which is collection-level because ordering is a property of the set and a per-kit position would let two kits claim one slot, so pass every id in the order you want; (3) pass brandKitId + extract:true to RE-RUN the import: the visuals from its first website and the analysis of its websites and own accounts, which writes only into sections still empty and returns immediately (poll analysisStatus and extractionStatus via get_brand_kit). logos/assets/brandAccounts/inspirationAccounts are DECLARATIVE: a patch REPLACES the whole list, so pass the full set and use [] to clear. THIS IS ALSO HOW YOU ADD NEW MEDIA TO A KIT: a logo or asset entry names either a url it already has, or outputId to bring in a generation that is not in the kit yet ('\<id\>', or '\<id\>-2' for variation 2 of a batch), whose bytes get COPIED into the kit so trashing that generation later cannot empty it. To add a logo, read the kit, append one entry, and send the whole list back; sending an outputId twice adds it twice. brandAccounts are the account owner's OWN profiles (performance), inspirationAccounts are competitors and creators they watch; they are separate lists because they mean opposite things. AN ENTRY IS EITHER a tracked-account id you already have, OR \{ platform?, handleOrUrl \} to ADD a profile that is not tracked yet, which is what STARTS ingesting its posts (a full profile url carries its own platform, so platform is only needed for a bare handle). isDefault only accepts true (passing false would leave the account with no default at all, so to move the default, name the kit that should hold it).
+Update a brand kit: its section content, colors and fonts, brand media, which kit is the DEFAULT, and which tracked accounts it is LINKED to. Only what you pass changes. Get the current kit first with get_brand_kit. SECTION CONTENT is written with sections, naming only the sections you change, all or nothing. An entry with a key edits that section: body (Markdown) replaces the whole section, revertTo restores an earlier version as a new one, sectionName renames it, width sets its card to full or half. An entry without a key adds a section of your own, with sectionName and tab. Pass each edited section's version as expectedVersion: if any of them changed since you read it, NOTHING is written and the error lists each stale section's current version and body, so re-read, reapply your change, and retry. To remove a section, archive it with archive (assetType brand_kit_section). Requires the brandkit:write scope. THREE MODES, chosen by what you pass: (1) pass brandKitId to patch one kit; (2) pass orderedIds ALONE to reorder the whole set, which is collection-level because ordering is a property of the set and a per-kit position would let two kits claim one slot, so pass every id in the order you want; (3) pass brandKitId + extract:true to RE-RUN the import: the visuals from its first website and the analysis of its websites and own accounts, which writes only into sections still empty and returns immediately (poll analysisStatus and extractionStatus via get_brand_kit). logos/assets/brandAccounts/inspirationAccounts are DECLARATIVE: a patch REPLACES the whole list, so pass the full set and use [] to clear. THIS IS ALSO HOW YOU ADD NEW MEDIA TO A KIT: a logo or asset entry names either a url it already has, or outputId to bring in a generation that is not in the kit yet ('\<id\>', or '\<id\>-2' for variation 2 of a batch), whose bytes get COPIED into the kit so trashing that generation later cannot empty it. To add a logo, read the kit, append one entry, and send the whole list back; sending an outputId twice adds it twice. brandAccounts are the account owner's OWN profiles (performance), inspirationAccounts are competitors and creators they watch; they are separate lists because they mean opposite things. AN ENTRY IS EITHER a tracked-account id you already have, OR \{ platform?, handleOrUrl \} to ADD a profile that is not tracked yet, which is what STARTS ingesting its posts (a full profile url carries its own platform, so platform is only needed for a bare handle). isDefault only accepts true (passing false would leave the account with no default at all, so to move the default, name the kit that should hold it).
 
 <ParamField body name="assets" type="object[]">
 The kit's brand assets, each \{ url | outputId, name? \}. REPLACES the list; [] clears it.
@@ -108,6 +116,10 @@ The kit's brand assets, each \{ url | outputId, name? \}. REPLACES the list; [] 
 
 <ParamField body name="brandAccounts" type="value[]">
 The account owner's OWN profiles. Each entry is a tracked-account id, or \{ platform?, handleOrUrl \} to ADD one and start ingesting it. REPLACES the list; [] clears it.
+</ParamField>
+
+<ParamField body name="brandColors" type="object[]">
+The kit's palette, each \{ hex, name?, role? \}. REPLACES the list; [] clears it.
 </ParamField>
 
 <ParamField body name="brandKitId" type="string">
@@ -140,6 +152,10 @@ Reorder mode: every brand kit id, in the order you want them. Pass this alone.
 
 <ParamField body name="sections" type="object[]">
 Section writes: only the sections you change, all or nothing. \{ key, body, expectedVersion \} edits one; \{ sectionName, tab, body? \} adds one.
+</ParamField>
+
+<ParamField body name="typography" type="object or null">
+The kit's fonts, \{ titleFont?, bodyFont? \}. MERGES: a font left out keeps its value; null clears both.
 </ParamField>
 
 <ParamField body name="websiteUrls" type="string[]">
