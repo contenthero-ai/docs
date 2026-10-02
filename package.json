@@ -7,10 +7,12 @@
     "generate:reference": "node scripts/generate-reference.mjs",
     "check:reference": "node scripts/generate-reference.mjs --check",
     "check:tool-names": "node scripts/check-tool-names.mjs",
-    "check": "npm run check:currency && npm run check:reference && npm run check:skill-install && npm run check:tool-names && npm run check:spelling",
+    "check": "npm run check:currency && npm run check:reference && npm run check:skill-install && npm run check:media-host && npm run check:tool-names && npm run check:spelling",
     "check:currency": "node scripts/check-package-currency.mjs",
     "generate:skill-install": "node scripts/generate-skill-install.mjs",
     "check:skill-install": "node scripts/generate-skill-install.mjs --check",
+    "generate:media-host": "node scripts/generate-media-host.mjs",
+    "check:media-host": "node scripts/generate-media-host.mjs --check",
     "check:spelling": "check-american-spelling"
   },
   "devDependencies": {

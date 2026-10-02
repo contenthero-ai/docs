@@ -17,7 +17,7 @@
 
 import { writeFileSync, readFileSync, existsSync } from 'node:fs'
 import { join } from 'node:path'
-import { MCP_HOSTS, SKILL_ZIP_URL, PLUGIN_ZIP_URL } from '@contenthero-ai/connect'
+import { MCP_HOSTS, SKILL_ZIP_URL, PLUGIN_ZIP_URL, hostSettingFor } from '@contenthero-ai/connect'
 
 const CHECK = process.argv.includes('--check')
 const OUT = join(new URL('..', import.meta.url).pathname, 'skills/install.mdx')
@@ -42,12 +42,22 @@ const checked = (skill) =>
     ? `Tested by a real install on ${skill.verifiedOn}.`
     : `Checked against the host's own documentation on ${skill.verifiedOn}.`
 
+// A setting in the host itself that ContentHero depends on (connect's `hostSetting`): after the steps, because it
+// applies however ContentHero was installed, as the app's and the site's installers show it.
+const hostSetting = (h) => {
+  const s = hostSettingFor('skill', h)
+  if (!s) return ''
+  const parts = [s.body]
+  if (s.code) parts.push(`\`\`\`\n${s.code}\n\`\`\``)
+  return `\n    <Note title="${s.title}">\n${indent(parts.join('\n\n'), 6)}\n    </Note>\n`
+}
+
 const tabs = MCP_HOSTS.map(
   (h) => `  <Tab title="${h.name}">
     <Steps>
 ${h.skill.steps.map(step).join('\n')}
     </Steps>
-
+${hostSetting(h)}
     ${checked(h.skill)}
   </Tab>`,
 ).join('\n')

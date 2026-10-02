@@ -3,6 +3,8 @@ title: "MCP Overview"
 description: "Connect the hosted ContentHero MCP server over OAuth. Everything ContentHero can do, no key handling, account-scoped."
 ---
 
+import MediaHost from '/snippets/media-host.mdx'
+
 The hosted MCP server gives your agent everything ContentHero can do at **`https://mcp.contenthero.ai`** over OAuth. It is the preferred transport for agents: no key handling, one consent flow, and every call runs as you against your own account and credits. Tools appear as `mcp__contenthero__*`.
 
 ## Add ContentHero to your agent
@@ -52,6 +54,24 @@ Everything across five domains:
 - **Account:** balance and usage.
 
 The model roster is live: it is the `modelId` enum on the generate tools, resolved from the registry at startup.
+
+## Downloading your files
+
+ContentHero gives your agent links to your files: images, video, audio and logos. Each link works without signing in and does not expire, so your agent can show a file, look at it, or download it.
+
+Some agents run code in a cloud sandbox that can reach only the sites you allow. To let one download your files, allow this one host:
+
+<MediaHost />
+
+| Where your agent runs | What to do |
+| --- | --- |
+| On your computer (Claude Code, Codex CLI, Cursor, VS Code) | Nothing, unless you turned on a network sandbox. Then allow the host above. |
+| Claude, on the web and desktop | In **Settings, Capabilities**, add the host to the allowed domains. |
+| Claude Code on the web | In your cloud environment's **Network access**, choose **Custom** and add the host. |
+| Codex cloud | Turn on the environment's agent internet access and add the host to its domain allowlist. |
+| ChatGPT | Its code tool has no internet access, so it cannot download files. ChatGPT can still show your files and look at them. |
+
+If a download is blocked, ContentHero tells your agent to say so, so the fix is one setting rather than a workaround.
 
 ## Why OAuth
 

@@ -3,6 +3,8 @@ title: "Claude Desktop & Web"
 description: "Connect ContentHero to Claude Desktop or claude.ai as a custom connector over OAuth."
 ---
 
+import MediaHost from '/snippets/media-host.mdx'
+
 Claude Desktop and claude.ai (web) both connect to remote MCP servers as custom connectors, with the same flow.
 
 ## Add the connector
@@ -28,6 +30,14 @@ Claude Desktop and claude.ai (web) both connect to remote MCP servers as custom 
 Ask Claude to read your balance. It calls `get_account` and returns your credits. By default the connector asks before each call; you can switch it to always allow in the connector settings.
 
 On claude.ai (web), the flow is the same: **Settings, Connectors, Add custom connector**, with the URL `https://mcp.contenthero.ai`.
+
+## Let Claude download your files
+
+When Claude runs code for you, it can download only from sites your settings allow. In **Settings, Capabilities**, add this to the allowed domains so it can use your logos and other files:
+
+<MediaHost />
+
+See [Downloading your files](/mcp/overview#downloading-your-files) for other hosts.
 
 ## Note
 
