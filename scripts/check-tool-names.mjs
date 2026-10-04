@@ -107,7 +107,7 @@ const liveCommands = new Set(cliSchema.commands.map((c) => c.command))
  *
  * Measured on the same corpus: the backtick rule finds 51 distinct tokens, 21 of them
  * genuinely dead tools and 3 not tools at all. Two of those three end in `_id`, which is
- * a field, so the only judgement call left is the ALLOWED list above.
+ * a field, so the only judgment call left is the ALLOWED list above.
  */
 const TOOL_RE = /`([a-z][a-z0-9]*_[a-z0-9_]+)`/g
 /**
