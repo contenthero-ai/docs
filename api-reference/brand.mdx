@@ -9,10 +9,10 @@ Base URL `https://app.contenthero.ai/api/v1`. All endpoints take a bearer API ke
 
 | Method | Path | Scope | Purpose |
 | --- | --- | --- | --- |
-| `GET` | `/brand-kits` | `brandkit:read` | List your brand kits. |
-| `POST` | `/brand-kits` | `brandkit:write` | Create a brand kit: empty, imported (`websiteUrls` and/or its own accounts in `brandAccounts`, with `extract: true`), from a social profile, or as a copy. Every new kit starts with the eight starter sections. An import returns at once; poll `analysisStatus` and `extractionStatus`. |
-| `GET` | `/brand-kits/{brandKitId}` | `brandkit:read` | Read one brand kit, three ways (below). |
-| `PATCH` | `/brand-kits/{brandKitId}` | `brandkit:write` | Update the kit: section content (`sections`), media, colors, typography and linked accounts. Send `{ "archive": true }` to archive (reversible). |
+| `GET` | `/brand-kits` | `brand:read` | List your brand kits. |
+| `POST` | `/brand-kits` | `brand:write` | Create a brand kit: empty, imported (`websiteUrls` and/or its own accounts in `brandAccounts`, with `extract: true`), from a social profile, or as a copy. Every new kit starts with the eight starter sections. An import returns at once; poll `analysisStatus` and `extractionStatus`. |
+| `GET` | `/brand-kits/{brandKitId}` | `brand:read` | Read one brand kit, three ways (below). |
+| `PATCH` | `/brand-kits/{brandKitId}` | `brand:write` | Update the kit: section content (`sections`), media, colors, typography and linked accounts. Send `{ "archive": true }` to archive (reversible). |
 
 ### Sections
 
@@ -73,11 +73,11 @@ Re-read, reapply your change to the current body, and send the new version.
 
 | Method | Path | Scope | Purpose |
 | --- | --- | --- | --- |
-| `GET` | `/brand-kits/{brandKitId}/knowledge` | `brandkit:read` | List the knowledge index (titles and metadata). |
-| `POST` | `/brand-kits/{brandKitId}/knowledge` | `brandkit:write` | Add an item. Source is `text`, `url`, `youtube`, or a file via `fileData` (base64) or `fileUrl` (hosted). |
-| `GET` | `/brand-kits/{brandKitId}/knowledge/{knowledgeId}` | `brandkit:read` | Get one item's stored body. |
-| `DELETE` | `/brand-kits/{brandKitId}/knowledge/{knowledgeId}` | `brandkit:write` | Remove an item and its embeddings. |
-| `GET` | `/brand-kits/{brandKitId}/knowledge/search?q=` | `brandkit:read` | Semantic search, ranked by similarity. |
+| `GET` | `/brand-kits/{brandKitId}/knowledge` | `brand:read` | List the knowledge index (titles and metadata). |
+| `POST` | `/brand-kits/{brandKitId}/knowledge` | `brand:write` | Add an item. Source is `text`, `url`, `youtube`, or a file via `fileData` (base64) or `fileUrl` (hosted). |
+| `GET` | `/brand-kits/{brandKitId}/knowledge/{knowledgeId}` | `brand:read` | Get one item's stored body. |
+| `DELETE` | `/brand-kits/{brandKitId}/knowledge/{knowledgeId}` | `brand:write` | Remove an item and its embeddings. |
+| `GET` | `/brand-kits/{brandKitId}/knowledge/search?q=` | `brand:read` | Semantic search, ranked by similarity. |
 
 <Note>
 Large files and video or audio must be added by a hosted URL (`fileUrl`), which the server fetches and chunks. Base64 (`fileData`) is for small documents and images. Adding is plan-limited; a `limitReached` response means the brand kit is at its cap.

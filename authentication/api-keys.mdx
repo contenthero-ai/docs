@@ -17,12 +17,19 @@ Every key is scope-gated. Grant only what the integration needs.
 
 | Scope | Grants |
 | --- | --- |
-| `generate:*` | Image, video, audio, board, and lip-sync generation |
-| `pipeline:write` | Create and assemble posts |
-| `publish:write` | Schedule and publish posts |
-| `brandkit:read` | Read brand kits, knowledge, inspiration, and performance |
-| `brandkit:write` | Edit brand kits and add or remove knowledge |
-| `assets:write` | Upload and attach media |
+| `studio:generate` | Studio: generate images, video and audio. |
+| `studio:write` | Studio: create and update avatars, their looks, and Kling elements. |
+| `brand:read` | Brand: read brand kits and brand knowledge. |
+| `brand:write` | Brand: create and update brand kits and knowledge. |
+| `inspiration:write` | Inspiration: arrange tracked accounts. |
+| `library:write` | Library: import, upload and organize media. |
+| `publish:write` | Planner: publish posts to connected accounts. |
+| `planner:write` | Planner: cards, spaces, stages and tags. |
+| `favorites:write` | Library: favorite and archive items. |
+| `editor:read` | Editor: read projects, timelines and canvases. |
+| `editor:write` | Editor: apply ops to timelines and canvases. |
+| `context:read` | Workspace: read the live focus, selection and presence a client publishes, plus ephemeral renders. |
+| `billing:write` | Billing: change the account's monthly spend cap. |
 
 If a call fails on a missing scope, the response tells you which scope to grant. Add it in the same API Keys view. Do not work around a missing scope.
 

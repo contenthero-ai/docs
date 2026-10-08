@@ -55,4 +55,4 @@ The skill repo is [`contenthero-ai/skills`](https://github.com/contenthero-ai/sk
 
 - **Async generation:** `generate_*` runs a smart-wait (about 50s) then hands back an `outputId` if the render is still going. Poll with `get_generation_status`, which blocks until terminal by default; pass `wait: false` for a snapshot. The `outputId` is always returned, so keep polling.
 - **Chaining:** a reference (start frame, image input) accepts a raw URL **or** a ContentHero output-id token `<uuid>-<N>` (the Nth variation of a prior output). The server resolves either, type-checks it, and scopes it to the owner. Prefer passing the output-id straight through rather than re-uploading.
-- **Scopes:** keys are scope-gated (generation, `publish:write`, `pipeline:write`, `brandkit:read`/`brandkit:write`). If a call fails on scope, tell the user which scope to grant in API Keys settings. Do not work around it.
+- **Scopes:** keys are scope-gated (generation, `publish:write`, `planner:write`, `brand:read`/`brand:write`). If a call fails on scope, tell the user which scope to grant in API Keys settings. Do not work around it.

@@ -21,7 +21,7 @@ A brand kit's content is a set of **sections**, each one Markdown document. Ever
 
 Start with the summary: it is small, and each section's outline (its own headings) and length tell you which sections the task needs, so the next read pulls only those.
 
-Edits need `brandkit:write`. Section writes are by key and **all or nothing**, naming only the sections you change. A `body` replaces the whole section in Markdown, so read it, change what needs changing, and send the whole body back. Pass each section's `version` as `expectedVersion`: if anyone changed it since you read it, nothing is written and the error returns its current body, so you re-read and reapply rather than overwrite. `revertTo` restores an earlier version as a new one. Archiving is a soft delete; there is no hard delete.
+Edits need `brand:write`. Section writes are by key and **all or nothing**, naming only the sections you change. A `body` replaces the whole section in Markdown, so read it, change what needs changing, and send the whole body back. Pass each section's `version` as `expectedVersion`: if anyone changed it since you read it, nothing is written and the error returns its current body, so you re-read and reapply rather than overwrite. `revertTo` restores an earlier version as a new one. Archiving is a soft delete; there is no hard delete.
 
 ## The knowledge base
 
@@ -37,7 +37,7 @@ Browse to see what exists, search to find what is relevant, get to open one item
 
 ### Grow it (where the value compounds)
 
-The knowledge base is most valuable when it grows as you work. When the user learns something, decides something, or shares a resource, offer to remember it with `add_brand_knowledge` (needs `brandkit:write`).
+The knowledge base is most valuable when it grows as you work. When the user learns something, decides something, or shares a resource, offer to remember it with `add_brand_knowledge` (needs `brand:write`).
 
 | Source | How |
 | --- | --- |
