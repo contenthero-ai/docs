@@ -6,7 +6,7 @@ description: "The library: browse, search, import and upload the media an accoun
 {/* GENERATED FILE. Do not edit by hand. */}
 {/* Regenerate with `npm run generate:reference` in contenthero-docs. */}
 
-The library: browse, search, import and upload the media an account owns. 14 tools.
+The library: browse, search, import and upload the media an account owns. 15 tools.
 
 Every tool below is exposed by the hosted MCP server at `https://mcp.contenthero.ai` and by the `@contenthero/mcp` npm package. A <Badge>write</Badge> tool changes your account; a <Badge>read</Badge> tool does not.
 
@@ -14,18 +14,22 @@ Every tool below is exposed by the hosted MCP server at `https://mcp.contenthero
 
 <Badge>read</Badge>
 
-List the account's media, newest first. `source` selects which library: 'creations' (default) is studio generations, each an output with one or more variations (images, video, or audio); 'uploads' is the editor Uploads tab, the raw video, image, and audio files the user uploaded to edit with; 'stock' is stock media the user has already used in a project (cached and reusable); 'all' returns every library merged across sources, each item self-describing via its `source`. Filter with contentType and page with limit/offset. NOTE THE GRAIN: a page is counted in VARIATIONS, not generations, so limit:3 on a four-variation generation returns three variations of that one generation, not three different ones. Each variation is individually addressable and favoritable, which is why it is the unit. To survey distinct generations, ask for a larger limit and group the results by their shared id. For creations you can also filter by kind ('board'/'creation'/'look') or favorited/archived. Each item shows its id and, for a single-file item like an upload, its file name, duration, and resolved URL inline, so you can reference it directly (for example, add an upload to a timeline with update_timeline). Call get_media to SEE an item (image blocks / video keyframes).
+List the library's files: every file the account keeps, or one part of the library with `source`, each item naming the part it is in. Filter by contentType, kind, favorited or archived; order with sort and order; page with limit and cursor. Each item shows its media id, its file name and size, its asset id (the id get_project reports as a clip's sourceId) and its resolved URL inline, so you can reference it directly. Call get_media to SEE an item (image blocks / video keyframes).
 
 <ParamField body name="archived" type="boolean">
-Creations only. Only outputs that have an archived variation.
+Only archived files.
 </ParamField>
 
-<ParamField body name="contentType" type="`image` \| `video` \| `audio` \| `transcript`">
-Filter to one media type.
+<ParamField body name="contentType" type="string[]">
+Only these media types.
+</ParamField>
+
+<ParamField body name="cursor" type="string">
+The previous page's cursor.
 </ParamField>
 
 <ParamField body name="favorited" type="boolean">
-Creations only. Only outputs that have a favorited variation.
+Only favorited files.
 </ParamField>
 
 <ParamField body name="kind" type="`creation` \| `board` \| `look`">
@@ -33,22 +37,30 @@ Creations only. Filter by asset class: 'creation' (normal generations), 'board' 
 </ParamField>
 
 <ParamField body name="limit" type="integer">
-How many to return (default 20).
+How many to return.
 </ParamField>
 
-<ParamField body name="source" type="`creations` \| `uploads` \| `stock` \| `all`">
-Which library to read: 'creations' (default, studio generations), 'uploads' (the editor Uploads tab), 'stock' (used stock media), or 'all' (every library merged newest-first).
+<ParamField body name="order" type="`asc` \| `desc`">
+The sort direction.
 </ParamField>
 
-<ParamField body name="status" type="string">
-Status filter; defaults to 'completed'.
+<ParamField body name="smallCopies" type="boolean">
+Link each image's small copy instead of the file itself, where the library keeps one: for drawing images small, as code that shows many at once does. Never for downloading or delivering a file, or showing it large.
+</ParamField>
+
+<ParamField body name="sort" type="`createdAt` \| `fileName` \| `sizeBytes`">
+The field to sort by.
+</ParamField>
+
+<ParamField body name="source" type="`all` \| `creations` \| `uploads` \| `exports`">
+Which part of the library to read: 'all' (the default, every file), 'creations' (studio generations), 'uploads' (files the user uploaded), or 'exports' (renders of their projects).
 </ParamField>
 
 ### `get_media`
 
 <Badge>read</Badge>
 
-SEE specific media, up to 5 items. This is for YOUR eyes only: it returns image blocks so you can judge a face, check legibility or compare variations, and it renders NOTHING for the person. If they should see it, call show_media, which displays up to 100 items and costs you almost no context. Pass a batch of items to view at once, returned as image blocks for you: each item is either a \{ url \} (e.g. a URL threaded from get_context, a layer/asset URL from get_project / get_card, or an upload URL from list_media source=uploads) or an \{ mediaId, variation? \} (a studio output id: its short id, full id or first 8 characters; omit variation to get the primary one). Returns light metadata per item plus an IMAGE block for each image so you can actually see it. For a VIDEO, set frames (and optionally fromSec/toSec) on the item to get low-res KEYFRAMES across that source-time window, so you can watch the raw footage (judge B-roll relevance, take quality) without editing it; audio still returns metadata + the url. An mediaId without a variation returns ONLY the primary variation and lists the others; request a specific variation to see it. Use this to inspect the actual pixels, not just URLs.
+SEE specific media, up to 5 items. This is for YOUR eyes only: it returns image blocks so you can judge a face, check legibility or compare variations, and it renders NOTHING for the person. If they should see it, call show_media, which displays up to 100 items and costs you almost no context. Pass a batch of items to view at once, returned as image blocks for you: each item is either a \{ url \} (e.g. a URL threaded from get_context, a layer/asset URL from get_project / get_card, or an upload URL from list_media source=uploads) or a \{ mediaId \} (the media id list_media, search_media and get_folder print: a1B2c3D4, or a1B2c3D4-2 for one output of a generation with several). Returns light metadata per item plus an IMAGE block for each image so you can actually see it. For a VIDEO, set frames (and optionally fromSec/toSec) on the item to get low-res KEYFRAMES across that source-time window, so you can watch the raw footage (judge B-roll relevance, take quality) without editing it; audio still returns metadata + the url. A bare id for a generation returns ONLY its primary output, named by its full media id, and lists the others' media ids; pass one of those to see it. To ZOOM, set region \{ x, y, width, height \} on an item, in the file's own pixels: that part is cut from the original and returned at its own detail, never enlarged, so you can check small text or an edge; on a video it applies to every keyframe. Use this to inspect the actual pixels, not just URLs.
 
 <ParamField body name="items" type="value[]" required>
 The media to LOOK at, up to 5 per call. Five is where the inline byte budget runs out, not a round number. Use show_media for a larger set you only need to display.
@@ -58,7 +70,7 @@ The media to LOOK at, up to 5 per call. Five is where the inline byte budget run
 
 <Badge>read</Badge>
 
-SHOW media to the person, up to 100 items in one card. Use this to present a set you do not need to look at yourself: search results, a folder, a shortlist, everything a list_media call returned. It renders a grid the person can browse, expand and act on, and it costs you almost no context because it returns urls rather than pixels. Each item is a \{ url \} or an \{ mediaId, variation? \}, the same shapes get_media takes. Pair it with list_media: list to FIND, show to PRESENT. Do not re-show media another tool already displayed: anything that creates or imports media renders its own card, and showing it again only duplicates it. If you need to SEE the pixels yourself (judge a face, check legibility, compare variations) use get_media instead, which attaches image blocks for up to 5 items.
+SHOW media to the person, up to 100 items in one card. Use this to present a set you do not need to look at yourself: search results, a folder, a shortlist, everything a list_media call returned. It renders a grid the person can browse, expand and act on, and it costs you almost no context because it returns urls rather than pixels. Each item is a \{ url \} or a \{ mediaId \}, the same shapes get_media takes. Pair it with list_media: list to FIND, show to PRESENT. Do not re-show media another tool already displayed: anything that creates or imports media renders its own card, and showing it again only duplicates it. If you need to SEE the pixels yourself (judge a face, check legibility, compare variations) use get_media instead, which attaches image blocks for up to 5 items.
 
 <ParamField body name="items" type="value[]" required>
 The media to show, up to 100 items per call.
@@ -74,19 +86,27 @@ Semantically search the account's editable media library (their generated creati
 A natural-language description of the media to find, describing its visible or audible content.
 </ParamField>
 
+<ParamField body name="cursor" type="string">
+The previous page's cursor.
+</ParamField>
+
 <ParamField body name="kinds" type="string[]">
 Restrict results to these media kinds. Omit to search all kinds.
 </ParamField>
 
 <ParamField body name="limit" type="integer">
-Maximum number of assets to return (default 12, max 50).
+How many to return.
+</ParamField>
+
+<ParamField body name="smallCopies" type="boolean">
+Link each image's small copy instead of the file itself, where the library keeps one: for drawing images small, as code that shows many at once does. Never for downloading or delivering a file, or showing it large.
 </ParamField>
 
 ### `import_media`
 
 <Badge>write</Badge>
 
-Import a remote URL as first-class media: the server fetches and re-hosts it, returning its outputId + public URL (referenceable by outputId in generate_* and as an asset on a card via update_card). Use this for a file already on a public URL, or from a hosted client that cannot read local files. Requires the assets:write scope.
+Import a remote URL as first-class media: the server fetches and re-hosts it, returning its outputId + public URL (referenceable by outputId in generate_* and as an asset on a card via update_card). Use this for a file already on a public URL, or from a hosted client that cannot read local files. Requires the library:write scope.
 
 <ParamField body name="url" type="string" required>
 A public https URL to fetch and re-host.
@@ -100,32 +120,46 @@ Optional MIME override (else taken from the response).
 Optional file name (used for its extension).
 </ParamField>
 
+### `share_media`
+
+<Badge>write</Badge>
+
+A public link to media made in Studio: outputs of your finished generations, by the media ids list_media, search_media and get_folder print. One output gives its generation's link, opened at that output; a generation keeps one link, so sharing it again returns the same page. Several give a new link to them as a set, leaving out any that cannot be shared. Anyone with the link sees the media, with no sign-in. Pass shared:false to stop sharing, naming a generation by one media id or any media link as shareUrl; a stopped link never opens again, and sharing again makes a new one. An export's share page comes with get_export. Requires the studio:write scope.
+
+<ParamField body name="mediaIds" type="string[]">
+One or more media ids of outputs of your finished generations. To stop sharing, one.
+</ParamField>
+
+<ParamField body name="shareUrl" type="string">
+With shared:false, the media link to stop.
+</ParamField>
+
+<ParamField body name="shared" type="boolean">
+Default true. Pass false to stop sharing.
+</ParamField>
+
+<ParamField body name="title" type="string">
+A title for a set of two or more.
+</ParamField>
+
 ### `create_media_upload`
 
 <Badge>write</Badge>
 
-Upload a local file as first-class media (phase 1 of 2). Returns a signed uploadUrl and the exact headers to send; PUT the file bytes to that URL with those headers unchanged, then call complete_media_upload with the returned outputId. The finished media is referenceable by outputId in generate_* and as an asset on a card via update_card. For a file already on a public URL, use import_media instead. Requires the assets:write scope.
+Upload local files as first-class media (phase 1 of 2). Accepts 1-25 files in one call. Returns, for each file, a signed uploadUrl and the exact headers to send; PUT each file's bytes to its URL with those headers unchanged, then call complete_media_upload once with every returned outputId. The finished media is referenceable by outputId in generate_* and as an asset on a card via update_card. For a file already on a public URL, use import_media instead. Requires the library:write scope.
 
-<ParamField body name="contentType" type="string" required>
-The file MIME type, e.g. "image/png" or "video/mp4".
-</ParamField>
-
-<ParamField body name="fileName" type="string" required>
-The file name (used for its extension), e.g. "cover.png".
-</ParamField>
-
-<ParamField body name="sizeBytes" type="number">
-Optional file size in bytes.
+<ParamField body name="files" type="object[]" required>
+1-25 files to upload.
 </ParamField>
 
 ### `complete_media_upload`
 
 <Badge>write</Badge>
 
-Finalize a media upload (phase 2 of 2) after the file bytes were PUT to the signed uploadUrl from create_media_upload. Publishes the media and returns its outputId + public URL. Requires the assets:write scope.
+Finalize uploads (phase 2 of 2) after each file's bytes were PUT to its signed uploadUrl from create_media_upload. Accepts 1-25 outputIds in one call: finalize a batch together, so the person sees it as one card. Publishes each file and returns its outputId and URL. Requires the library:write scope.
 
-<ParamField body name="outputId" type="string" required>
-The outputId returned by create_media_upload.
+<ParamField body name="outputIds" type="string[]" required>
+1-25 outputIds returned by create_media_upload.
 </ParamField>
 
 ### `list_folders`
@@ -134,7 +168,13 @@ The outputId returned by create_media_upload.
 
 List the account's library folders (their own manual and smart folders, as a flat list with parent links for nesting) together with the built-in derived folders (recents, favorites, edits, canvas, cards). Use this to see how the library is organized before browsing or filing items.
 
-Takes no parameters.
+<ParamField body name="cursor" type="string">
+The previous page's cursor.
+</ParamField>
+
+<ParamField body name="limit" type="integer">
+How many to return.
+</ParamField>
 
 ### `get_folder`
 
@@ -144,6 +184,18 @@ Return the contents of one folder. The folder id is either one of the account's 
 
 <ParamField body name="folderId" type="string" required>
 A folder id, or a derived-folder key (recents, favorites, edits, canvas, cards).
+</ParamField>
+
+<ParamField body name="cursor" type="string">
+The previous page's cursor.
+</ParamField>
+
+<ParamField body name="limit" type="integer">
+How many to return.
+</ParamField>
+
+<ParamField body name="smallCopies" type="boolean">
+Link each image's small copy instead of the file itself, where the library keeps one: for drawing images small, as code that shows many at once does. Never for downloading or delivering a file, or showing it large.
 </ParamField>
 
 ### `create_folder`
@@ -172,18 +224,22 @@ For a smart folder: the live query that defines its membership (the same filters
 
 <Badge>write</Badge>
 
-Update the account's own folders: rename one, MOVE folders under a different parent (or to the top level with a null parent), change a smart folder's saved query, and FILE or UNFILE items. addItems/removeItems are DELTAS of \{ sourceTable, sourceRecordId, variant? \}, not a list to replace, because an item can sit in several folders at once and a replace would silently unfile it from the others. Filing never moves or copies anything: it adds a pointer, and only manual folders accept items (a smart folder computes its own membership). Pass folderIds to patch several folders at once, which crossed with addItems files the same items into all of them; renaming and re-querying still need exactly one folder. NOTE the asymmetry: nesting a FOLDER via parentId is a MOVE (a folder has one parent), while filing an ITEM is a pointer that leaves its other folders alone.
+Update the account's own folders: rename one, MOVE folders under a different parent (or to the top level with a null parent), change a smart folder's saved query, and FILE or UNFILE items. addItems/removeItems are DELTAS of \{ mediaId \} (media, as list_media, search_media and get_folder print it), \{ projectId \} or \{ cardId \}, not a list to replace, because an item can sit in several folders at once and a replace would silently unfile it from the others. Filing never moves or copies anything: it adds a pointer, and only manual folders accept items (a smart folder computes its own membership). Pass folderIds to patch several folders at once, which crossed with addItems files the same items into all of them; renaming and re-querying still need exactly one folder. NOTE the asymmetry: nesting a FOLDER via parentId is a MOVE (a folder has one parent), while filing an ITEM is a pointer that leaves its other folders alone.
 
 <ParamField body name="folderId" type="string" required>
 The folder id to update.
 </ParamField>
 
-<ParamField body name="addItems" type="object[]">
+<ParamField body name="addItems" type="value[]">
 File these items into the folder(s). A delta: their other folders are untouched.
 </ParamField>
 
 <ParamField body name="folderIds" type="string[]">
 Patch several folders at once. Attribute fields (name, query) still need exactly one.
+</ParamField>
+
+<ParamField body name="moveItem" type="object">
+Move one item within this manual folder: after or before another of its items, or to an end (position). Each item is named as addItems names one. Name neighbors or a position, not both.
 </ParamField>
 
 <ParamField body name="name" type="string">
@@ -198,7 +254,7 @@ A new parent folder id, or null to move to the top level. MOVES the folder.
 For a smart folder: the live query that defines its membership (the same filters as the library search bar).
 </ParamField>
 
-<ParamField body name="removeItems" type="object[]">
+<ParamField body name="removeItems" type="value[]">
 Unfile these items. Only the pointer goes; the asset is never deleted.
 </ParamField>
 
@@ -216,43 +272,43 @@ The folder id to delete.
 
 <Badge>write</Badge>
 
-Favorite or UNfavorite an asset: pass favorited:false to clear it (default true). For a top-level asset, pass assetType + id (card, voice, brand_kit, project, inspiration_content, gallery, transition, space). To favorite a single studio media variation (one image/video/audio slot from list_media / get_media), pass the output id + variationIndex (1-based) and omit assetType. Requires the favorites:write scope. Idempotent in both directions.
+Favorite or UNfavorite an asset: pass favorited:false to clear it (default true). For media (one output of a generation, an upload, stock), pass its mediaId as list_media, search_media and get_folder print it (a1B2c3D4-2 for one output of several). For anything else, pass assetType + id (card, voice, brand_kit, project, inspiration_content, gallery, transition, caption-template, template, space). Requires the favorites:write scope. Idempotent in both directions.
 
-<ParamField body name="id" type="string" required>
-The asset id (or studio output id when using variationIndex).
-</ParamField>
-
-<ParamField body name="assetType" type="`card` \| `voice` \| `brand_kit` \| `project` \| `inspiration_content` \| `gallery` \| `transition` \| `space`">
-The kind of asset. Required unless targeting a media variation via variationIndex.
+<ParamField body name="assetType" type="`card` \| `voice` \| `brand_kit` \| `project` \| `inspiration_content` \| `gallery` \| `transition` \| `caption-template` \| `template` \| `space`">
+The kind of asset, for anything that is not media. Pass with id.
 </ParamField>
 
 <ParamField body name="favorited" type="boolean">
 Default true. Pass false to UNfavorite.
 </ParamField>
 
-<ParamField body name="variationIndex" type="integer">
-1-based studio media variation slot. When set, id is a studio output id and assetType is ignored.
+<ParamField body name="id" type="string">
+The asset's id, with assetType.
+</ParamField>
+
+<ParamField body name="mediaId" type="string">
+A media id, for media. A bare id for a generation with several outputs is refused with their media ids listed.
 </ParamField>
 
 ### `archive`
 
 <Badge>write</Badge>
 
-Archive or UNarchive an asset: pass archived:false to restore it (default true). ContentHero never hard-deletes, so this is always reversible. For a top-level asset, pass assetType + id (card, brand_kit, brand_kit_section, project, space). To archive a single studio media variation, pass the output id + variationIndex (1-based) and omit assetType. Archiving is a timestamp and nothing else is touched, so a scheduled card restores as scheduled. Requires the favorites:write scope. Idempotent in both directions.
-
-<ParamField body name="id" type="string" required>
-The asset id (or studio output id when using variationIndex).
-</ParamField>
+Archive or UNarchive an asset: pass archived:false to restore it (default true). ContentHero never hard-deletes, so this is always reversible. For one output of a generation, pass its mediaId (a1B2c3D4-2 for one output of several). For anything else, pass assetType + id (card, brand_kit, brand_kit_section, project, space, template). Archiving is a timestamp and nothing else is touched, so a scheduled card restores as scheduled. Requires the favorites:write scope. Idempotent in both directions.
 
 <ParamField body name="archived" type="boolean">
 Default true. Pass false to RESTORE (unarchive).
 </ParamField>
 
-<ParamField body name="assetType" type="`card` \| `brand_kit` \| `brand_kit_section` \| `project` \| `space`">
-The kind of asset. Required unless targeting a media variation via variationIndex.
+<ParamField body name="assetType" type="`card` \| `brand_kit` \| `brand_kit_section` \| `project` \| `space` \| `template`">
+The kind of asset, for anything that is not media. Pass with id.
 </ParamField>
 
-<ParamField body name="variationIndex" type="integer">
-1-based studio media variation slot. When set, id is a studio output id and assetType is ignored.
+<ParamField body name="id" type="string">
+The asset's id, with assetType.
+</ParamField>
+
+<ParamField body name="mediaId" type="string">
+A generated output's media id. A bare id for a generation with several outputs is refused with their media ids listed.
 </ParamField>
 

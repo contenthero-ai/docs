@@ -20,8 +20,16 @@ List the account's brand kits (default first). Excludes archived kits unless arc
 Only archived brand kits (default excludes archived).
 </ParamField>
 
+<ParamField body name="cursor" type="string">
+The previous page's cursor.
+</ParamField>
+
 <ParamField body name="favorited" type="boolean">
 Only favorited brand kits.
+</ParamField>
+
+<ParamField body name="limit" type="integer">
+How many to return.
 </ParamField>
 
 ### `get_brand_kit`
@@ -58,7 +66,7 @@ Section roles, as the summary lists them.
 
 <Badge>write</Badge>
 
-Create a brand kit. THREE SOURCES, chosen by what you pass: (1) EMPTY, just a name, then fill it in with update_brand_kit; or FROM A SOCIAL PROFILE, pass its url in brandAccounts (your own) or inspirationAccounts (a creator you watch) with no name at all, and the kit is named after the handle and starts ingesting that account's posts if it is YouTube or Instagram; (2) IMPORTED, pass websiteUrls (primary first) and/or the brand's own YouTube or Instagram in brandAccounts, with extract:true, and ContentHero takes the colors, typography, logos and assets from the first website and analyzes every website and those accounts' posts to write the kit's empty sections, which is by far the fastest way to get a real kit; (3) A COPY, pass duplicateFrom with an existing kit id, which copies its sections and brand media (assets re-link rather than duplicate, so a copy costs no storage). Every new kit starts with its starter sections, empty. A brand with NO WEBSITE (so nothing to extract) is built by passing its content directly: sections, written by key into those starter sections, and logos, whose entries may name outputId to bring in a generation you just made rather than a url. With extract it RETURNS IMMEDIATELY, before the kit has any content: that empty kit is the handle, and the sections fill in over the next few minutes (longer while a newly linked account's posts arrive), so poll analysisStatus and extractionStatus with get_brand_kit rather than assuming it failed. name is OPTIONAL when websiteUrls or a social profile url is given: it defaults to the first site's hostname or the @handle, a placeholder extraction or you overwrite later. Brand kits are capped by plan, so this fails with a limit error near the cap, and a duplicate counts against it like any other kit. Requires the brandkit:write scope.
+Create a brand kit. THREE SOURCES, chosen by what you pass: (1) EMPTY, just a name, then fill it in with update_brand_kit; or FROM A SOCIAL PROFILE, pass its url in brandAccounts (your own) or inspirationAccounts (a creator you watch) with no name at all, and the kit is named after the handle and starts ingesting that account's posts if it is YouTube or Instagram; (2) IMPORTED, pass websiteUrls (primary first) and/or the brand's own YouTube or Instagram in brandAccounts, with extract:true, and ContentHero takes the colors, typography, logos and assets from the first website and analyzes every website and those accounts' posts to write the kit's empty sections, which is by far the fastest way to get a real kit; (3) A COPY, pass duplicateFrom with an existing kit id, which copies its sections and brand media (assets re-link rather than duplicate, so a copy costs no storage). Every new kit starts with its starter sections, empty. A brand with NO WEBSITE (so nothing to extract) is built by passing its content directly: sections, written by key into those starter sections, and logos, whose entries may name outputId to bring in a generation you just made rather than a url. With extract it RETURNS IMMEDIATELY, before the kit has any content: that empty kit is the handle, and the sections fill in over the next few minutes (longer while a newly linked account's posts arrive), so poll analysisStatus and extractionStatus with get_brand_kit rather than assuming it failed. name is OPTIONAL when websiteUrls or a social profile url is given: it defaults to the first site's hostname or the @handle, a placeholder extraction or you overwrite later. Brand kits are capped by plan, so this fails with a limit error near the cap, and a duplicate counts against it like any other kit. Requires the brand:write scope.
 
 <ParamField body name="assets" type="object[]">
 The kit's brand assets, each \{ url | outputId, name? \}.
@@ -85,7 +93,7 @@ Competitor/creator profiles they watch. Same entry shape as brandAccounts.
 </ParamField>
 
 <ParamField body name="logos" type="object[]">
-The kit's logos, each \{ url | outputId, name?, is_primary?, layout?, colorMode? \}. Use outputId to bring in a generation.
+The kit's logos, each \{ url | outputId, name?, isPrimary?, isDisplay?, layout?, colorMode? \}. Use outputId to bring in a generation.
 </ParamField>
 
 <ParamField body name="name" type="string">
@@ -108,10 +116,22 @@ The brand's websites, primary first. The first gives the logos, colors and fonts
 
 <Badge>write</Badge>
 
-Update a brand kit: its section content, colors and fonts, brand media, which kit is the DEFAULT, and which tracked accounts it is LINKED to. Only what you pass changes. Get the current kit first with get_brand_kit. SECTION CONTENT is written with sections, naming only the sections you change, all or nothing. An entry with a key edits that section: body (Markdown) replaces the whole section, revertTo restores an earlier version as a new one, sectionName renames it, width sets its card to full or half. An entry without a key adds a section of your own, with sectionName and tab. Pass each edited section's version as expectedVersion: if any of them changed since you read it, NOTHING is written and the error lists each stale section's current version and body, so re-read, reapply your change, and retry. To remove a section, archive it with archive (assetType brand_kit_section). Requires the brandkit:write scope. THREE MODES, chosen by what you pass: (1) pass brandKitId to patch one kit; (2) pass orderedIds ALONE to reorder the whole set, which is collection-level because ordering is a property of the set and a per-kit position would let two kits claim one slot, so pass every id in the order you want; (3) pass brandKitId + extract:true to RE-RUN the import: the visuals from its first website and the analysis of its websites and own accounts, which writes only into sections still empty and returns immediately (poll analysisStatus and extractionStatus via get_brand_kit). logos/assets/brandAccounts/inspirationAccounts are DECLARATIVE: a patch REPLACES the whole list, so pass the full set and use [] to clear. THIS IS ALSO HOW YOU ADD NEW MEDIA TO A KIT: a logo or asset entry names either a url it already has, or outputId to bring in a generation that is not in the kit yet ('\<id\>', or '\<id\>-2' for variation 2 of a batch), whose bytes get COPIED into the kit so trashing that generation later cannot empty it. To add a logo, read the kit, append one entry, and send the whole list back; sending an outputId twice adds it twice. brandAccounts are the account owner's OWN profiles (performance), inspirationAccounts are competitors and creators they watch; they are separate lists because they mean opposite things. AN ENTRY IS EITHER a tracked-account id you already have, OR \{ platform?, handleOrUrl \} to ADD a profile that is not tracked yet, which is what STARTS ingesting its posts (a full profile url carries its own platform, so platform is only needed for a bare handle). isDefault only accepts true (passing false would leave the account with no default at all, so to move the default, name the kit that should hold it).
+Update a brand kit: its section content, colors and fonts, brand media, which kit is the DEFAULT, and which tracked accounts it is LINKED to. Only what you pass changes. Get the current kit first with get_brand_kit. SECTION CONTENT is written with sections, naming only the sections you change, all or nothing. An entry with a key edits that section: body (Markdown) replaces the whole section, revertTo restores an earlier version as a new one, sectionName renames it, width sets its card to full or half. An entry without a key adds a section of your own, with sectionName and tab. Pass each edited section's version as expectedVersion: if any of them changed since you read it, NOTHING is written and the error lists each stale section's current version and body, so re-read, reapply your change, and retry. To remove a section, archive it with archive (assetType brand_kit_section). A section entry's afterId, beforeId or position moves that section within its tab; its neighbors are section ids. Requires the brand:write scope. afterId, beforeId or position moves the kit itself among the caller's kits. extract:true RE-RUNS the import: the visuals from its first website and the analysis of its websites and own accounts, which writes only into sections still empty and returns immediately (poll analysisStatus and extractionStatus via get_brand_kit). logos/assets/brandAccounts/inspirationAccounts are DECLARATIVE: a patch REPLACES the whole list, so pass the full set and use [] to clear. THIS IS ALSO HOW YOU ADD NEW MEDIA TO A KIT: a logo or asset entry names either a url it already has, or outputId to bring in a generation that is not in the kit yet ('\<id\>', or '\<id\>-2' for variation 2 of a batch), whose bytes get COPIED into the kit so trashing that generation later cannot empty it. To add a logo, read the kit, append one entry, and send the whole list back; sending an outputId twice adds it twice. brandAccounts are the account owner's OWN profiles (performance), inspirationAccounts are competitors and creators they watch; they are separate lists because they mean opposite things. AN ENTRY IS EITHER a tracked-account id you already have, OR \{ platform?, handleOrUrl \} to ADD a profile that is not tracked yet, which is what STARTS ingesting its posts (a full profile url carries its own platform, so platform is only needed for a bare handle). isDefault only accepts true (passing false would leave the account with no default at all, so to move the default, name the kit that should hold it).
+
+<ParamField body name="brandKitId" type="string" required>
+The brand kit id.
+</ParamField>
+
+<ParamField body name="afterId" type="string">
+Place it immediately after this item of the same list.
+</ParamField>
 
 <ParamField body name="assets" type="object[]">
 The kit's brand assets, each \{ url | outputId, name? \}. REPLACES the list; [] clears it.
+</ParamField>
+
+<ParamField body name="beforeId" type="string">
+Place it immediately before this item of the same list.
 </ParamField>
 
 <ParamField body name="brandAccounts" type="value[]">
@@ -120,10 +140,6 @@ The account owner's OWN profiles. Each entry is a tracked-account id, or \{ plat
 
 <ParamField body name="brandColors" type="object[]">
 The kit's palette, each \{ hex, name?, role? \}. REPLACES the list; [] clears it.
-</ParamField>
-
-<ParamField body name="brandKitId" type="string">
-The brand kit id. Omit ONLY when reordering with orderedIds.
 </ParamField>
 
 <ParamField body name="extract" type="boolean">
@@ -139,15 +155,15 @@ Make this the default kit, un-defaulting every other.
 </ParamField>
 
 <ParamField body name="logos" type="object[]">
-The kit's logos, each \{ url | outputId, name?, is_primary?, layout?: horizontal|stacked|icon|wordmark, colorMode?: full_color|light|dark|grayscale \}. REPLACES the list; [] clears it. Exactly one ends up primary (the kit's cover); name none and the first wins.
+The kit's logos, each \{ url | outputId, name?, isPrimary?, isDisplay?, layout?: horizontal|stacked|icon|wordmark, colorMode?: full_color|light|dark|grayscale \}. REPLACES the list; [] clears it. Exactly one ends up primary (the kit's cover); name none and the first wins.
 </ParamField>
 
 <ParamField body name="name" type="string">
 Rename the kit. This is the label in the UI, not the business name.
 </ParamField>
 
-<ParamField body name="orderedIds" type="string[]">
-Reorder mode: every brand kit id, in the order you want them. Pass this alone.
+<ParamField body name="position" type="`top` \| `bottom`">
+Place it at an end of the list instead of beside an item. Name neighbors or a position, not both.
 </ParamField>
 
 <ParamField body name="sections" type="object[]">
@@ -166,25 +182,25 @@ The brand's websites, primary first. REPLACES the list; [] clears it. Stored onl
 
 <Badge>read</Badge>
 
-The complete, paginated index of a brand kit's knowledge items (titles and metadata, no bodies). Use it to browse what exists, or to find an item's id before get_brand_knowledge or remove_brand_knowledge. For relevance retrieval, use search_brand_knowledge instead. Requires the brandkit:read scope.
+The complete, paginated index of a brand kit's knowledge items (titles and metadata, no bodies). Use it to browse what exists, or to find an item's id before get_brand_knowledge or remove_brand_knowledge. For relevance retrieval, use search_brand_knowledge instead. Requires the brand:read scope.
 
 <ParamField body name="brandKitId" type="string" required>
 The brand kit id.
 </ParamField>
 
-<ParamField body name="limit" type="integer">
-How many to return (default 50).
+<ParamField body name="cursor" type="string">
+The previous page's cursor.
 </ParamField>
 
-<ParamField body name="offset" type="integer">
-Pagination offset.
+<ParamField body name="limit" type="integer">
+How many to return.
 </ParamField>
 
 ### `get_brand_knowledge`
 
 <Badge>read</Badge>
 
-Get one knowledge item's stored body by id (the capped anchor text; the full document is embedded for search, not stored verbatim). Use search_brand_knowledge for the deep content. Requires the brandkit:read scope.
+Get one knowledge item's stored body by id (the capped anchor text; the full document is embedded for search, not stored verbatim). Use search_brand_knowledge for the deep content. Requires the brand:read scope.
 
 <ParamField body name="brandKitId" type="string" required>
 The brand kit id.
@@ -198,7 +214,7 @@ The knowledge item id (from list_brand_knowledge or search_brand_knowledge).
 
 <Badge>write</Badge>
 
-Add an item to a brand kit's knowledge base so it can be searched later. This is how the brand's knowledge grows over time: capture a lesson learned, a brand decision, an asset description, an article, or a video. Source can be text (a note), url (a page to scrape), youtube (a video transcript), or file. For a file, pass either fileData (base64, best for small documents and images) or fileUrl (a hosted URL the server fetches, needed for large files and video/audio). Requires the brandkit:write scope. SPENDS CREDITS for images, video and audio (text, links, YouTube and documents are free): pass getCost to preview the price first, which runs nothing and charges nothing.
+Add an item to a brand kit's knowledge base so it can be searched later. This is how the brand's knowledge grows over time: capture a lesson learned, a brand decision, an asset description, an article, or a video. Source can be text (a note), url (a page to scrape), youtube (a video transcript), or file. For a file, pass either fileData (base64, best for small documents and images) or fileUrl (a hosted URL the server fetches, needed for large files and video/audio). Requires the brand:write scope. SPENDS CREDITS for images, video and audio (text, links, YouTube and documents are free): pass getCost to preview the price first, which runs nothing and charges nothing.
 
 <ParamField body name="brandKitId" type="string" required>
 The brand kit id.
@@ -240,7 +256,7 @@ For sourceType "url" or "youtube": the link.
 
 <Badge>write</Badge>
 
-Remove a knowledge item and its embedding chunks from a brand kit's knowledge base. Requires the brandkit:write scope.
+Remove a knowledge item and its embedding chunks from a brand kit's knowledge base. Requires the brand:write scope.
 
 <ParamField body name="brandKitId" type="string" required>
 The brand kit id.
@@ -254,7 +270,7 @@ The knowledge item id to remove.
 
 <Badge>read</Badge>
 
-Semantic search over a brand kit's knowledge base (everything the owner has uploaded: notes, docs, articles, video transcripts). Returns the most relevant passages, ranked. This is the deep-grounding read: use it to pull what the brand has said about a topic before drafting or deciding. Requires the brandkit:read scope.
+Semantic search over a brand kit's knowledge base (everything the owner has uploaded: notes, docs, articles, video transcripts). Returns the most relevant passages, ranked. This is the deep-grounding read: use it to pull what the brand has said about a topic before drafting or deciding. Requires the brand:read scope.
 
 <ParamField body name="brandKitId" type="string" required>
 The brand kit id (from list_brand_kits / get_brand_kit).

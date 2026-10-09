@@ -1,12 +1,12 @@
 ---
-title: "Avatars and voices"
-description: "The identity layer: avatars with their looks, and the voices they speak with."
+title: "Avatars, voices and Kling elements"
+description: "The identity layer: avatars with their looks, the voices they speak with, and the Kling elements that keep a character, location or prop consistent across Kling generations."
 ---
 
 {/* GENERATED FILE. Do not edit by hand. */}
 {/* Regenerate with `npm run generate:reference` in contenthero-docs. */}
 
-The identity layer: avatars with their looks, and the voices they speak with. 7 tools.
+The identity layer: avatars with their looks, the voices they speak with, and the Kling elements that keep a character, location or prop consistent across Kling generations. 12 tools.
 
 Every tool below is exposed by the hosted MCP server at `https://mcp.contenthero.ai` and by the `@contenthero/mcp` npm package. A <Badge>write</Badge> tool changes your account; a <Badge>read</Badge> tool does not.
 
@@ -16,7 +16,13 @@ Every tool below is exposed by the hosted MCP server at `https://mcp.contenthero
 
 List the account's avatars. Each avatar has an imageUrl (its base look) and a defaultVoiceId, which feed generate_lip_sync. Call get_avatar for full detail and the avatar's looks.
 
-Takes no parameters.
+<ParamField body name="cursor" type="string">
+The previous page's cursor.
+</ParamField>
+
+<ParamField body name="limit" type="integer">
+How many to return.
+</ParamField>
 
 ### `get_avatar`
 
@@ -84,6 +90,14 @@ Update an avatar and/or change its looks. Fields: name, defaultLookId (also beco
 The avatar id from list_avatars.
 </ParamField>
 
+<ParamField body name="afterId" type="string">
+Place it immediately after this item of the same list.
+</ParamField>
+
+<ParamField body name="beforeId" type="string">
+Place it immediately before this item of the same list.
+</ParamField>
+
 <ParamField body name="defaultLookId" type="string">
 A look id from get_avatar. Becomes the avatar's default look AND its profile photo.
 </ParamField>
@@ -98,6 +112,10 @@ New name, at least 3 characters.
 
 <ParamField body name="ops" type="value[]">
 Look changes, applied in order before the field updates. NOT a transaction: a failure part-way leaves earlier ops applied.
+</ParamField>
+
+<ParamField body name="position" type="`top` \| `bottom`">
+Place it at an end of the list instead of beside an item. Name neighbors or a position, not both.
 </ParamField>
 
 ### `delete_avatar`
@@ -116,8 +134,16 @@ The avatar id from list_avatars.
 
 List the account's saved voices (favorites first). Set favorited=true to show only favorites. Each has a voiceId for generate_lip_sync / generate_audio (TTS). Call get_voice for full detail.
 
+<ParamField body name="cursor" type="string">
+The previous page's cursor.
+</ParamField>
+
 <ParamField body name="favorited" type="boolean">
 Only favorited voices.
+</ParamField>
+
+<ParamField body name="limit" type="integer">
+How many to return.
 </ParamField>
 
 ### `get_voice`
@@ -128,5 +154,87 @@ Get one voice by its voiceId: provider, traits (accent/language/gender/age), des
 
 <ParamField body name="voiceId" type="string" required>
 The voice id from list_voices.
+</ParamField>
+
+### `list_kling_elements`
+
+<Badge>read</Badge>
+
+List the account's saved Kling elements. A Kling element is Kling 3.0's saved reference for one character, location or prop: 2-4 images (or one video) of it under a name, so the subject stays consistent across Kling video generations. Use one in generate_video's klingElements by klingElementId, and as @name in the prompt.
+
+<ParamField body name="cursor" type="string">
+The previous page's cursor.
+</ParamField>
+
+<ParamField body name="limit" type="integer">
+How many to return.
+</ParamField>
+
+### `get_kling_element`
+
+<Badge>read</Badge>
+
+Get one saved Kling element by id: its name, category, description, and images.
+
+<ParamField body name="klingElementId" type="string" required>
+The Kling element id.
+</ParamField>
+
+### `create_kling_element`
+
+<Badge>write</Badge>
+
+Create a Kling element: a saved reference for one character, location or prop that keeps it consistent across Kling 3.0 video generations. Give it 2-4 images (or one video) of that one subject; images may be URLs or output-id tokens, so you can generate the angle shots first and assemble the Kling element from them. Use it later in generate_video's klingElements [\{ klingElementId \}] and as @name in the prompt.
+
+<ParamField body name="description" type="string" required>
+What the Kling element represents (required).
+</ParamField>
+
+<ParamField body name="name" type="string" required>
+Referenced in the prompt as @name.
+</ParamField>
+
+<ParamField body name="category" type="`auto` \| `character` \| `location` \| `prop`">
+Kind of entity (default 'auto').
+</ParamField>
+
+<ParamField body name="images" type="string[]">
+2-4 image URLs or output-id tokens.
+</ParamField>
+
+<ParamField body name="video" type="string">
+A single video URL or output-id token (alternative to images).
+</ParamField>
+
+### `update_kling_element`
+
+<Badge>write</Badge>
+
+Update a saved Kling element's name, description, or category.
+
+<ParamField body name="klingElementId" type="string" required>
+The Kling element id.
+</ParamField>
+
+<ParamField body name="category" type="`auto` \| `character` \| `location` \| `prop`">
+What kind of Kling element this is. 'auto' lets the server classify it from the image.
+</ParamField>
+
+<ParamField body name="description" type="string">
+What this Kling element is, in words. This is what makes it findable later.
+</ParamField>
+
+<ParamField body name="name" type="string">
+Rename the Kling element.
+</ParamField>
+
+### `delete_kling_element`
+
+<Badge>write</Badge>
+
+Permanently delete a saved Kling element. Videos already generated with it are unaffected.
+
+<ParamField body name="klingElementId" type="string" required>
+The Kling element id.
 </ParamField>
 

@@ -6,7 +6,7 @@ description: "Create images, video, audio and boards, upscale them, and check wh
 {/* GENERATED FILE. Do not edit by hand. */}
 {/* Regenerate with `npm run generate:reference` in contenthero-docs. */}
 
-Create images, video, audio and boards, upscale them, and check what a generation is doing. 12 tools.
+Create images, video, audio and boards, upscale them, and check what a generation is doing. 11 tools.
 
 Every tool below is exposed by the hosted MCP server at `https://mcp.contenthero.ai` and by the `@contenthero/mcp` npm package. A <Badge>write</Badge> tool changes your account; a <Badge>read</Badge> tool does not.
 
@@ -16,8 +16,8 @@ Every tool below is exposed by the hosted MCP server at `https://mcp.contenthero
 
 Generate one or more images from a text prompt (optionally image-to-image with reference images). Waits for the result and returns the image URLs. Optionally pass projectId to place the generated image onto that project in the same call, controlled by an optional placement: a VIDEO timeline places a clip on a track, a CANVAS design places a layer on a slide (defaulting to the slide the user is focused on). Omit projectId to save a standalone library output. The result LINKS each output so the user sees it inline; to SEE it yourself (judge a face, check legibility, pick between variations) call get_media with the outputId. SPENDS CREDITS: pass getCost to preview the price first, which runs nothing and charges nothing.
 
-<ParamField body name="modelId" type="`nano-banana-2` \| `nano-banana` \| `nano-banana-pro` \| `seedream-5-lite` \| `gpt-image-2` \| `flux-2-pro` \| `flux-1-kontext-pro`" required>
-nano-banana-2 = strong general default (1K/2K/4K). gpt-image-2 = best text rendering (resolution 1K/2K/4K, no quality param). flux-2-pro / seedream-5-lite / nano-banana-pro = alternatives. flux-1-kontext-pro = edit/recreate. Higher tiers are separate ids, not a parameter: flux-2-flex, flux-1-kontext-max, wan-2.7-image-pro. Pass referenceImages for image-to-image / editing.
+<ParamField body name="modelId" type="string" required>
+The model id. list_models (contentType image) names every image model and what each is for; get_model gives one model's options and prompt guide.
 </ParamField>
 
 <ParamField body name="aspectRatio" type="string">
@@ -57,17 +57,17 @@ References for image-to-image / editing. Each may be a URL or a previous output 
 </ParamField>
 
 <ParamField body name="resolution" type="string">
-e.g. 1K, 2K, 4K. Model-dependent (e.g. gpt-image-2, nano-banana-2/pro, flux-2-pro, seedream).
+e.g. 1K, 2K, 4K. get_model lists the resolutions a model takes; validated per model.
 </ParamField>
 
 ### `generate_video`
 
 <Badge>write</Badge>
 
-Generate a video from a text prompt (optionally from a start/end frame or reference images/videos/audio). Waits up to ~50s; if the render is still running it returns an outputId to poll with get_generation_status. Seedance 2.0 has two input modes selected by which references you pass: a startFrame (and optional endFrame) runs start/end-frame mode; referenceImages / referenceVideos / referenceAudio (without a startFrame) run references mode. Optionally pass projectId to place the generated video onto that project in the same call, controlled by an optional placement: a VIDEO timeline places a clip on a track, a CANVAS design places a layer on a slide (defaulting to the slide the user is focused on). Omit projectId to save a standalone library output. The result LINKS each output so the user sees it inline; to SEE it yourself (judge a face, check legibility, pick between variations) call get_media with the outputId. SPENDS CREDITS: pass getCost to preview the price first, which runs nothing and charges nothing.
+Generate a video from a text prompt (optionally from a start/end frame or reference images/videos/audio). Returns at once with an outputId; get_generation_status waits for the render. Some models choose an input mode by which references you pass (a startFrame with an optional endFrame, or references alone); get_model describes each model's modes. Optionally pass projectId to place the generated video onto that project in the same call, controlled by an optional placement: a VIDEO timeline places a clip on a track, a CANVAS design places a layer on a slide (defaulting to the slide the user is focused on). Omit projectId to save a standalone library output. The result LINKS each output so the user sees it inline; to SEE it yourself (judge a face, check legibility, pick between variations) call get_media with the outputId. SPENDS CREDITS: pass getCost to preview the price first, which runs nothing and charges nothing.
 
-<ParamField body name="modelId" type="`veo-3.1-fast` \| `veo-3.1-quality` \| `seedance-2` \| `seedance-2-fast` \| `kling-3.0` \| `kling-2.6` \| `kling-3.0-motion-control` \| `kling-2.6-motion-control` \| `wan-2.6`" required>
-veo-3.1-fast / veo-3.1-quality = high quality clips with audio. seedance-2 / seedance-2-fast = multimodal references; startFrame(+endFrame) = frame mode, referenceImages/Videos/Audio = references mode. kling-3.0 (per-shot via shots) / kling-2.6 = strong motion. wan-2.6 (multiShot for multi-shot mode) = alternative. The motion-control variants require an input image plus an input video.
+<ParamField body name="modelId" type="string" required>
+The model id. list_models (contentType video) names every video model and what each is for; get_model gives one model's options, input modes and prompt guide.
 </ParamField>
 
 <ParamField body name="aspectRatio" type="string">
@@ -83,7 +83,7 @@ Clip length in seconds. Model-dependent; some models lock it.
 </ParamField>
 
 <ParamField body name="elements" type="object[]">
-Named reference elements (Kling 3.0): each is a saved element (\{ elementId \}) or an inline group (\{ name, description, images \}), addressable in the prompt as @name. Requires a startFrame. See get_model promptReferences (named_tag scheme).
+Deprecated alias for `klingElements`, accepted for one release window.
 </ParamField>
 
 <ParamField body name="endFrame" type="string">
@@ -94,8 +94,16 @@ Last frame: an image URL or a previous output id.
 Return the credit cost estimate instead of generating (nothing runs, nothing is charged).
 </ParamField>
 
+<ParamField body name="keepInputLength" type="boolean">
+Video edit only, on models that offer it: keep the input video's full length instead of a set duration. Charged for that length.
+</ParamField>
+
+<ParamField body name="klingElements" type="object[]">
+Kling elements: each is a saved Kling element (\{ klingElementId \}) or an inline group (\{ name, description, images \}), addressable in the prompt as @name. Only for models that take them (get_model promptReferences, named_tag scheme). Requires a startFrame.
+</ParamField>
+
 <ParamField body name="multiShot" type="boolean">
-WAN 2.6: enable multi-shot mode (a single longer sequence with multiple shots) instead of single-shot. For Kling 3.0, pass per-shot prompts via `shots` instead, which turns on multi-shot automatically.
+Enable multi-shot mode (one longer sequence of several shots) on a model that offers it; get_model says which do. On a model that takes per-shot prompts, pass `shots` instead, which turns multi-shot on.
 </ParamField>
 
 <ParamField body name="negativePrompt" type="string">
@@ -123,7 +131,7 @@ Describe the video to generate. Required for most models; optional for some (e.g
 </ParamField>
 
 <ParamField body name="referenceAudio" type="string[]">
-Reference audio (e.g. Seedance references mode, audio-driven video): each a URL or a previous output id. Only used by models that accept audio references.
+Reference audio (audio-driven video): each a URL or a previous output id. Only used by models that accept audio references; get_model says which do.
 </ParamField>
 
 <ParamField body name="referenceImages" type="string[]">
@@ -139,7 +147,7 @@ e.g. 720p, 1080p, 4K. Model-dependent.
 </ParamField>
 
 <ParamField body name="shots" type="object[]">
-Kling 3.0 multi-shot mode: an ordered list of shots, each with its own prompt and duration in seconds (1-12 each, total \<=15). When provided, the video runs in multi-shot mode; only startFrame attaches as an image (it becomes the first frame of shot 1), all other shots are text-only. Audio is always on in multi-shot.
+Multi-shot mode with per-shot prompts, on a model that takes them (get_model gives its shot limits): an ordered list of shots, each with its own prompt and duration in seconds. When provided, the video runs in multi-shot mode; only startFrame attaches as an image (it becomes the first frame of shot 1), all other shots are text-only.
 </ParamField>
 
 <ParamField body name="startFrame" type="string">
@@ -150,10 +158,10 @@ First frame: an image URL or a previous output id (e.g. "\<id\>-2") to chain (e.
 
 <Badge>write</Badge>
 
-Generate audio with ElevenLabs: speech (TTS), music, or a sound effect. Returns the audio URL directly (synchronous, no polling). Optionally pass projectId to place the generated audio onto that editor project's timeline in the same call, controlled by an optional placement; omit projectId to save a standalone library output. The result LINKS each output so the user sees it inline; to SEE it yourself (judge a face, check legibility, pick between variations) call get_media with the outputId. SPENDS CREDITS: pass getCost to preview the price first, which runs nothing and charges nothing.
+Generate audio: speech (TTS), music, or a sound effect. Returns the audio URL directly (synchronous, no polling). Optionally pass projectId to place the generated audio onto that editor project's timeline in the same call, controlled by an optional placement; omit projectId to save a standalone library output. The result LINKS each output so the user sees it inline; to SEE it yourself (judge a face, check legibility, pick between variations) call get_media with the outputId. SPENDS CREDITS: pass getCost to preview the price first, which runs nothing and charges nothing.
 
-<ParamField body name="modelId" type="`elevenlabs-tts` \| `elevenlabs-music` \| `elevenlabs-sound-effects`" required>
-elevenlabs-tts = text to speech (needs text + voiceId). elevenlabs-music = music from a prompt. elevenlabs-sound-effects = a sound effect from a prompt.
+<ParamField body name="modelId" type="string" required>
+The model id. list_models (contentType audio) names every audio model and what each is for; get_model gives one model's inputs.
 </ParamField>
 
 <ParamField body name="durationSeconds" type="number">
@@ -185,11 +193,11 @@ For sfx: how literally to follow the prompt (0 to 1).
 </ParamField>
 
 <ParamField body name="text" type="string">
-For TTS (elevenlabs-tts): the words to speak. Read the model's promptGuide with get_model before writing directions into it.
+For a speech model: the words to speak. Read the model's promptGuide with get_model before writing directions into it.
 </ParamField>
 
 <ParamField body name="voiceId" type="string">
-For TTS: the ElevenLabs voice id.
+For a speech model: the voice id (list_voices names them).
 </ParamField>
 
 <ParamField body name="voiceName" type="string">
@@ -200,10 +208,10 @@ For TTS: human-readable voice name (display only).
 
 <Badge>write</Badge>
 
-Generate a Reference Board: a dense multi-panel reference sheet (3:4, 4K) built from a source image and/or a written description, used to keep a subject on-model across later generations (feed the board back in as a referenceImage). Provide referenceImages and/or a prompt (at least one is required). Waits up to ~50s; boards render slowly (minutes), so it usually returns an outputId to poll with get_generation_status. SPENDS CREDITS: pass getCost to preview the price first, which runs nothing and charges nothing.
+Generate a Reference Board: a dense multi-panel reference sheet (3:4, 4K) built from a source image and/or a written description, used to keep a subject on-model across later generations (feed the board back in as a referenceImage). Provide referenceImages and/or a prompt (at least one is required). Waits up to ~40s; boards render slowly (minutes), so it usually returns an outputId to poll with get_generation_status. SPENDS CREDITS: pass getCost to preview the price first, which runs nothing and charges nothing.
 
-<ParamField body name="boardType" type="`character` \| `pose` \| `mascot` \| `creature` \| `weapon` \| `vehicle` \| `object` \| `location` \| `shot`" required>
-character = a person or figure. pose = a pose / action sheet. mascot = a brand mascot. creature = a creature or animal. weapon = a weapon. vehicle = a vehicle. object = a prop or object. location = an environment. shot = a multi-shot storyboard in one image.
+<ParamField body name="boardType" type="string" required>
+One of the board types listed by get_model('reference-boards').
 </ParamField>
 
 <ParamField body name="avatarId" type="string">
@@ -234,14 +242,14 @@ Source images the board is built from: each a URL or a previous output id (e.g. 
 
 <Badge>write</Badge>
 
-Animate a portrait image so the subject speaks. Provide imageUrl (the face) plus a voice source: either audioUrl (an existing speech clip) or script + voiceId (we synthesize the speech). Optional motionPrompt nudges expression/motion. Waits up to ~50s; if still rendering it returns an outputId to poll with get_generation_status. SPENDS CREDITS: pass getCost to preview the price first, which runs nothing and charges nothing.
+Animate a portrait image so the subject speaks. Provide imageUrl (the face) plus a voice source: either audioUrl (an existing speech clip) or script + voiceId (we synthesize the speech). Optional motionPrompt nudges expression/motion. Returns at once with an outputId; get_generation_status waits for the render. SPENDS CREDITS: pass getCost to preview the price first, which runs nothing and charges nothing.
 
 <ParamField body name="imageUrl" type="string" required>
 The portrait to animate (the speaking subject): an image URL or a previous output id (e.g. "\<id\>-1") to chain.
 </ParamField>
 
-<ParamField body name="modelId" type="`infinitalk` \| `infinitalk-fast` \| `kling-ai-avatar`" required>
-infinitalk = talking-head lip-sync (480p/720p). infinitalk-fast = faster, cheaper. kling-ai-avatar = Kling avatar (720p/1080p). All take a portrait image plus either an audio clip or a script + voiceId.
+<ParamField body name="modelId" type="string" required>
+The model id: a lip-sync model. list_models (contentType video) names them; get_model gives one model's resolutions and inputs.
 </ParamField>
 
 <ParamField body name="audioDurationSeconds" type="number">
@@ -265,11 +273,11 @@ e.g. 480p, 720p, 1080p. Model-dependent.
 </ParamField>
 
 <ParamField body name="script" type="string">
-Text for the subject to speak. Requires voiceId; synthesized to speech. Use this OR audioUrl. Spoken by elevenlabs-tts: read its promptGuide with get_model before writing directions into the script.
+Text for the subject to speak. Requires voiceId; synthesized to speech. Use this OR audioUrl. Before writing directions into the script, read the speech model's promptGuide with get_model.
 </ParamField>
 
 <ParamField body name="voiceId" type="string">
-ElevenLabs voice id to speak the script (required with script).
+The voice to speak the script (list_voices names them; required with script).
 </ParamField>
 
 <ParamField body name="voiceName" type="string">
@@ -286,8 +294,8 @@ Upscale an existing image or video to a higher resolution. Provide the source me
 Upscale factor, e.g. 2x, 4x. Model-dependent; validated per model.
 </ParamField>
 
-<ParamField body name="modelId" type="`topaz-image-upscale` \| `topaz-video-upscale`" required>
-topaz-image-upscale = upscale an image (source must be an image URL). topaz-video-upscale = upscale a video (source must be a video URL; also pass durationSeconds).
+<ParamField body name="modelId" type="string" required>
+The model id: an upscaler. list_models names them, each one's contentType saying whether it takes an image or a video; get_model gives its factors.
 </ParamField>
 
 <ParamField body name="sourceUrl" type="string" required>
@@ -306,11 +314,7 @@ Return the credit cost estimate instead of upscaling (nothing runs, nothing is c
 
 <Badge>write</Badge>
 
-Transform existing audio with an audio-processing model, in one of TWO shapes. FILE mode: pass sourceUrl to process a standalone file into a new library asset. Voice isolation removes background noise and music and returns the processed URL directly; audio enhancement levels loudness and cleans up background noise, is asynchronous, and returns an outputId to poll with get_generation_status. Optionally pass projectId to place the result onto that editor project's timeline in the same call, controlled by an optional placement. IN-PLACE mode: pass projectId with clipIds (or enhanceClips for the whole timeline) to enhance the audio OF EXISTING CLIPS instead of producing a new asset, which is how you clean up a recording already on a timeline. In-place returns a LIST on outputs, one job per SOURCE, because the vendor estimates a noise profile per production: one recording's clips are concatenated and enhanced together so the level and noise floor stay consistent across cuts, while separate recordings stay separate jobs. Poll every outputId. The enhanced audio is applied to the clips automatically when each job lands: an audio clip has its source swapped, and a video clip is muted with the enhanced audio placed on its own clip. Silenced clips are skipped. In-place mode is enhancement only and needs no sourceUrl. SPENDS CREDITS: pass getCost to preview the price first, which runs nothing and charges nothing.
-
-<ParamField body name="modelId" type="`elevenlabs-voice-isolator` \| `auphonic-enhance`" required>
-The audio-processing model. Each transforms audio input into audio output. elevenlabs-voice-isolator = remove background noise and music, leaving clean speech (synchronous). auphonic-enhance = level loudness and clean up background noise (asynchronous; poll get_generation_status).
-</ParamField>
+Transform existing audio with an audio-processing model, in one of TWO shapes. FILE mode: pass sourceUrl to process a standalone file into a new library asset. Voice isolation removes background noise and music and returns the processed URL directly; audio enhancement levels loudness and cleans up background noise, is asynchronous, and returns an outputId to poll with get_generation_status. Optionally pass projectId to place the result onto that editor project's timeline in the same call, controlled by an optional placement. IN-PLACE mode: pass projectId with clipIds (or enhanceClips for the whole timeline) to enhance the audio OF EXISTING CLIPS instead of producing a new asset, which is how you clean up a recording already on a timeline. In-place returns a LIST of jobs, one per SOURCE, because the vendor estimates a noise profile per production: one recording's clips are concatenated and enhanced together so the level and noise floor stay consistent across cuts, while separate recordings stay separate jobs. Poll every job's outputId. The enhanced audio is applied to the clips automatically when each job lands: an audio clip has its source swapped, and a video clip is muted with the enhanced audio placed on its own clip. Silenced clips are skipped. In-place mode is enhancement only and needs no sourceUrl. SPENDS CREDITS: pass getCost to preview the price first, which runs nothing and charges nothing.
 
 <ParamField body name="clipIds" type="string[]">
 IN-PLACE mode: enhance the audio of these clips on projectId. Omit with enhanceClips:true to enhance every audible clip on the timeline.
@@ -326,6 +330,14 @@ IN-PLACE mode for the whole timeline, without naming clips. Implied when clipIds
 
 <ParamField body name="getCost" type="boolean">
 Return the credit cost estimate instead of running (nothing runs, nothing is charged).
+</ParamField>
+
+<ParamField body name="modelId" type="string">
+Instead of operation: an audio model that takes one audio file and returns audio (it resolves to the operation it performs). list_models (contentType audio) names them; get_model gives one model's inputs and whether it finishes at once or is polled with get_generation_status.
+</ParamField>
+
+<ParamField body name="operation" type="`isolate` \| `enhance`">
+isolate: voice isolation. enhance: loudness leveling and noise cleanup. The server picks the model that performs it. Omitted: enhance in in-place mode, else isolate.
 </ParamField>
 
 <ParamField body name="placement" type="object or object">
@@ -366,28 +378,14 @@ ISO language hint, e.g. "en". Auto-detected when omitted.
 
 <Badge>read</Badge>
 
-Check one or more in-progress generations (outputIds from generate_image / generate_video / upscale / generate_lip_sync / generate_board) and get their final URLs. BY DEFAULT THIS BLOCKS until they finish, up to ~50s per call, because that is almost always what you want after starting a render; if one is still running it comes back with the current status and a poll_after_seconds hint, so call again. Pass wait:false for an instant snapshot with no blocking. Accepts 1-8 outputIds in one call.
+Check one or more in-progress generations (outputIds from generate_image / generate_video / upscale / generate_lip_sync / generate_board) and get their final URLs. BY DEFAULT THIS BLOCKS until they finish, up to ~40s per call, because that is almost always what you want after starting a render; if one is still running it comes back with the current status and a poll_after_seconds hint, so call again. Pass wait:false for an instant snapshot with no blocking. Accepts 1-8 outputIds in one call.
 
 <ParamField body name="outputIds" type="string[]" required>
 1-8 outputIds to check (each from a prior generate_* call).
 </ParamField>
 
 <ParamField body name="wait" type="boolean">
-Block until terminal (up to ~50s), the default. false = an instant snapshot.
-</ParamField>
-
-### `get_preview`
-
-<Badge>read</Badge>
-
-Poll a preview started by get_context with mode="video". While rendering, returns the progress; when done, returns a short-lived url to the ephemeral preview output (plus the estimated cost). Requires the context:read scope.
-
-<ParamField body name="bucketName" type="string" required>
-The bucketName returned by get_context with mode="video".
-</ParamField>
-
-<ParamField body name="renderId" type="string" required>
-The renderId returned by get_context with mode="video".
+Block until terminal (up to ~40s), the default. false = an instant snapshot.
 </ParamField>
 
 ### `list_models`
@@ -407,6 +405,6 @@ Filter to one content type.
 Get one model's full request shape by id: the exact parameters it accepts (input types, prompt mode and char cap, duration range, resolutions, aspect ratios, max references, generation count, audio, features). Ground a generation against this instead of guessing the parameters, then preview cost with the matching generate tool's getCost option before running it.
 
 <ParamField body name="modelId" type="string" required>
-The model id, e.g. from list_models (such as "veo-3.1-fast").
+The model id, as list_models names it.
 </ParamField>
 

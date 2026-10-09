@@ -6,7 +6,7 @@ description: "The research surface: the social accounts you track, and their pos
 {/* GENERATED FILE. Do not edit by hand. */}
 {/* Regenerate with `npm run generate:reference` in contenthero-docs. */}
 
-The research surface: the social accounts you track, and their posts ranked by outlier score. 5 tools.
+The research surface: the social accounts you track, and their posts ranked by outlier score. 6 tools.
 
 Every tool below is exposed by the hosted MCP server at `https://mcp.contenthero.ai` and by the `@contenthero/mcp` npm package. A <Badge>write</Badge> tool changes your account; a <Badge>read</Badge> tool does not.
 
@@ -24,6 +24,14 @@ Narrow to one kind. Omitted, both come back.
 Scope to the accounts linked to this brand kit (from get_brand_kit).
 </ParamField>
 
+<ParamField body name="cursor" type="string">
+The previous page's cursor.
+</ParamField>
+
+<ParamField body name="limit" type="integer">
+How many to return.
+</ParamField>
+
 ### `get_tracked_account`
 
 <Badge>read</Badge>
@@ -32,6 +40,28 @@ Get one tracked account with how its content actually performs: post count, tota
 
 <ParamField body name="accountId" type="string" required>
 The account id from list_tracked_accounts.
+</ParamField>
+
+### `update_tracked_account`
+
+<Badge>write</Badge>
+
+Move a tracked account within its list (its kind's: the creators they watch, or their own profiles), after or before another of the same kind, or to an end. Returns the account with its performance, as get_tracked_account does. Requires the inspiration:write scope.
+
+<ParamField body name="accountId" type="string" required>
+The account id from list_tracked_accounts.
+</ParamField>
+
+<ParamField body name="afterId" type="string">
+Place it immediately after this item of the same list.
+</ParamField>
+
+<ParamField body name="beforeId" type="string">
+Place it immediately before this item of the same list.
+</ParamField>
+
+<ParamField body name="position" type="`top` \| `bottom`">
+Place it at an end of the list instead of beside an item. Name neighbors or a position, not both.
 </ParamField>
 
 ### `list_content`
@@ -56,6 +86,10 @@ Scope to the accounts linked to this brand kit.
 Filter by content type, e.g. 'video', 'short', 'reel'.
 </ParamField>
 
+<ParamField body name="cursor" type="string">
+The previous page's cursor.
+</ParamField>
+
 <ParamField body name="durationMax" type="number">
 Maximum duration in seconds.
 </ParamField>
@@ -69,11 +103,11 @@ Only content the account has favorited.
 </ParamField>
 
 <ParamField body name="limit" type="integer">
-How many to return (default 20).
+How many to return.
 </ParamField>
 
-<ParamField body name="offset" type="integer">
-Pagination offset.
+<ParamField body name="order" type="`asc` \| `desc`">
+The sort direction.
 </ParamField>
 
 <ParamField body name="outlierScoreMax" type="number">
@@ -108,12 +142,8 @@ ISO timestamp.
 Finds posts by meaning and by keyword across title, creator, description and transcript, ranked by relevance. Returns only the posts judged relevant, so an empty result means nothing matched.
 </ParamField>
 
-<ParamField body name="sortBy" type="`relevance` \| `score` \| `date` \| `views` \| `engagement`">
-Sort field. Default 'relevance' when search is set, otherwise 'score'. Any other field reorders the same relevant set.
-</ParamField>
-
-<ParamField body name="sortOrder" type="`asc` \| `desc`">
-Sort direction (default 'desc').
+<ParamField body name="sort" type="`relevance` \| `outlierScore` \| `publishedAt` \| `viewCount` \| `engagementRate`">
+The field to sort by.
 </ParamField>
 
 <ParamField body name="subscribersMax" type="number">

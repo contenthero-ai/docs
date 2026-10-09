@@ -39,35 +39,35 @@ Also return a screenshot of the user's live viewport (their SCREEN), captured at
 </ParamField>
 
 <ParamField body name="count" type="integer">
-mode='image': how many frames to return across the range. Omit for one frame at the focus point, or a proportional default when a range is given.
+How many frames to return across the range. Omit for one frame at the focus point, or a proportional default when a range is given.
 </ParamField>
 
 <ParamField body name="frame" type="integer">
-mode='image' (editor): which single timeline frame to render. Omit to render the current playhead frame.
+Editor: which single timeline frame to render. Omit to render the current playhead frame.
 </ParamField>
 
 <ParamField body name="fromFrame" type="integer">
-Start timeline frame of the range, for several frames or a video. Omit to start at the beginning.
-</ParamField>
-
-<ParamField body name="mode" type="`image` \| `video`">
-What MEDIUM to render (default 'image'). 'image' returns composed frames INLINE: one by default, or several across a range when you pass count with fromFrame/toFrame, to judge motion, flow and cut placement. 'video' returns the range actually playing, as a short low-res composed clip, for timing a cut or a beat that separate frames cannot show; it is a JOB, returning a renderId to poll with get_preview, because it has to be rendered.
+Start timeline frame of the range, for several frames. Omit to start at the beginning.
 </ParamField>
 
 <ParamField body name="projectId" type="string">
 Scope to a specific project (editor/canvas). Omit for the user's most-recent-active surface anywhere. Required for render when no session is live.
 </ParamField>
 
+<ParamField body name="region" type="object">
+Render only this rectangle, in composition units (get_project's compositionSpace), to inspect detail at full resolution. Without width, it renders at native scale; rendered reports pixelsPerCompositionUnit.
+</ParamField>
+
 <ParamField body name="render" type="boolean">
-Also render your work so you can visually verify edits. Ephemeral, stored nowhere, counts against no quota, works without a live tab. render=true alone renders the current focus point as one image; add count with fromFrame/toFrame for several across a range; mode=video returns a short playable clip of that range. Use this to check your work, not export_project, which produces a file the user KEEPS. To watch a RAW source clip instead of your composition, use get_media with a video item.
+Also render your work so you can visually verify edits. Ephemeral, stored nowhere, counts against no quota, works without a live tab. render=true alone renders the current focus point as one image; add count with fromFrame/toFrame for several across a range. Frames across a range are how you judge motion, timing and pacing: the closer together they are, the finer the motion they show. Use this to check your work, not export_project, which produces a file the user KEEPS. To watch a RAW source clip instead of your composition, use get_media with a video item.
 </ParamField>
 
 <ParamField body name="slideId" type="string">
-mode='image' (canvas): the id of the slide to render. Omit to render the focused slide.
+Canvas: the id of the slide to render. Omit to render the focused slide.
 </ParamField>
 
 <ParamField body name="slideIndex" type="integer">
-mode='image' (canvas): the 1-based slide index to render (alternative to slideId).
+Canvas: the 1-based slide index to render (alternative to slideId).
 </ParamField>
 
 <ParamField body name="toFrame" type="integer">
@@ -75,16 +75,16 @@ End timeline frame of the range. Omit to run to the end.
 </ParamField>
 
 <ParamField body name="width" type="integer">
-mode='image': render at an explicit DISPLAY width in pixels, to judge legibility at the size the output will actually be seen (a course tile, a thumbnail, a feed card) rather than at full resolution, where small type always looks fine. Height follows the composition aspect ratio and is not settable. Clamped; the size produced is reported back on rendered.
+The width in pixels to render at, to check legibility at the size it will be seen (a thumbnail, a feed card). Height follows the aspect ratio. The size used is reported in rendered.
 </ParamField>
 
 ### `get_schema`
 
 <Badge>read</Badge>
 
-Get a vocabulary another call accepts, by kind. 'platform': with no platform, the platforms this account can publish to, each with its formats and whether a connected account exists; with a platform (and optionally a format), the fields, options (enums) and character limits a post requires per format. Ground a post's platformSettings against it instead of guessing the fields. 'timeline': the EDITOR timeline clip types (video, image, text, shape, audio, graphic) with their fields (each with who writes it, its range and its allowed values), the track types and what each holds, a copy-pasteable `example` clip skeleton per type, and a `creation` section documenting the CREATE ops (create_clip, insert_track, insert_prebuilt_track); read it before building any clip with update_timeline. 'layer': the CANVAS layer types (image, text, shape, video, graphic) with their fields and the shared prop groups (base, animation, template, transform, decoration, adjust), so you know what update_canvas ops can create and set. 'export': the export formats and their options per project type, so you know what export_project accepts. 'link': the grammar of app addresses and every noun and section it takes (what each opens, its tabs, what a tab's item names) plus the app's origin, so you can build a link to any item from its noun and id. 'timeline', 'layer' and 'export' require the editor:read scope.
+Get a vocabulary another call accepts, by kind. 'platform': with no platform, the platforms this account can publish to, each with its formats and whether a connected account exists; with a platform (and optionally a format), the fields, options (enums) and character limits a post requires per format. Ground a post's platformSettings against it instead of guessing the fields. 'timeline': the EDITOR timeline clip types (video, image, text, shape, audio) with their fields (each with who writes it, its range and its allowed values), the track types and what each holds, a copy-pasteable `example` clip skeleton per type, and a `creation` section documenting the CREATE ops (create_clip, insert_track, insert_prebuilt_track); read it before building any clip with update_timeline. 'layer': the CANVAS layer types (image, text, shape, video) with their fields and the shared prop groups (base, animation, template, transform, decoration, adjust), so you know what update_canvas ops can create and set. 'export': the export formats and their options per project type, so you know what export_project accepts. 'link': the grammar of app addresses and every noun and section it takes (what each opens, its tabs, what a tab's item names) plus the app's origin, so you can build a link to any item from its noun and id. 'code': the authoring guide for a code clip or code layer (a video, audio or image whose content is code): what the sandbox can import and what it cannot use, the box the code draws in, the sound it can synthesize, the brand prop names, the size limit, the workflow and examples; read it before writing or changing a clip's code. 'effect': every effect code or a video or image clip can use, by group, with what it does, where code imports it, and whether a clip can carry it; with a name, that effect's parameters with their ranges and defaults, and which of them keyframe on a clip. Read it before giving anything effects. 'timeline', 'layer', 'export', 'code' and 'effect' require the editor:read scope.
 
-<ParamField body name="kind" type="`platform` \| `timeline` \| `layer` \| `export` \| `link`" required>
+<ParamField body name="kind" type="`platform` \| `timeline` \| `layer` \| `export` \| `link` \| `code` \| `effect`" required>
 Which vocabulary to read.
 </ParamField>
 
@@ -94,6 +94,10 @@ kind 'platform' with a platform only: a format to narrow to (e.g. "reel", "short
 
 <ParamField body name="jsonSchema" type="boolean">
 kind 'timeline' or 'layer' only: also return each type's full JSON Schema. It is large; ask for it only to validate a whole item before sending it.
+</ParamField>
+
+<ParamField body name="name" type="string">
+kind 'effect' only: the effect to read in full (such as "glow"). Omit to list the effects.
 </ParamField>
 
 <ParamField body name="platform" type="`youtube` \| `instagram` \| `tiktok` \| `facebook` \| `linkedin` \| `x` \| `threads` \| `general`">

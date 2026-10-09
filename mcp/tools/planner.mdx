@@ -14,10 +14,34 @@ Every tool below is exposed by the hosted MCP server at `https://mcp.contenthero
 
 <Badge>read</Badge>
 
-List the account's SPACES. A space is the planner's top-level container: Space \> Stage \> Card \> Post. Each space has its own stages, so two spaces can both hold a stage called 'Published'. Call this FIRST to discover which board to work in, then pass a space id to list_stages, list_cards or create_card. Archived spaces are excluded unless includeArchived is set.
+List the account's SPACES. A space is the planner's top-level container: Space \> Stage \> Card \> Post. Each space has its own stages, so two spaces can both hold a stage called 'Published'. Call this FIRST to discover which board to work in, then pass a space id to list_stages, list_cards or create_card. Archived spaces are excluded unless archived is set, which lists only them.
 
-<ParamField body name="includeArchived" type="boolean">
-Include archived spaces. Default false, matching the grid in the app.
+<ParamField body name="archived" type="boolean">
+Only archived spaces. Archived spaces are excluded by default, matching the grid in the app.
+</ParamField>
+
+<ParamField body name="cursor" type="string">
+The previous page's cursor.
+</ParamField>
+
+<ParamField body name="favorited" type="boolean">
+Only favorited spaces.
+</ParamField>
+
+<ParamField body name="limit" type="integer">
+How many to return.
+</ParamField>
+
+<ParamField body name="order" type="`asc` \| `desc`">
+The sort direction.
+</ParamField>
+
+<ParamField body name="search" type="string">
+Search space names.
+</ParamField>
+
+<ParamField body name="sort" type="`updatedAt` \| `name` \| `cardCount`">
+The field to sort by.
 </ParamField>
 
 ### `get_space`
@@ -82,6 +106,14 @@ The space id to delete.
 
 List one SPACE's stages, in order. ⚠️ STAGES ARE PER-SPACE: without spaceId this is the account's DEFAULT space, and two spaces can each hold a stage named 'Published' with different ids, so a stage name resolved against the wrong space is a different column. Stages are user-customizable (renamed, reordered, added, removed), so call this to discover the real stages before placing a card; pass a stage's id (most stable), slug, or name to create_card / update_card.
 
+<ParamField body name="cursor" type="string">
+The previous page's cursor.
+</ParamField>
+
+<ParamField body name="limit" type="integer">
+How many to return.
+</ParamField>
+
 <ParamField body name="spaceId" type="string">
 Which space's stages, from list_spaces. Omit only when you mean the account's default space.
 </ParamField>
@@ -90,22 +122,26 @@ Which space's stages, from list_spaces. Omit only when you mean the account's de
 
 <Badge>write</Badge>
 
-Create a stage (a column on one board). ⚠️ STAGES ARE PER-SPACE: without spaceId this creates on the account's DEFAULT board, which is rarely what you want once more than one space exists, so call list_spaces first. The slug is DERIVED from the name and is not settable; a board cannot hold two columns whose names produce the same slug and the server refuses the second rather than renaming it for you. Place the column with afterId/beforeId, or omit both to put it at the end. Requires the planner:write scope.
+Create a stage (a column on one board). ⚠️ STAGES ARE PER-SPACE: without spaceId this creates on the account's DEFAULT board, which is rarely what you want once more than one space exists, so call list_spaces first. The slug is DERIVED from the name and is not settable; a board cannot hold two columns whose names produce the same slug and the server refuses the second rather than renaming it for you. Place the column with afterId, beforeId or position (top is the first column), or name none to put it at the end. Requires the planner:write scope.
 
 <ParamField body name="name" type="string" required>
 The column name, for example "In Review". Must contain a letter or number.
 </ParamField>
 
 <ParamField body name="afterId" type="string">
-Put the new column immediately after this stage id.
+Place it immediately after this item of the same list.
 </ParamField>
 
 <ParamField body name="beforeId" type="string">
-Put the new column immediately before this stage id.
+Place it immediately before this item of the same list.
 </ParamField>
 
 <ParamField body name="color" type="string">
 A hex color such as "#3B82F6".
+</ParamField>
+
+<ParamField body name="position" type="`top` \| `bottom`">
+Place it at an end of the list instead of beside an item. Name neighbors or a position, not both.
 </ParamField>
 
 <ParamField body name="spaceId" type="string">
@@ -116,7 +152,7 @@ Which board, from list_spaces. Omit only when you mean the account's default spa
 
 <Badge>write</Badge>
 
-Rename, recolor or move one stage. This is a PATCH: a field you omit is left alone. ⚠️ spaceId is REQUIRED, because a stage id alone does not tell the server which board you mean and guessing the wrong one silently changes nothing. Renaming re-derives the slug, so renaming a column away from 'Published' also stops publishing auto-moving cards into it; a rename that collides with another column on the same board is refused. Moving names NEIGHBORS, not a position: pass afterId or beforeId. Requires the planner:write scope.
+Rename, recolor or move one stage. This is a PATCH: a field you omit is left alone. ⚠️ spaceId is REQUIRED, because a stage id alone does not tell the server which board you mean and guessing the wrong one silently changes nothing. Renaming re-derives the slug, so renaming a column away from 'Published' also stops publishing auto-moving cards into it; a rename that collides with another column on the same board is refused. Moving names NEIGHBORS or an end, never a number: pass afterId, beforeId, or position (top is the first column). Requires the planner:write scope.
 
 <ParamField body name="spaceId" type="string" required>
 The board this stage is on, from list_stages or list_spaces.
@@ -127,11 +163,11 @@ The stage id to update, from list_stages.
 </ParamField>
 
 <ParamField body name="afterId" type="string">
-Move it immediately after this stage id. Use the empty string to move it to the far left.
+Place it immediately after this item of the same list.
 </ParamField>
 
 <ParamField body name="beforeId" type="string">
-Move it immediately before this stage id. Use the empty string to move it to the far right.
+Place it immediately before this item of the same list.
 </ParamField>
 
 <ParamField body name="color" type="string">
@@ -140,6 +176,10 @@ A new hex color such as "#3B82F6".
 
 <ParamField body name="name" type="string">
 A new name. The slug follows it automatically.
+</ParamField>
+
+<ParamField body name="position" type="`top` \| `bottom`">
+Place it at an end of the list instead of beside an item. Name neighbors or a position, not both.
 </ParamField>
 
 ### `delete_stage`
@@ -164,18 +204,26 @@ Where this column's cards should go. Required unless the column is empty.
 
 <Badge>read</Badge>
 
-List one SPACE's cards (newest-updated first). ⚠️ SCOPED, NOT COMPLETE: without spaceId this lists the account's DEFAULT space only, and cards on any other board are absent with nothing in the response saying so (search misses them too). Call list_spaces FIRST and pass spaceId unless you specifically mean the default board. Filter by status, platform, stage (id/slug/name), favorite, or a title search. Call get_card for one card's full detail (posts + assets).
+List one SPACE's cards (newest-updated first). ⚠️ SCOPED, NOT COMPLETE: without spaceId this lists the account's DEFAULT space only, and cards on any other board are absent with nothing in the response saying so (search misses them too). Call list_spaces FIRST and pass spaceId unless you specifically mean the default board. Filter by status, platform, stage (id/slug/name), favorite, tag, or a title search. Call get_card for one card's full detail (posts + assets).
 
 <ParamField body name="archived" type="boolean">
 Only ARCHIVED cards. Archived cards are excluded by default, matching the board.
 </ParamField>
 
-<ParamField body name="limit" type="integer">
-How many to return (default 50).
+<ParamField body name="cursor" type="string">
+The previous page's cursor.
 </ParamField>
 
-<ParamField body name="offset" type="integer">
-Pagination offset.
+<ParamField body name="isFavorite" type="boolean">
+Only favorited cards.
+</ParamField>
+
+<ParamField body name="limit" type="integer">
+How many to return.
+</ParamField>
+
+<ParamField body name="order" type="`asc` \| `desc`">
+The sort direction.
 </ParamField>
 
 <ParamField body name="platform" type="`youtube` \| `instagram` \| `tiktok` \| `facebook` \| `linkedin` \| `x` \| `threads` \| `general`">
@@ -186,12 +234,20 @@ Filter by the post platform.
 Case-insensitive title search, scoped to the chosen space.
 </ParamField>
 
+<ParamField body name="sort" type="`updatedAt` \| `createdAt` \| `scheduledAt` \| `title` \| `position`">
+The field to sort by.
+</ParamField>
+
 <ParamField body name="spaceId" type="string">
-Which space's board to list, from list_spaces. Omit ONLY when you mean the account's default space; omitting it does not search every board.
+Which space's board to list, from list_spaces, or 'all' for every space. Omit ONLY when you mean the account's default space; omitting it does not search every board.
 </ParamField>
 
 <ParamField body name="stage" type="string">
-Filter by a stage id, slug, or name. Resolved within the chosen space.
+Filter by a stage id, slug, or name. Resolved within the chosen space. Needed for sort position, which reads that stage's own order.
+</ParamField>
+
+<ParamField body name="tag" type="string">
+Only cards carrying this tag.
 </ParamField>
 
 ### `get_card`
@@ -218,12 +274,24 @@ Primary platform for the post.
 Post title (required).
 </ParamField>
 
+<ParamField body name="afterId" type="string">
+Place it immediately after this item of the same list.
+</ParamField>
+
+<ParamField body name="beforeId" type="string">
+Place it immediately before this item of the same list.
+</ParamField>
+
 <ParamField body name="coverOutputId" type="string">
 A media token (short id, output id or first 8 characters, optionally with "-N") for the cover, resolved to its URL. Use this or coverUrl.
 </ParamField>
 
 <ParamField body name="coverUrl" type="string">
 Public URL for the post cover (the card thumbnail).
+</ParamField>
+
+<ParamField body name="position" type="`top` \| `bottom`">
+Place it at an end of the list instead of beside an item. Name neighbors or a position, not both.
 </ParamField>
 
 <ParamField body name="spaceId" type="string">
@@ -248,8 +316,16 @@ Update a card: its fields (title, notes, platform, cover, stage), its POSTS (one
 The card id.
 </ParamField>
 
+<ParamField body name="afterId" type="string">
+Place it immediately after this item of the same list.
+</ParamField>
+
 <ParamField body name="assets" type="object[]">
 The post's assets IN ORDER, each \{ id \} to keep an existing one or ONE of \{ outputId \} | \{ assetUrl, assetType? \} | \{ contentId \} | \{ projectId \} to add. REPLACES the list; [] clears it.
+</ParamField>
+
+<ParamField body name="beforeId" type="string">
+Place it immediately before this item of the same list.
 </ParamField>
 
 <ParamField body name="cardIds" type="string[]">
@@ -272,8 +348,16 @@ REQUIRED when writing notes: the revision get_card reported for this card. A car
 Working notes on the card. Plain text or markdown; tables render here. No emojis.
 </ParamField>
 
+<ParamField body name="notesEdits" type="object[]">
+Change the notes in place without resending them. Each edit is \{ append: text \}, which adds to the end, or \{ find, replace \}, where find must match exactly one place in the current notes. Edits apply in order, all or none, to the notes as they are when the call arrives, so no expectedRevision is needed. Prefer this to notes for any change smaller than a rewrite.
+</ParamField>
+
 <ParamField body name="platform" type="`youtube` \| `instagram` \| `tiktok` \| `facebook` \| `linkedin` \| `x` \| `threads` \| `general`">
 The card's primary platform. This is a label on the card; what actually publishes is its posts.
+</ParamField>
+
+<ParamField body name="position" type="`top` \| `bottom`">
+Place it at an end of the list instead of beside an item. Name neighbors or a position, not both.
 </ParamField>
 
 <ParamField body name="posts" type="object[]">
@@ -306,7 +390,13 @@ Rename the card. Keep it short: a long title wraps and makes the column unreadab
 
 List the account's tags (the organizational tag library). Set a post's tags with the `tags` field on create_card / update_card. A tag is just a lowercase name.
 
-Takes no parameters.
+<ParamField body name="cursor" type="string">
+The previous page's cursor.
+</ParamField>
+
+<ParamField body name="limit" type="integer">
+How many to return.
+</ParamField>
 
 ### `create_tag`
 
@@ -362,7 +452,13 @@ Publish only this platform. Omit to publish all posts.
 
 List the social accounts the owner has connected (the publish targets), default first. Use an account's id as connectedAccountId on a post in update_card, then publish_post. Read-only: connecting an account is done in the ContentHero app.
 
-Takes no parameters.
+<ParamField body name="cursor" type="string">
+The previous page's cursor.
+</ParamField>
+
+<ParamField body name="limit" type="integer">
+How many to return.
+</ParamField>
 
 ### `get_connected_account`
 
