@@ -1,12 +1,12 @@
 ---
 title: "Media"
-description: "The library: browse, search, import and upload the media an account owns."
+description: "The library: browse, search, import and upload the media an account owns, and favorite, archive or share any item."
 ---
 
 {/* GENERATED FILE. Do not edit by hand. */}
 {/* Regenerate with `npm run generate:reference` in contenthero-docs. */}
 
-The library: browse, search, import and upload the media an account owns. 15 tools.
+The library: browse, search, import and upload the media an account owns, and favorite, archive or share any item. 15 tools.
 
 Every tool below is exposed by the hosted MCP server at `https://mcp.contenthero.ai` and by the `@contenthero/mcp` npm package. A <Badge>write</Badge> tool changes your account; a <Badge>read</Badge> tool does not.
 
@@ -118,28 +118,6 @@ Optional MIME override (else taken from the response).
 
 <ParamField body name="fileName" type="string">
 Optional file name (used for its extension).
-</ParamField>
-
-### `share_media`
-
-<Badge>write</Badge>
-
-A public link to media made in Studio: outputs of your finished generations, by the media ids list_media, search_media and get_folder print. One output gives its generation's link, opened at that output; a generation keeps one link, so sharing it again returns the same page. Several give a new link to them as a set, leaving out any that cannot be shared. Anyone with the link sees the media, with no sign-in. Pass shared:false to stop sharing, naming a generation by one media id or any media link as shareUrl; a stopped link never opens again, and sharing again makes a new one. An export's share page comes with get_export. Requires the studio:write scope.
-
-<ParamField body name="mediaIds" type="string[]">
-One or more media ids of outputs of your finished generations. To stop sharing, one.
-</ParamField>
-
-<ParamField body name="shareUrl" type="string">
-With shared:false, the media link to stop.
-</ParamField>
-
-<ParamField body name="shared" type="boolean">
-Default true. Pass false to stop sharing.
-</ParamField>
-
-<ParamField body name="title" type="string">
-A title for a set of two or more.
 </ParamField>
 
 ### `create_media_upload`
@@ -310,5 +288,35 @@ The asset's id, with assetType.
 
 <ParamField body name="mediaId" type="string">
 A generated output's media id. A bare id for a generation with several outputs is refused with their media ids listed.
+</ParamField>
+
+### `share`
+
+<Badge>write</Badge>
+
+Make an item's public link, or stop sharing it with shared:false. Anyone with the link sees the item with no sign-in; a stopped link never opens again, and sharing again makes a new one. For media made in Studio, pass mediaIds: outputs of your finished generations, as list_media, search_media and get_folder print them. One output gives its generation's link, opened at that output; a generation keeps one link, so sharing it again returns the same page. Several give a new link to them as a set, leaving out any that cannot be shared. To stop a media link, name a generation by one media id or any media link as shareUrl. For anything else, pass assetType + id: a project's live link shows the project as it is now, a project has one link, and get_project reports it. An export's share page comes with get_export. Requires studio:write for media and editor:write for a project.
+
+<ParamField body name="assetType" type="`project`">
+The kind of item, for anything that is not media. Pass with id.
+</ParamField>
+
+<ParamField body name="id" type="string">
+The item's id, with assetType.
+</ParamField>
+
+<ParamField body name="mediaIds" type="string[]">
+For media: one or more media ids of outputs of your finished generations. To stop sharing, one.
+</ParamField>
+
+<ParamField body name="shareUrl" type="string">
+For media, with shared:false: the media link to stop.
+</ParamField>
+
+<ParamField body name="shared" type="boolean">
+Default true. Pass false to stop sharing.
+</ParamField>
+
+<ParamField body name="title" type="string">
+For media: a title for a set of two or more.
 </ParamField>
 

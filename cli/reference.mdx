@@ -6,7 +6,7 @@ description: "Every ContentHero CLI command, its arguments and its options."
 {/* GENERATED FILE. Do not edit by hand. */}
 {/* Regenerate with `npm run generate:reference` in contenthero-docs. */}
 
-Every command the CLI exposes, grouped by resource. 119 commands.
+Every command the CLI exposes, grouped by resource. 118 commands.
 
 Run `contenthero schema get commands` to get this same information as JSON, which is the discovery path for agents.
 
@@ -781,21 +781,6 @@ Generate a video from a prompt (optionally with frames / references)
 | `--placement <json>` | placement intent as JSON, e.g. \{"mode":"atPlayhead"\} (omit to place at the playhead when known, else append) |
 | `--playhead <frame>` | current playhead frame, for playhead-relative placement |
 
-## `generation-status`
-
-### `contenthero generation-status get <id>...`
-
-Show one or more generations; blocks until they finish unless --no-wait
-
-| Argument | Required | Purpose |
-| --- | --- | --- |
-| `id` | yes | one or more outputIds from a generate / upscale command |
-
-| Option | Purpose |
-| --- | --- |
-| `--no-wait` | take an instant snapshot instead of blocking |
-| `--timeout <seconds>` | how long to block before handing back Defaults to `600`. |
-
 ## `kling-element`
 
 ### `contenthero kling-element create`
@@ -926,20 +911,6 @@ Semantically search your library (creations, uploads, stock, brand) by describin
 | `--limit <n>` | how many to return |
 | `--cursor <cursor>` | the previous page's cursor |
 | `--small-copies` | give each image its small copy, where the library keeps one: for drawing images small, never for downloading, delivering or showing large |
-
-### `contenthero media share [mediaIds]...`
-
-A public link to outputs of your finished generations: one gives its generation's link, opened at that output; several give a new link to them as a set (requires studio:write)
-
-| Argument | Required | Purpose |
-| --- | --- | --- |
-| `mediaIds` | no | one or more media ids, as these commands print them; with --off, one |
-
-| Option | Purpose |
-| --- | --- |
-| `--title <title>` | a title for a set of two or more |
-| `--off` | stop sharing: one media id, or the link with --link; a stopped link never opens again |
-| `--link <shareUrl>` | with --off, the media link to stop |
 
 ### `contenthero media upload <file>`
 
@@ -1103,7 +1074,7 @@ Export a project to a file: video, stills, documents, and for an editor project 
 
 ### `contenthero project export get <exportId>`
 
-Poll an export job by id (requires editor:read)
+Read one export by id: its file, state and details; wait for one with `contenthero status --kind export` (requires editor:read)
 
 | Argument | Required | Purpose |
 | --- | --- | --- |
@@ -1165,18 +1136,6 @@ List projects, both editor + canvas (requires editor:read)
 | `--sort <field>` | the field to sort by |
 | `--order <order>` | the sort direction |
 
-### `contenthero project share <projectId>`
-
-Make the project's public live link, or revoke it with --off; anyone with the link sees the project as it is now (requires editor:write)
-
-| Argument | Required | Purpose |
-| --- | --- | --- |
-| `projectId` | yes | the project id |
-
-| Option | Purpose |
-| --- | --- |
-| `--off` | revoke the link; a revoked link stays dead |
-
 ### `contenthero project transcript get <projectId>`
 
 Read a project's transcript mapped to its timeline clips (requires editor:read)
@@ -1220,6 +1179,18 @@ Change a project: its title, brand kit and cover, and its settings, which are th
 | `--cover <choice>` | the cover: auto (follows the composition), frame:\<n\> (a chosen frame or slide index), or media:\<id\> (a library image) |
 | `--cover-position <x,y>` | where the cover is framed, as percentages of its width and height, or none for the default framing |
 
+### `contenthero project version create <projectId>`
+
+Save the project's current state as a new version (requires editor:write)
+
+| Argument | Required | Purpose |
+| --- | --- | --- |
+| `projectId` | yes | the project id |
+
+| Option | Purpose |
+| --- | --- |
+| `--label <text>` | a name for the version |
+
 ### `contenthero project version delete <projectId> <versionId>`
 
 Remove a version (requires editor:write)
@@ -1250,18 +1221,6 @@ Put a version back into its project; the current state is saved as a version fir
 | --- | --- | --- |
 | `projectId` | yes | the project id |
 | `versionId` | yes | the version id (from `project version list`) |
-
-### `contenthero project version save <projectId>`
-
-Save the project's current state as a version (requires editor:write)
-
-| Argument | Required | Purpose |
-| --- | --- | --- |
-| `projectId` | yes | the project id |
-
-| Option | Purpose |
-| --- | --- |
-| `--label <text>` | a name for the version |
 
 ### `contenthero project version update <projectId> <versionId>`
 
@@ -1294,6 +1253,23 @@ Read a vocabulary another command accepts: commands, platform, timeline, layer, 
 | `--json-schema` | kinds timeline and layer only, with a type's --name or --detail full: also return each type's full JSON Schema (large) |
 | `--name <name>` | kind effect: the effect to read in full; omit to list the effects. kind timeline: one op or clip type to read in full, or animations for the presets; omit for the index. kind layer: one op or layer type to read in full; omit for the index. |
 | `--detail <detail>` | kinds timeline and layer only: full reads the whole schema at once (large) |
+
+## `share`
+
+### `contenthero share <assetType> [ids]...`
+
+Make an item's public link, or stop sharing it with --off; a stopped link never opens again. Media: one output gives its generation's link, several a new link to them as a set (requires studio:write). A project: its live link, which shows it as it is now (requires editor:write)
+
+| Argument | Required | Purpose |
+| --- | --- | --- |
+| `assetType` | yes | media | project |
+| `ids` | no | for media, one or more media ids as the media commands print them (with --off, one); otherwise the item id |
+
+| Option | Purpose |
+| --- | --- |
+| `--title <title>` | for media: a title for a set of two or more |
+| `--off` | stop sharing instead |
+| `--link <shareUrl>` | for media, with --off: the media link to stop |
 
 ## `space`
 
@@ -1411,6 +1387,22 @@ Rename, recolor or move a column. A PATCH: a flag you omit leaves that field alo
 | `--after <id>` | place it immediately after this item of the same list |
 | `--before <id>` | place it immediately before this item of the same list |
 | `--position <end>` | place it at an end of the list instead of beside an item |
+
+## `status`
+
+### `contenthero status <ids>...`
+
+Show where background jobs are; blocks until they finish unless --no-wait
+
+| Argument | Required | Purpose |
+| --- | --- | --- |
+| `ids` | yes | one or more job ids, each as the command that started it returned |
+
+| Option | Purpose |
+| --- | --- |
+| `--kind <kind>` | which kind of job the ids name; only for a full UUID, a transcript, or an ambiguous id |
+| `--no-wait` | take an instant snapshot instead of blocking |
+| `--timeout <seconds>` | how long to block before handing back Defaults to `600`. |
 
 ## `tag`
 

@@ -204,7 +204,7 @@ Return only the segments containing this phrase. Implies segments.
 
 <Badge>write</Badge>
 
-Analyze a tracked post, as one of two kinds. breakdown (default) runs Break It Down: why it works, from the hook and structure to visuals, audio, the call to action, and steps to recreate it. scenes prepares the post to be seen: a map of every scene with what happens and what is said in it, and a frame of each, which get_content then returns. Viewing an existing result is free; creating one spends credits, so pass getCost to see the price first. If it returns pending, call it again for the result.
+Analyze a tracked post, as one of two kinds. breakdown (default) runs Break It Down: why it works, from the hook and structure to visuals, audio, the call to action, and steps to recreate it. scenes prepares the post to be seen: a map of every scene with what happens and what is said in it, and a frame of each, which get_content then returns. Viewing an existing result is free; creating one spends credits, so pass getCost to see the price first. Either one still running returns pending: wait for it with get_status by the post's id (kind content for a breakdown, kind scenes for scenes), then call this again to read it at no charge.
 
 <ParamField body name="contentId" type="string" required>
 The content id from list_content, get_tracked_account, or a get_card inspiration asset.
