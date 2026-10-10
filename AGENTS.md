@@ -40,4 +40,4 @@ The docs describe the PUBLISHED packages, not the working tree, so the order is:
 ## Content boundaries
 
 - Do not document internal admin features, encrypted credential columns, or anything not exposed on the public `/api/v1`, MCP, or CLI surface.
-- Do not invent endpoints, parameters, or model names. If a shape is uncertain, point at `contenthero schema` or the SDK types as the authoritative contract.
+- Do not invent endpoints, parameters, or model names. If a shape is uncertain, point at `contenthero schema get` or the SDK types as the authoritative contract.

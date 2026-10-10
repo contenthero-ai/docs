@@ -1,5 +1,5 @@
 /**
- * The installed CLI's command schema: `contenthero schema commands`, the one read both the reference generator and
+ * The installed CLI's command schema: `contenthero schema get commands`, the one read both the reference generator and
  * the tool-name check make. It was two copies of the same shell call, and when the CLI's `schema` command gained a
  * required `kind` (cli 0.3.14, get_schema) both broke the same way.
  *
@@ -19,7 +19,7 @@ export function readCliSchema(repo) {
   try {
     execFileSync('sh', [
       '-c',
-      `node ${JSON.stringify(join(repo, 'node_modules/@contenthero/cli/dist/index.js'))} schema commands > ${JSON.stringify(schemaPath)}`,
+      `node ${JSON.stringify(join(repo, 'node_modules/@contenthero/cli/dist/index.js'))} schema get commands > ${JSON.stringify(schemaPath)}`,
     ])
     return JSON.parse(readFileSync(schemaPath, 'utf8'))
   } finally {

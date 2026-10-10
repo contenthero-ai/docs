@@ -112,7 +112,12 @@ const liveCommands = new Set(cliSchema.commands.map((c) => c.command))
 const TOOL_RE = /`([a-z][a-z0-9]*_[a-z0-9_]+)`/g
 /**
  * Only match `contenthero` where it is being INVOKED, which means at the start of a line
- * (optionally after a shell prompt or `npx`) or immediately after a backtick.
+ * (optionally indented, or after a shell prompt or `npx`), immediately after a backtick, or
+ * where shell runs it: inside `$(`, after `if `, or after a pipe.
+ *
+ * The indented and shell positions were added after `contenthero generation wait`, a command
+ * that does not exist, sat in the quickstart (an indented block inside a tab) and in a script
+ * example (`if contenthero ...`), both invisible to the line-start anchor.
  *
  * Anchoring matters. A looser `\bcontenthero\s+(\w+)` flagged two lines that were both
  * correct: `claude mcp add --transport http contenthero https://mcp.contenthero.ai`,
@@ -125,7 +130,7 @@ const TOOL_RE = /`([a-z][a-z0-9]*_[a-z0-9_]+)`/g
 // line swallowed the first words of the next and produced phrases that exist nowhere:
 // `contenthero avatar list` (real) was reported dead because the capture ran on into the
 // following line.
-const CLI_RE = /(?:^|`|\$ |npx )contenthero[ \t]+([a-z][a-z0-9-]*(?:[ \t]+[a-z][a-z0-9-]*){0,2})\b/gm
+const CLI_RE = /(?:^[ \t]*|`|\$ |\$\(|npx |\bif |\| )contenthero[ \t]+([a-z][a-z0-9-]*(?:[ \t]+[a-z][a-z0-9-]*){0,2})\b/gm
 
 const problems = []
 
@@ -154,7 +159,7 @@ for (const file of mdxFiles(REPO)) {
     //   3. a prefix of IT is a leaf, so the rest is arguments  `archive card` (leaf is `archive`)
     //
     // Three earlier versions each missed one of these. Matching on the first word alone
-    // let `generation wait` pass because `generation status` exists. Requiring exact
+    // let `generation wait` pass because `generation status` existed. Requiring exact
     // leaves flagged `avatar look`, a real group. Prefix-of-a-leaf alone then flagged
     // `archive card`, where `card` is a positional argument, not a subcommand.
     const words = phrase.split(' ')

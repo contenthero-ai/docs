@@ -3,6 +3,20 @@ title: "Changelog"
 description: "Updates to the ContentHero developer platform: SDK, MCP, CLI, and skills."
 ---
 
+<Update label="2026-10-10" tags={["Editor", "SDK", "MCP", "CLI"]}>
+  **One `view` tool.** `view` replaces `get_context`: it reads what the user is looking at, and it shows you your own work or lets you hear it. It is `view(input)` in the SDK (was `getContext`), `contenthero view` in the CLI (was `contenthero context`) and `GET /api/v1/view` on the API (was `/api/v1/context`), still under the `context:read` scope. New: `video` watches a range play with its sound, which an MCP, SDK or CLI caller receives as frames across the range plus the sound measured; `assetId` or `mediaUrl`, windowed by `fromSec` and `toSec`, shows a raw source clip instead of your edit; and `sound` now renders on its own.
+
+  **Breaking: a clip's frames are `view`'s.** `get_media` no longer reads a clip's frames: its items drop `fromSec`, `toSec`, `frames` and `frameWidth`, and its `region` zooms an image only (`getMediaBatch` in the SDK; `media watch` is removed from the CLI). Use `view` with `assetId` or `mediaUrl`, whose `region` on a source clip is in the clip's own pixels and cuts each of its frames.
+
+  **A clip you add lands where the editor would put it.** In `update_timeline`, a `create_clip` that leaves out its `trackId`, its `from`, or both is placed by the editor's add rule: on the track that rule chooses at its start, at the live playhead when `from` is left out, else at the end of the timeline.
+
+  **A version restores, a duplicate copies.** `restore_project_version` only restores. To make a new project from a saved version, call `duplicate_project` with `versionId` (`duplicateProject(projectId, { versionId })` in the SDK, `project duplicate <projectId> <versionId>` in the CLI). The SDK's `renameProjectVersion` is now `updateProjectVersion(projectId, versionId, { label })`, and `copyProjectVersion` is gone.
+
+  **Breaking: CLI commands renamed, with no aliases.** `context` is `view`. `project export-status` is `project export get`, and `project exports` is `project export list`. `project version rename` is `project version update --label`, and `project version copy` is `project duplicate <projectId> <versionId>`. `tag remove` is `tag delete`. `card publish` is `post publish`. `generation status` is `generation-status get`. `project transcript` is `project transcript get`. `project undo` and `project redo` are `project edit undo` and `project edit redo`. `schema <kind>` is `schema get <kind>`.
+
+  Packages: `sdk 0.4.26`, `mcp 0.4.33`, `cli 0.3.23`.
+</Update>
+
 <Update label="2026-09-27 (2)" tags={["Inspiration", "Editor", "Pipeline", "SDK", "MCP", "CLI"]}>
   **One outlier score.** A post's outlier score is its performance divided by the median of the previous 20 posts in the same format on the same account, as of publication (the 20 nearest when fewer than 5 came before). Performance is views for anything that plays and likes plus comments for images, carousels and Threads posts. The score is computed in one place for every surface, so `list_content`, `get_content` and `get_card` always agree, and a creator's typical post now scores about 1x in every format.
 

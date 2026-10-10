@@ -180,7 +180,7 @@ function renderCliPage(commands, globals) {
     '',
     `Every command the CLI exposes, grouped by resource. ${commands.length} commands.`,
     '',
-    'Run `contenthero schema commands` to get this same information as JSON, which is the discovery path for agents.',
+    'Run `contenthero schema get commands` to get this same information as JSON, which is the discovery path for agents.',
     '',
     '## Global options',
     '',

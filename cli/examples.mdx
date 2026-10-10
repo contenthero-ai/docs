@@ -52,7 +52,7 @@ contenthero card update "$CARD" \
 
 ```bash
 ID=$(contenthero generate video --prompt "..." --model kling-3.0 --no-wait | jq -r '.outputId')
-if contenthero generation wait "$ID"; then
+if contenthero generation-status get "$ID"; then
   echo "done"
 else
   echo "still rendering or failed (exit $?)"

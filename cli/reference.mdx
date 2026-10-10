@@ -6,9 +6,9 @@ description: "Every ContentHero CLI command, its arguments and its options."
 {/* GENERATED FILE. Do not edit by hand. */}
 {/* Regenerate with `npm run generate:reference` in contenthero-docs. */}
 
-Every command the CLI exposes, grouped by resource. 123 commands.
+Every command the CLI exposes, grouped by resource. 119 commands.
 
-Run `contenthero schema commands` to get this same information as JSON, which is the discovery path for agents.
+Run `contenthero schema get commands` to get this same information as JSON, which is the discovery path for agents.
 
 ## Global options
 
@@ -398,18 +398,6 @@ List one space's cards (newest-updated first; defaults to the default space)
 | `--sort <field>` | the field to sort by |
 | `--order <order>` | the sort direction |
 
-### `contenthero card publish <id>`
-
-Publish a card's posts NOW (requires publish:write; pushes to live socials)
-
-| Argument | Required | Purpose |
-| --- | --- | --- |
-| `id` | yes | the post id |
-
-| Option | Purpose |
-| --- | --- |
-| `--platform <platform>` | publish only this platform (default: every post on the card) |
-
 ### `contenthero card update <id>`
 
 Update a post's fields, including its stage and its place in its column (requires planner:write)
@@ -540,27 +528,6 @@ List tracked content, ranked by outlier score, or by relevance when you pass --s
 | `--cursor <cursor>` | the previous page's cursor |
 | `--sort <field>` | the field to sort by |
 | `--order <order>` | the sort direction |
-
-## `context`
-
-### `contenthero context`
-
-Read what the user is currently viewing in the open app (requires context:read)
-
-| Option | Purpose |
-| --- | --- |
-| `--project <id>` | scope to a specific project (editor/canvas) |
-| `--capture` | also capture a fresh screenshot of the live viewport (the user's screen; slower) |
-| `--render` | also render your work inline (images); ephemeral. Add --count with a range for several frames. Frames across a range are how you judge motion, timing and pacing: the closer together they are, the finer the motion they show. |
-| `--frame <n>` | image: which single timeline frame (omit for the current playhead) |
-| `--slide <id>` | image (canvas): which slide id (omit for the focused slide) |
-| `--slide-index <n>` | image (canvas): 1-based slide index (alternative to --slide) |
-| `--from-frame <n>` | start timeline frame of the range (several frames) |
-| `--to-frame <n>` | end timeline frame of the range |
-| `--count <n>` | how many frames across the range (omit for one at the focus point) |
-| `--width <n>` | image: the width in pixels to render at, to check legibility at the size it will be seen (a thumbnail, a feed card). Height follows the aspect ratio. The size used is reported in rendered. |
-| `--region <x,y,w,h>` | image: render only this rectangle, in composition units (get_project's compositionSpace), to inspect detail at full resolution. Without --width, it renders at native scale; rendered reports pixelsPerCompositionUnit. |
-| `--save <path>` | write the produced image(s) to this file (several frames append -1, -2, ...) |
 
 ## `element`
 
@@ -804,8 +771,9 @@ Generate a video from a prompt (optionally with frames / references)
 | `--ref-audio <urlOrId>` | reference audio (URL or output id); repeatable |
 | `--kling-element <id>` | saved Kling element id (Kling 3.0, @name in prompt); repeatable |
 | `--element <id>` | deprecated alias for --kling-element |
-| `--multi-shot` | enable multi-shot mode (e.g. WAN 2.6) |
-| `--shots <json>` | Kling 3.0 multi-shot: JSON array of \{ prompt, duration \} objects |
+| `--multi-shot` | multi-shot with the cuts planned by the model, on a model whose shots include auto (model get); to write each shot yourself, pass --shots instead |
+| `--shots <json>` | write each shot yourself, on a model whose shots include custom: JSON array of \{ prompt, duration \} objects |
+| `--input-mode <id>` | the input mode, by id from model get; omit to let the attached inputs decide |
 | `--cost` | estimate the credit cost instead of generating (nothing runs, nothing is charged) |
 | `--no-wait` | return the outputId immediately instead of waiting for the render |
 | `--timeout <seconds>` | how long to wait before handing back the outputId Defaults to `600`. |
@@ -813,9 +781,9 @@ Generate a video from a prompt (optionally with frames / references)
 | `--placement <json>` | placement intent as JSON, e.g. \{"mode":"atPlayhead"\} (omit to place at the playhead when known, else append) |
 | `--playhead <frame>` | current playhead frame, for playhead-relative placement |
 
-## `generation`
+## `generation-status`
 
-### `contenthero generation status <id>...`
+### `contenthero generation-status get <id>...`
 
 Show one or more generations; blocks until they finish unless --no-wait
 
@@ -986,25 +954,9 @@ Upload a local file as first-class media (requires library:write)
 | `--content-type <mime>` | MIME type override (else inferred from the extension) |
 | `--name <name>` | file name override (else the basename) |
 
-### `contenthero media watch <idOrUrl>`
-
-Watch a VIDEO as low-res keyframes across a time window (inspect raw footage)
-
-| Argument | Required | Purpose |
-| --- | --- | --- |
-| `idOrUrl` | yes | a studio output id (short id, full id or first 8 characters) OR a media URL on our storage |
-
-| Option | Purpose |
-| --- | --- |
-| `--from <sec>` | start of the source-time window (seconds) |
-| `--to <sec>` | end of the source-time window (seconds) |
-| `--frames <n>` | how many keyframes (default 8) |
-| `--frame-width <px>` | each keyframe's width in pixels (default 640; 160 to 1280) |
-| `--save <dir>` | write the keyframes to \<dir\> |
-
 ### `contenthero media zoom <idOrUrl> <region>`
 
-Cut a region from a media file's original and get it at its own detail (never enlarged)
+Cut a region from an image's original and get it at its own detail (never enlarged)
 
 | Argument | Required | Purpose |
 | --- | --- | --- |
@@ -1033,11 +985,25 @@ List the models available to this key (the discovery catalog)
 | --- | --- |
 | `--type <type>` | filter by content type: image, video, or audio |
 
+## `post`
+
+### `contenthero post publish <cardId>`
+
+Publish a card's posts NOW (requires publish:write; pushes to live socials)
+
+| Argument | Required | Purpose |
+| --- | --- | --- |
+| `cardId` | yes | the card whose posts to publish |
+
+| Option | Purpose |
+| --- | --- |
+| `--platform <platform>` | publish only this platform (default: every post on the card) |
+
 ## `project`
 
 ### `contenthero project apply <projectId>`
 
-Apply a batch of ops to a project composition. Ops both CREATE (create_clip, insert_track, insert_prebuilt_track, add_transition) and EDIT (move_clip, trim_clip, update_clip, delete_clip, remove_background, disable_ranges, update_transition, remove_transition, ...) and KEYFRAME ops (add_keyframe, update_keyframe, remove_keyframe, apply_combo). One-shot cleanups: remove_silence, remove_filler_words, extract_audio. Templates: insert_template places one from `template list`, branded with the project's brand kit (see `schema timeline` for shapes). Build items from the `example` skeletons in `schema timeline` / `schema layer`; run `project get` first for the current revision and pass it as --expected-revision for safe concurrent edits. Requires editor:write.
+Apply a batch of ops to a project composition. Ops both CREATE (create_clip, insert_track, insert_prebuilt_track, add_transition) and EDIT (move_clip, trim_clip, update_clip, delete_clip, remove_background, disable_ranges, update_transition, remove_transition, ...) and KEYFRAME ops (add_keyframe, update_keyframe, remove_keyframe, apply_combo). One-shot cleanups: remove_silence, remove_filler_words, extract_audio. Templates: insert_template places one from `template list`, branded with the project's brand kit (see `schema get timeline` for shapes). Build each item from its type's `example`, read with `schema get timeline --name \<type\>` or `schema get layer --name \<type\>`; run `project get` first for the current revision and pass it as --expected-revision for safe concurrent edits. Requires editor:write.
 
 | Argument | Required | Purpose |
 | --- | --- | --- |
@@ -1078,17 +1044,18 @@ PERMANENTLY delete a project, irreversible (requires editor:write)
 | --- | --- |
 | `--yes` | confirm the irreversible permanent delete |
 
-### `contenthero project duplicate <projectId>`
+### `contenthero project duplicate <projectId> [versionId]`
 
-Copy a project: the same type, size, composition and brand kit (requires editor:write)
+Copy a project: the same type, size, composition and brand kit, as it is now or from a saved version (requires editor:write)
 
 | Argument | Required | Purpose |
 | --- | --- | --- |
 | `projectId` | yes | the project id |
+| `versionId` | no | a saved version to copy from (from `project version list`); omit to copy the project as it is now |
 
-### `contenthero project export <projectId>`
+### `contenthero project edit redo <projectId>`
 
-Export a project to a file: video, stills, documents, and for an editor project its sound, subtitles and transcript (`contenthero schema export` lists every format) (requires editor:write)
+Re-apply the edit most recently undone, the editor's own redo (requires editor:write)
 
 | Argument | Required | Purpose |
 | --- | --- | --- |
@@ -1096,11 +1063,37 @@ Export a project to a file: video, stills, documents, and for an editor project 
 
 | Option | Purpose |
 | --- | --- |
-| `--format <format>` | a format `contenthero schema export` lists (default mp4) |
+| `--expected-revision <n>` | the revision you last saw; refused if the project has moved since |
+
+### `contenthero project edit undo <projectId>`
+
+Reverse the project's most recent edit, the editor's own undo (requires editor:write)
+
+| Argument | Required | Purpose |
+| --- | --- | --- |
+| `projectId` | yes | the project id |
+
+| Option | Purpose |
+| --- | --- |
+| `--expected-revision <n>` | the revision you last saw; refused if the project has moved since |
+| `--revision <n>` | a specific revision to reverse (default: the most recent edit) |
+
+### `contenthero project export <projectId>`
+
+Export a project to a file: video, stills, documents, and for an editor project its sound, subtitles and transcript (`contenthero schema get export` lists every format) (requires editor:write)
+
+| Argument | Required | Purpose |
+| --- | --- | --- |
+| `projectId` | yes | the project id |
+
+| Option | Purpose |
+| --- | --- |
+| `--format <format>` | a format `contenthero schema get export` lists (default mp4) |
 | `--resolution <res>` | output resolution for ANY format: 480p|720p|1080p|2k|4k. Defaults 720p for an editor mp4, the project native size for a still. 1080p+ is plan-gated |
 | `--quality <q>` | mp4 quality: low|recommended|high |
 | `--frame <n>` | editor still (png/jpg) only: timeline frame to render (default 0) |
 | `--no-watermark` | remove the watermark (plan-gated) |
+| `--loudness <lufs|off>` | video and sound only: this export's loudness, a target in LUFS or off, in place of the project's own (default the project's) |
 | `--max-chars-per-line <n>` | subtitles only: longest line, 20 to 80 characters (default 42) |
 | `--max-lines-per-card <n>` | subtitles only: lines per card, 1 to 4 (default 2) |
 | `--show-speakers` | subtitles only: name who speaks, when there is more than one speaker |
@@ -1108,7 +1101,7 @@ Export a project to a file: video, stills, documents, and for an editor project 
 | `--wait` | poll until the export finishes and print the URL |
 | `--timeout <ms>` | max wait when --wait (default 600000) |
 
-### `contenthero project export-status <exportId>`
+### `contenthero project export get <exportId>`
 
 Poll an export job by id (requires editor:read)
 
@@ -1116,7 +1109,7 @@ Poll an export job by id (requires editor:read)
 | --- | --- | --- |
 | `exportId` | yes | the export id |
 
-### `contenthero project exports <projectId>`
+### `contenthero project export list <projectId>`
 
 List a project's exports, newest first: finished ones with their download and share page, running ones with their status (requires editor:read)
 
@@ -1172,50 +1165,6 @@ List projects, both editor + canvas (requires editor:read)
 | `--sort <field>` | the field to sort by |
 | `--order <order>` | the sort direction |
 
-### `contenthero project redo <projectId>`
-
-Re-apply the edit most recently undone, the editor's own redo (requires editor:write)
-
-| Argument | Required | Purpose |
-| --- | --- | --- |
-| `projectId` | yes | the project id |
-
-| Option | Purpose |
-| --- | --- |
-| `--expected-revision <n>` | the revision you last saw; refused if the project has moved since |
-
-### `contenthero project settings get <projectId>`
-
-Read a video project's timeline settings (requires editor:read)
-
-| Argument | Required | Purpose |
-| --- | --- | --- |
-| `projectId` | yes | the project id |
-
-### `contenthero project settings update <projectId>`
-
-Change some timeline settings; a setting left out is left alone (requires editor:write)
-
-| Argument | Required | Purpose |
-| --- | --- | --- |
-| `projectId` | yes | the project id |
-
-| Option | Purpose |
-| --- | --- |
-| `--magnetic-track` | turn magnetic track on |
-| `--no-magnetic-track` | turn magnetic track off |
-| `--snapping` | turn snapping on |
-| `--no-snapping` | turn snapping off |
-| `--linkage` | turn linkage on |
-| `--no-linkage` | turn linkage off |
-| `--follow-playhead` | turn follow playhead on |
-| `--no-follow-playhead` | turn follow playhead off |
-| `--skimming` | turn skimming on |
-| `--no-skimming` | turn skimming off |
-| `--skip-disabled-clips` | turn skip disabled clips on |
-| `--no-skip-disabled-clips` | turn skip disabled clips off |
-| `--linked-tracks <json>` | which kinds of track a linked edit reaches, as JSON with media, audio and text booleans |
-
 ### `contenthero project share <projectId>`
 
 Make the project's public live link, or revoke it with --off; anyone with the link sees the project as it is now (requires editor:write)
@@ -1228,7 +1177,7 @@ Make the project's public live link, or revoke it with --off; anyone with the li
 | --- | --- |
 | `--off` | revoke the link; a revoked link stays dead |
 
-### `contenthero project transcript <projectId>`
+### `contenthero project transcript get <projectId>`
 
 Read a project's transcript mapped to its timeline clips (requires editor:read)
 
@@ -1246,22 +1195,9 @@ Read a project's transcript mapped to its timeline clips (requires editor:read)
 | `--padding-start <ms>` | word mode: breathing room (ms) kept after speech at a silence start edge (negative tightens) |
 | `--padding-end <ms>` | word mode: breathing room (ms) kept before speech at a silence end edge (negative tightens) |
 
-### `contenthero project undo <projectId>`
-
-Reverse the project's most recent edit, the editor's own undo (requires editor:write)
-
-| Argument | Required | Purpose |
-| --- | --- | --- |
-| `projectId` | yes | the project id |
-
-| Option | Purpose |
-| --- | --- |
-| `--expected-revision <n>` | the revision you last saw; refused if the project has moved since |
-| `--revision <n>` | a specific revision to reverse (default: the most recent edit) |
-
 ### `contenthero project update <projectId>`
 
-Change a project's own fields: rename, resize, brand kit, cover (requires editor:write)
+Change a project: its title, brand kit and cover, and its settings, which are the project's and shared by everyone who edits it: canvas size, and a video project's frame rate, loudness and editing settings (requires editor:write)
 
 | Argument | Required | Purpose |
 | --- | --- | --- |
@@ -1270,21 +1206,19 @@ Change a project's own fields: rename, resize, brand kit, cover (requires editor
 | Option | Purpose |
 | --- | --- |
 | `--title <text>` | a new title |
-| `--orientation <ratio>` | a new aspect ratio |
-| `--width <n>` | a new pixel width |
-| `--height <n>` | a new pixel height |
+| `--orientation <ratio>` | an aspect from the editor's list, or custom; alone, it sets the size the editor gives that aspect |
+| `--width <n>` | a pixel width, given with --height |
+| `--height <n>` | a pixel height, given with --width |
+| `--fps <n>` | a video project's frame rate; every frame number converts with it, so clips keep their timing |
+| `--loudness <lufs|off>` | a video project's delivery loudness, a target in LUFS or off; every export follows it |
+| `--magnetic-track` | turn a video project's magnetic main track on; it closes the main track's gaps |
+| `--no-magnetic-track` | turn a video project's magnetic main track off |
+| `--linkage` | turn a video project's linkage on: other tracks follow the main track's ripple and delete |
+| `--no-linkage` | turn a video project's linkage off |
+| `--linked-tracks <json>` | which kinds of track linkage reaches, as JSON with media, audio and text booleans; a kind left out is left alone |
 | `--brand-kit <id>` | the brand kit to associate, or none to clear it |
 | `--cover <choice>` | the cover: auto (follows the composition), frame:\<n\> (a chosen frame or slide index), or media:\<id\> (a library image) |
 | `--cover-position <x,y>` | where the cover is framed, as percentages of its width and height, or none for the default framing |
-
-### `contenthero project version copy <projectId> <versionId>`
-
-Make a new project from a version (requires editor:write)
-
-| Argument | Required | Purpose |
-| --- | --- | --- |
-| `projectId` | yes | the project id |
-| `versionId` | yes | the version id (from `project version list`) |
 
 ### `contenthero project version delete <projectId> <versionId>`
 
@@ -1308,19 +1242,9 @@ List a project's saved versions, newest first (requires editor:read)
 | `--limit <n>` | how many to return |
 | `--cursor <cursor>` | the previous page's cursor |
 
-### `contenthero project version rename <projectId> <versionId> <label>`
-
-Name a version; an empty label clears its name (requires editor:write)
-
-| Argument | Required | Purpose |
-| --- | --- | --- |
-| `projectId` | yes | the project id |
-| `versionId` | yes | the version id (from `project version list`) |
-| `label` | yes | the new name |
-
 ### `contenthero project version restore <projectId> <versionId>`
 
-Put a version back into its project; the current state is saved as a version first (requires editor:write)
+Put a version back into its project; the current state is saved as a version first. To make a new project from a version, use `project duplicate \<projectId\> \<versionId\>` (requires editor:write)
 
 | Argument | Required | Purpose |
 | --- | --- | --- |
@@ -1339,9 +1263,22 @@ Save the project's current state as a version (requires editor:write)
 | --- | --- |
 | `--label <text>` | a name for the version |
 
+### `contenthero project version update <projectId> <versionId>`
+
+Name a version; an empty label clears its name (requires editor:write)
+
+| Argument | Required | Purpose |
+| --- | --- | --- |
+| `projectId` | yes | the project id |
+| `versionId` | yes | the version id (from `project version list`) |
+
+| Option | Purpose |
+| --- | --- |
+| `--label <label>` | the new name; empty clears it |
+
 ## `schema`
 
-### `contenthero schema <kind> [command]...`
+### `contenthero schema get <kind> [command]...`
 
 Read a vocabulary another command accepts: commands, platform, timeline, layer, export, link, code or effect
 
@@ -1354,8 +1291,9 @@ Read a vocabulary another command accepts: commands, platform, timeline, layer, 
 | --- | --- |
 | `--platform <platform>` | kind platform only: the platform to read; omit to list every platform |
 | `--format <format>` | kind platform with --platform only: narrow to one format (e.g. reel, short, story) |
-| `--json-schema` | kinds timeline and layer only: also return each type's full JSON Schema (large) |
-| `--name <name>` | kind effect only: the effect to read in full. Omit to list the effects. |
+| `--json-schema` | kinds timeline and layer only, with a type's --name or --detail full: also return each type's full JSON Schema (large) |
+| `--name <name>` | kind effect: the effect to read in full; omit to list the effects. kind timeline: one op or clip type to read in full, or animations for the presets; omit for the index. kind layer: one op or layer type to read in full; omit for the index. |
+| `--detail <detail>` | kinds timeline and layer only: full reads the whole schema at once (large) |
 
 ## `space`
 
@@ -1484,6 +1422,14 @@ Create a tag (the name is lowercased) (requires planner:write)
 | --- | --- | --- |
 | `name` | yes | the tag name |
 
+### `contenthero tag delete <id>`
+
+Delete a tag from the account, removing it from every post (requires planner:write)
+
+| Argument | Required | Purpose |
+| --- | --- | --- |
+| `id` | yes | the tag id (from `tag list`) |
+
 ### `contenthero tag list`
 
 List the account's tags
@@ -1492,14 +1438,6 @@ List the account's tags
 | --- | --- |
 | `--limit <n>` | how many to return |
 | `--cursor <cursor>` | the previous page's cursor |
-
-### `contenthero tag remove <id>`
-
-Delete a tag from the account, removing it from every post (requires planner:write)
-
-| Argument | Required | Purpose |
-| --- | --- | --- |
-| `id` | yes | the tag id (from `tag list`) |
 
 ### `contenthero tag update <id> <name>`
 
@@ -1529,7 +1467,7 @@ Save a template of your own: from a placed code clip, code layer or shape, as a 
 | `--lottie <url>` | a Lottie file of ours |
 | `--recolor <hex=prop>` | a color in the Lottie file that a prop recolors; repeatable |
 | `--emoji <name>` | an animated emoji's name, as the animated emoji list names it |
-| `--shape <name>` | a shape's name, as `schema layer` lists them |
+| `--shape <name>` | a shape's name, as `schema get layer --name shape` lists them |
 | `--props <json>` | its props as placed, as a JSON object |
 | `--props-schema <json>` | each prop's control, as a JSON object (as `template get --json` shows them) |
 | `--duration-frames <n>` | how long it lasts when placed, in frames |
@@ -1591,7 +1529,7 @@ Change one of your own templates, or move it among them: only the flags given
 | `--lottie <url>` | a Lottie file of ours |
 | `--recolor <hex=prop>` | a color in the Lottie file that a prop recolors; repeatable |
 | `--emoji <name>` | an animated emoji's name, as the animated emoji list names it |
-| `--shape <name>` | a shape's name, as `schema layer` lists them |
+| `--shape <name>` | a shape's name, as `schema get layer --name shape` lists them |
 | `--props <json>` | its props as placed, as a JSON object |
 | `--props-schema <json>` | each prop's control, as a JSON object (as `template get --json` shows them) |
 | `--duration-frames <n>` | how long it lasts when placed, in frames |
@@ -1672,6 +1610,39 @@ Upscale an existing image or video to a higher resolution
 | `--cost` | estimate the credit cost instead of upscaling |
 | `--no-wait` | return the outputId immediately instead of waiting |
 | `--timeout <seconds>` | how long to wait before handing back the outputId Defaults to `600`. |
+
+## `view`
+
+### `contenthero view`
+
+See what the user is looking at, and see or hear your own work (requires context:read)
+
+| Option | Purpose |
+| --- | --- |
+| `--project <id>` | scope to a specific project (editor/canvas) |
+| `--capture` | also capture a fresh screenshot of the live viewport (the user's screen; slower) |
+| `--render` | also render your work (images); ephemeral. Name several frames with --frames, --per-second or --count. Frames across a range are how you judge motion, timing and pacing: the closer together they are, the finer the motion they show. |
+| `--frame <n>` | image: which single timeline frame (omit for the current playhead) |
+| `--slide <id>` | image (canvas): which slide id (omit for the focused slide) |
+| `--slide-index <n>` | image (canvas): 1-based slide index (alternative to --slide) |
+| `--frames <list>` | image (editor): exactly these timeline frames, in this order, separated by commas |
+| `--from-frame <n>` | start timeline frame of the range (several frames, sound or video) |
+| `--to-frame <n>` | end timeline frame of the range |
+| `--count <n>` | how many frames to spread evenly across the range, or across a clip's window (omit for one at the focus point) |
+| `--per-second <n>` | how many frames to take per second of the range, up to every frame |
+| `--layout <layout>` | 'frames' returns each frame as its own image; 'sheets' tiles them into contact sheets, each frame numbered under its tile (omit to choose by how many fit one response) |
+| `--sound` | render the range's sound instead of its picture, mixed as an export mixes it, and measure it |
+| `--video` | watch the range play with its sound, to judge motion, timing, transitions and pacing; a terminal cannot take video, so it returns frames across the range and the sound measured. Takes --from-frame and --to-frame, or a clip's window |
+| `--render-id <id>` | read a render already started, by the renderId it returned |
+| `--page <n>` | which page of the render to read, starting at 1 |
+| `--wait <seconds>` | how long to wait for results before answering; what is not ready is read later with --render-id |
+| `--width <n>` | image: the width in pixels to render at, or of a clip's frames, to check legibility at the size it will be seen. Height follows the aspect ratio. The size used is reported with the result. |
+| `--region <x,y,w,h>` | image: render only this rectangle, in composition units (get_project's compositionSpace), to inspect detail at full resolution. Without --width, it renders at native scale; rendered reports pixelsPerCompositionUnit. For a source clip, the rectangle is in the clip's own pixels, and each of its frames is cut to it. |
+| `--asset <id>` | a raw source clip to see, by its asset id, rather than your edit (or --media-url) |
+| `--media-url <url>` | a raw source clip to see, by its media URL, rather than your edit (or --asset) |
+| `--from-sec <n>` | start of the clip's window, in its own seconds (omit to start at its beginning) |
+| `--to-sec <n>` | end of the clip's window, in its own seconds (omit to run to its end) |
+| `--save <path>` | write the produced image(s), a render's or a clip's keyframes, to this file (several append -1, -2, ...) |
 
 ## `voice`
 

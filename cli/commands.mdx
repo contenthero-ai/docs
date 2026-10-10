@@ -3,17 +3,17 @@ title: "Commands"
 description: "The ContentHero CLI command tree, organized by resource."
 ---
 
-Commands follow `contenthero <noun> <verb>`. Run `contenthero --help` for the live tree, `contenthero <command> --help` for one command's flags, and `contenthero schema` to dump the input schema of every command.
+Commands follow `contenthero <noun> <verb>`. Run `contenthero --help` for the live tree, `contenthero <command> --help` for one command's flags, and `contenthero schema get commands` to dump the input schema of every command.
 
 ## Discover
 
 ```bash
 contenthero --help                 # the full command tree
 contenthero generate image --help  # one command's flags
-contenthero schema                 # JSON Schema of every command's inputs
+contenthero schema get commands    # JSON Schema of every command's inputs
 ```
 
-`contenthero schema` is the discovery tool for agents: it returns the argument shape of every command without reading the docs.
+`contenthero schema get commands` is the discovery tool for agents: it returns the argument shape of every command without reading the docs.
 
 ## Generate
 
@@ -32,8 +32,8 @@ contenthero model list         # the live roster
 ## Generations
 
 ```bash
-contenthero generation status <outputId>              # blocks until done
-contenthero generation status <outputId> --no-wait    # snapshot
+contenthero generation-status get <outputId>            # blocks until done
+contenthero generation-status get <outputId> --no-wait  # snapshot
 ```
 
 ## Cards (pipeline)
@@ -48,7 +48,7 @@ contenthero card update <cardId> --stage <id|slug|name>
 contenthero card update <cardId> --posts '[{"platform":"instagram","format":"reel","connectedAccountId":"..."}]'
 contenthero card update <cardId> --assets '[{"assetUrl":"<mediaUrl>"}]'
 contenthero card update <cardId> --schedule <iso8601>
-contenthero card publish <cardId>
+contenthero post publish <cardId>
 contenthero archive card <cardId>
 ```
 
@@ -120,5 +120,5 @@ contenthero auth status
 ```
 
 <Note>
-This tree reflects the surface at the time of writing. The live source of truth is `contenthero --help` and `contenthero schema`, which always match your installed version.
+This tree reflects the surface at the time of writing. The live source of truth is `contenthero --help` and `contenthero schema get commands`, which always match your installed version.
 </Note>

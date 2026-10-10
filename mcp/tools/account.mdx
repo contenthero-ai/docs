@@ -1,12 +1,12 @@
 ---
 title: "Account"
-description: "Your ContentHero account (balance, spend cap, plan), the platforms available to publish to, and what the user is looking at."
+description: "Your ContentHero account (balance, spend cap, plan), the platforms available to publish to, what the user is looking at, and your own work seen or heard."
 ---
 
 {/* GENERATED FILE. Do not edit by hand. */}
 {/* Regenerate with `npm run generate:reference` in contenthero-docs. */}
 
-Your ContentHero account (balance, spend cap, plan), the platforms available to publish to, and what the user is looking at. 4 tools.
+Your ContentHero account (balance, spend cap, plan), the platforms available to publish to, what the user is looking at, and your own work seen or heard. 4 tools.
 
 Every tool below is exposed by the hosted MCP server at `https://mcp.contenthero.ai` and by the `@contenthero/mcp` npm package. A <Badge>write</Badge> tool changes your account; a <Badge>read</Badge> tool does not.
 
@@ -28,38 +28,70 @@ Update your ContentHero account. Only the fields you pass change. spendCap sets 
 The monthly spend cap in credits, or null for no cap.
 </ParamField>
 
-### `get_context`
+### `view`
 
 <Badge>read</Badge>
 
-Read the live context of what the user is currently viewing in the open app: the active surface, the focused element, the playhead, and the current selection, so you act on what the user is looking at rather than guessing. Read this first. It is fast, structured, and does not disturb the live page, and structured context alone is enough whenever the task does not depend on the exact pixels; it returns no image by default. Acquire vision only when the task genuinely requires seeing, and pick the path by what you need to see. Set render=true to see the composed output itself: the actual rendered editor frame or canvas slide, reconstructed from saved data, so you can visually verify your own edits while iterating. Pass frame (editor) or slideId/slideIndex (canvas) to inspect a specific point, or render=true alone for the point the user is viewing. The render returns inline as an image, is ephemeral, leaves nothing in the user's storage, and does not need a live tab. Set capture=true instead only when you need the user's actual screen as shown right now, including transient interface state and unsaved edits; capturing renders the current screen on demand, so its latency and brief page interruption grow with how visually heavy that screen is. Do not use export_project to check your work: exports are permanent deliverables that count against the user's storage; use render for previews. Returns the most-recent-active session and the live participant set, or nothing when no one is viewing (render still works with an explicit projectId). Optionally scope to one project. Requires the context:read scope.
+See what the user is looking at, and see or hear your own work. With no render input it returns the live context of the open app: the active surface, the focused element, the playhead and the selection, from the most recently active session, with the live participants. It is fast and does not disturb the page. Set capture to also get a picture of the user's screen as shown now, including unsaved and transient state; capturing takes a moment and briefly interrupts the page. To see your work as it will play, rendered from the saved project: render shows one composed frame or slide, the one in focus unless frame, slideId or slideIndex names another; for an editor timeline, frames, perSecond over a range, or count over a range name several frames, which come back one by one when they fit one result and otherwise as contact sheets with each frame's number under its tile, in pages. sound renders a range of the mix as an export mixes it and measures it (integrated loudness, true peak, loudness range, sample peak, where sounds start, stereo width, band balance), with a waveform and spectrogram picture and a link to the audio. video watches a range play with its sound; where video cannot be received, as here, it returns frames across the range and the sound measured. To see a raw source clip rather than your edit, name it with assetId or mediaUrl and window it with fromSec and toSec. A render is a job: what finishes within the call comes back with a renderId, and the rest is read by calling again with renderId and page. Renders are ephemeral, count against nothing and need no live tab, only a projectId when no one is viewing. Check your work here, never with export_project, which makes a file the user keeps. Requires the context:read scope.
+
+<ParamField body name="assetId" type="string">
+A raw source clip to see, by its asset id, rather than your edit. Or pass mediaUrl.
+</ParamField>
 
 <ParamField body name="capture" type="boolean">
-Also return a screenshot of the user's live viewport (their SCREEN), captured at read time. Default false returns structured context only. Request it only when the task depends on seeing the live, as-shown state including unsaved UI. To see the composed OUTPUT rather than the screen, use render instead.
+Also return a picture of the user's screen as shown now, including unsaved and transient state. Use it only when the task depends on what the screen shows; to see your work, render it instead.
 </ParamField>
 
 <ParamField body name="count" type="integer">
-How many frames to return across the range. Omit for one frame at the focus point, or a proportional default when a range is given.
+How many frames to spread evenly across the range, or across a clip's window. Omit for one frame at the focus point, or about one a second of a range.
 </ParamField>
 
 <ParamField body name="frame" type="integer">
 Editor: which single timeline frame to render. Omit to render the current playhead frame.
 </ParamField>
 
+<ParamField body name="frames" type="integer[]">
+Editor: exactly these timeline frames, in this order.
+</ParamField>
+
 <ParamField body name="fromFrame" type="integer">
-Start timeline frame of the range, for several frames. Omit to start at the beginning.
+Start timeline frame of the range, for several frames, sound or video. Omit to start at the beginning.
+</ParamField>
+
+<ParamField body name="fromSec" type="number">
+Start of the clip's window, in its own seconds. Omit to start at its beginning.
+</ParamField>
+
+<ParamField body name="layout" type="`frames` \| `sheets`">
+'frames' returns each frame as its own image; 'sheets' tiles them into contact sheets, each frame numbered under its tile. Omit to choose by how many fit one result.
+</ParamField>
+
+<ParamField body name="mediaUrl" type="string">
+A raw source clip to see, by its media URL, rather than your edit. Or pass assetId.
+</ParamField>
+
+<ParamField body name="page" type="integer">
+Which page of the render to read, starting at 1.
+</ParamField>
+
+<ParamField body name="perSecond" type="number">
+How many frames to take per second of the range, up to every frame.
 </ParamField>
 
 <ParamField body name="projectId" type="string">
-Scope to a specific project (editor/canvas). Omit for the user's most-recent-active surface anywhere. Required for render when no session is live.
+The project to view or render. Omit for the surface the user is on now. Needed to render when no one is viewing.
 </ParamField>
 
 <ParamField body name="region" type="object">
-Render only this rectangle, in composition units (get_project's compositionSpace), to inspect detail at full resolution. Without width, it renders at native scale; rendered reports pixelsPerCompositionUnit.
+Render only this rectangle, in composition units (get_project's compositionSpace), to inspect detail at full resolution. Without width, it renders at native scale; rendered reports pixelsPerCompositionUnit. For a source clip, the rectangle is in the clip's own pixels, and each of its frames is cut to it.
 </ParamField>
 
 <ParamField body name="render" type="boolean">
-Also render your work so you can visually verify edits. Ephemeral, stored nowhere, counts against no quota, works without a live tab. render=true alone renders the current focus point as one image; add count with fromFrame/toFrame for several across a range. Frames across a range are how you judge motion, timing and pacing: the closer together they are, the finer the motion they show. Use this to check your work, not export_project, which produces a file the user KEEPS. To watch a RAW source clip instead of your composition, use get_media with a video item.
+Render your work from the saved project: one composed frame or slide, the one in focus unless frame, slideId or slideIndex names another, or the frames that frames, count or perSecond name. Frames across a range show motion, timing and pacing, finer the closer together they are.
+</ParamField>
+
+<ParamField body name="renderId" type="string">
+Read a render already started, by the renderId it returned. Pass only page with it.
 </ParamField>
 
 <ParamField body name="slideId" type="string">
@@ -70,22 +102,38 @@ Canvas: the id of the slide to render. Omit to render the focused slide.
 Canvas: the 1-based slide index to render (alternative to slideId).
 </ParamField>
 
+<ParamField body name="sound" type="boolean">
+Render the range's sound instead of its picture, mixed as an export mixes it, and measure it. Takes fromFrame and toFrame only.
+</ParamField>
+
 <ParamField body name="toFrame" type="integer">
 End timeline frame of the range. Omit to run to the end.
 </ParamField>
 
+<ParamField body name="toSec" type="number">
+End of the clip's window, in its own seconds. Omit to run to its end.
+</ParamField>
+
+<ParamField body name="video" type="boolean">
+Watch the range play with its sound, to judge motion, timing, transitions and pacing. Where video cannot be received, as here, it returns frames across the range and the sound measured. Takes fromFrame and toFrame, or a clip's window.
+</ParamField>
+
 <ParamField body name="width" type="integer">
-The width in pixels to render at, to check legibility at the size it will be seen (a thumbnail, a feed card). Height follows the aspect ratio. The size used is reported in rendered.
+The width in pixels to render at, or of a clip's frames, to check legibility at the size it will be seen. Height follows the aspect ratio. The size used is reported with the result.
 </ParamField>
 
 ### `get_schema`
 
 <Badge>read</Badge>
 
-Get a vocabulary another call accepts, by kind. 'platform': with no platform, the platforms this account can publish to, each with its formats and whether a connected account exists; with a platform (and optionally a format), the fields, options (enums) and character limits a post requires per format. Ground a post's platformSettings against it instead of guessing the fields. 'timeline': the EDITOR timeline clip types (video, image, text, shape, audio) with their fields (each with who writes it, its range and its allowed values), the track types and what each holds, a copy-pasteable `example` clip skeleton per type, and a `creation` section documenting the CREATE ops (create_clip, insert_track, insert_prebuilt_track); read it before building any clip with update_timeline. 'layer': the CANVAS layer types (image, text, shape, video) with their fields and the shared prop groups (base, animation, template, transform, decoration, adjust), so you know what update_canvas ops can create and set. 'export': the export formats and their options per project type, so you know what export_project accepts. 'link': the grammar of app addresses and every noun and section it takes (what each opens, its tabs, what a tab's item names) plus the app's origin, so you can build a link to any item from its noun and id. 'code': the authoring guide for a code clip or code layer (a video, audio or image whose content is code): what the sandbox can import and what it cannot use, the box the code draws in, the sound it can synthesize, the brand prop names, the size limit, the workflow and examples; read it before writing or changing a clip's code. 'effect': every effect code or a video or image clip can use, by group, with what it does, where code imports it, and whether a clip can carry it; with a name, that effect's parameters with their ranges and defaults, and which of them keyframe on a clip. Read it before giving anything effects. 'timeline', 'layer', 'export', 'code' and 'effect' require the editor:read scope.
+Get a vocabulary another call accepts, by kind. 'platform': with no platform, the platforms this account can publish to, each with its formats and whether a connected account exists; with a platform (and optionally a format), the fields, options (enums) and character limits a post requires per format. Ground a post's platformSettings against it instead of guessing the fields. 'timeline': the EDITOR timeline schema, in two steps. Without a name, its index: every update_timeline op with its shape, every clip and track type, and the rules every op follows. With a name, that one entry in full: an op with its rules, or a clip type with its fields (each with who writes it, its range and its allowed values), the shared field groups it has and a copy-pasteable `example` clip; the name 'animations' reads the presets add_animation, add_transition and apply_combo take. detail 'full' reads the whole schema at once. Read the index, then the entries you need, before building any clip with update_timeline. 'layer': the CANVAS schema, in the same two steps. Without a name, its index: every update_canvas op with its shape, every layer type, and the rules every op follows. With a name, that one entry in full: an op with its rules, or a layer type with its fields and the shared field groups it has. detail 'full' reads the whole schema at once. Read the index, then the entries you need, before building any layer with update_canvas. 'export': the export formats and their options per project type, so you know what export_project accepts. 'link': the grammar of app addresses and every noun and section it takes (what each opens, its tabs, what a tab's item names) plus the app's origin, so you can build a link to any item from its noun and id. 'code': the authoring guide for a code clip or code layer (a video, audio or image whose content is code): what the sandbox can import and what it cannot use, the box the code draws in, the sound it can synthesize, the brand prop names, the size limit, the workflow and examples; read it before writing or changing a clip's code. 'effect': every effect code or a video or image clip can use, by group, with what it does, where code imports it, and whether a clip can carry it; with a name, that effect's parameters with their ranges and defaults, and which of them keyframe on a clip. Read it before giving anything effects. 'timeline', 'layer', 'export', 'code' and 'effect' require the editor:read scope.
 
 <ParamField body name="kind" type="`platform` \| `timeline` \| `layer` \| `export` \| `link` \| `code` \| `effect`" required>
 Which vocabulary to read.
+</ParamField>
+
+<ParamField body name="detail" type="`full`">
+kinds 'timeline' and 'layer' only: 'full' reads the whole schema at once. It is large; read the index and the entries you need instead unless you need everything.
 </ParamField>
 
 <ParamField body name="format" type="string">
@@ -93,11 +141,11 @@ kind 'platform' with a platform only: a format to narrow to (e.g. "reel", "short
 </ParamField>
 
 <ParamField body name="jsonSchema" type="boolean">
-kind 'timeline' or 'layer' only: also return each type's full JSON Schema. It is large; ask for it only to validate a whole item before sending it.
+kinds 'timeline' and 'layer' only, with a type's name or detail 'full': also return each type's full JSON Schema. It is large; ask for it only to validate a whole item before sending it.
 </ParamField>
 
 <ParamField body name="name" type="string">
-kind 'effect' only: the effect to read in full (such as "glow"). Omit to list the effects.
+kind 'effect': the effect to read in full (such as "glow"); omit to list the effects. kind 'timeline': one op or clip type to read in full, or 'animations' for the presets; omit for the index. kind 'layer': one op or layer type to read in full; omit for the index.
 </ParamField>
 
 <ParamField body name="platform" type="`youtube` \| `instagram` \| `tiktok` \| `facebook` \| `linkedin` \| `x` \| `threads` \| `general`">

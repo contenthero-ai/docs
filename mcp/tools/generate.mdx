@@ -94,6 +94,10 @@ Last frame: an image URL or a previous output id.
 Return the credit cost estimate instead of generating (nothing runs, nothing is charged).
 </ParamField>
 
+<ParamField body name="inputMode" type="string">
+The input mode, by id from get_model. Omit to let the attached inputs decide.
+</ParamField>
+
 <ParamField body name="keepInputLength" type="boolean">
 Video edit only, on models that offer it: keep the input video's full length instead of a set duration. Charged for that length.
 </ParamField>
@@ -103,7 +107,7 @@ Kling elements: each is a saved Kling element (\{ klingElementId \}) or an inlin
 </ParamField>
 
 <ParamField body name="multiShot" type="boolean">
-Enable multi-shot mode (one longer sequence of several shots) on a model that offers it; get_model says which do. On a model that takes per-shot prompts, pass `shots` instead, which turns multi-shot on.
+Multi-shot with the cuts planned by the model, on a model whose shots include auto (get_model). To write each shot yourself, pass shots instead.
 </ParamField>
 
 <ParamField body name="negativePrompt" type="string">
