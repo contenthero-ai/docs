@@ -97,11 +97,11 @@ If the render outlasts the smart-wait, you get an `outputId`. Poll it.
 
 <Tabs>
   <Tab title="MCP">
-    Call `get_generation_status` with the `outputId`. It blocks until the render finishes by default; pass `wait: false` for an instant snapshot.
+    Call `get_status` with the `outputId` in `ids`. It blocks until the render finishes by default; pass `wait: false` for an instant snapshot.
   </Tab>
   <Tab title="CLI">
     ```bash
-    contenthero generation-status get <outputId>
+    contenthero status <outputId>
     ```
   </Tab>
 </Tabs>
