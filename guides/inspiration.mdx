@@ -20,9 +20,9 @@ They mean opposite things, which is why the distinction is worth keeping straigh
 | Posts, ranked by outlier score | `list_content` |
 | One post in full: transcript, analysis, scenes | `get_content` |
 | A post's Break It Down, or its scenes | `analyze_content` (`kind: "breakdown"` or `"scenes"`) |
-| A post's video, downloaded into its shared analysis copy | `import` with `contentId` |
+| A post's video, downloaded into its shared analysis copy, with its cut list | `analyze_content` (`kind: "video"`) |
 
-Reads need no scope; moving a tracked account within its list needs `inspiration:write`. Importing a post's video needs `studio:generate`: it downloads into the post's shared analysis copy, which the reading tools use, and nothing lands in your library. It spends credits unless that copy already exists or is being made, in which case it is free; pass `getCost` to see the spend first. While the copy is still downloading, call `import` again with the same `contentId` to follow it, at no charge. Full parameters are in the [inspiration tool reference](/mcp/tools/inspiration).
+Reads need no scope; moving a tracked account within its list needs `inspiration:write`. `analyze_content` needs `studio:generate`. With `kind: "video"` it downloads the post's video into its shared analysis copy, which the reading tools use; nothing lands in your library or counts against your storage, and once stored it answers with the post's cut list (where the video changes scene), free. It is charged for what the download moved, and is free when that copy already exists or is being made; pass `getCost` to see the spend first. While the copy is still downloading, call `analyze_content` again with the same `contentId` and `kind: "video"` to follow it, at no charge. A post's video is not an import: `import` always brings something into your own library or a new project. Full parameters are in the [inspiration tool reference](/mcp/tools/inspiration).
 
 ## What an outlier score is
 

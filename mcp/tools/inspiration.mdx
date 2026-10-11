@@ -204,17 +204,17 @@ Return only the segments containing this phrase. Implies segments.
 
 <Badge>write</Badge>
 
-Analyze a tracked post, as one of two kinds. breakdown (default) runs Break It Down: why it works, from the hook and structure to visuals, audio, the call to action, and steps to recreate it. scenes prepares the post to be seen: a map of every scene with what happens and what is said in it, and a frame of each, which get_content then returns. Viewing an existing result is free; creating one spends credits, so pass getCost to see the price first. Either one still running returns pending: wait for it with get_status by the post's id (kind content for a breakdown, kind scenes for scenes), then call this again to read it at no charge.
+Work on a tracked post, for analysis, as one of three kinds. breakdown (default) runs Break It Down: why it works, from the hook and structure to visuals, audio, the call to action, and steps to recreate it. scenes prepares the post to be seen: a map of every scene with what happens and what is said in it, and a frame of each, which get_content then returns. video downloads the post's video into its shared analysis copy, which the reading tools use; nothing lands in your library or counts against your storage, and once stored it answers with the cut list, where the video changes scene, free. Viewing an existing result is free; creating one spends credits (video is charged for what its download moved, holding the most it may move first), so pass getCost to see the price first. A breakdown or scenes still running returns pending: wait for it with get_status by the post's id (kind content for a breakdown, kind scenes for scenes), then call this again to read it at no charge. A video still downloading returns pending: call this again with the same kind to follow it, which is free.
 
 <ParamField body name="contentId" type="string" required>
 The content id from list_content, get_tracked_account, or a get_card inspiration asset.
 </ParamField>
 
 <ParamField body name="getCost" type="boolean">
-Return the credit cost instead of analyzing (nothing runs, nothing is charged). 0 when the result already exists.
+Return the credit cost instead of analyzing (nothing runs, nothing is charged). 0 when the result already exists, or for video when its copy is being made.
 </ParamField>
 
-<ParamField body name="kind" type="`breakdown` \| `scenes`">
-breakdown (default): the Break It Down analysis. scenes: the scene map and a frame of each scene, priced per minute of video.
+<ParamField body name="kind" type="`breakdown` \| `scenes` \| `video`">
+breakdown (default): the Break It Down analysis. scenes: the scene map and a frame of each scene, priced per minute of video. video: the post's video in its shared analysis copy, with its cut list once stored, charged for what the download moved.
 </ParamField>
 

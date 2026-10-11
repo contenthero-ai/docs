@@ -468,7 +468,7 @@ List connected accounts (default first)
 
 ### `contenthero content analyze <id>`
 
-Analyze a tracked post: Break It Down, or its scenes with --kind scenes. Free when the result exists, otherwise it spends credits (see --cost)
+Analyze a tracked post: Break It Down, its scenes with --kind scenes, or its video with --kind video (downloaded into the post's shared analysis copy with its cut list, never your library). Free when the result exists, otherwise it spends credits (see --cost)
 
 | Argument | Required | Purpose |
 | --- | --- | --- |
@@ -476,7 +476,7 @@ Analyze a tracked post: Break It Down, or its scenes with --kind scenes. Free wh
 
 | Option | Purpose |
 | --- | --- |
-| `--kind <kind>` | breakdown (default) or scenes (the scene map and a frame of each scene, priced per minute of video) |
+| `--kind <kind>` | breakdown (default), scenes (the scene map and a frame of each scene, priced per minute of video), or video (the post's video in its shared analysis copy, with its cut list once stored, charged for what the download moved) |
 | `--cost` | show the credit cost instead of analyzing (nothing runs, nothing is charged) |
 | `--no-wait` | return at once instead of waiting for a running analysis |
 | `--timeout <sec>` | how long to wait for a running analysis (default 600) |
@@ -785,7 +785,7 @@ Generate a video from a prompt (optionally with frames / references)
 
 ### `contenthero import [url]`
 
-Bring something into ContentHero: a url (a file, free, or a video page on a supported site, which spends) into the library, a tracked post into its shared analysis copy (--content), or a deck into a new canvas project (--pptx, --canva). See --cost
+Bring something into your own library or a new project: a url (a file, free, or a video page on a supported site, which spends) into the library, or a deck into a new canvas project (--pptx, --canva). See --cost. A tracked post's video is content analyze --kind video
 
 | Argument | Required | Purpose |
 | --- | --- | --- |
@@ -793,7 +793,6 @@ Bring something into ContentHero: a url (a file, free, or a video page on a supp
 
 | Option | Purpose |
 | --- | --- |
-| `--content <id>` | a tracked post: its video goes into the post's shared analysis copy, not your library |
 | `--pptx <url>` | a PowerPoint or Google Slides file address: imported into a new canvas project |
 | `--canva <id>` | a Canva design id: imported into a new canvas project through the account's Canva connection |
 | `--content-type <mime>` | with a url: MIME type override (else taken from the response) |
@@ -801,7 +800,7 @@ Bring something into ContentHero: a url (a file, free, or a video page on a supp
 | `--title <text>` | with --pptx or --canva: the new project's title |
 | `--card <id>` | with --pptx or --canva: link the new project to this card in the same call (also needs planner:write) |
 | `--cost` | show what the import would spend instead of importing (nothing runs, nothing is charged) |
-| `--no-wait` | return at once instead of waiting for a url import or a post's copy |
+| `--no-wait` | return at once instead of waiting for a url import |
 | `--timeout <seconds>` | how long to wait before handing back Defaults to `600`. |
 
 ## `kling-element`

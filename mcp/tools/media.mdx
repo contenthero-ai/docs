@@ -1,12 +1,12 @@
 ---
 title: "Media"
-description: "The library: browse, search, import and upload the media an account owns, and favorite, archive or share any item. import also brings a tracked post's video in for analysis, and a deck in as a new canvas project."
+description: "The library: browse, search, import and upload the media an account owns, and favorite, archive or share any item. import also brings a deck in as a new canvas project."
 ---
 
 {/* GENERATED FILE. Do not edit by hand. */}
 {/* Regenerate with `npm run generate:reference` in contenthero-docs. */}
 
-The library: browse, search, import and upload the media an account owns, and favorite, archive or share any item. import also brings a tracked post's video in for analysis, and a deck in as a new canvas project. 15 tools.
+The library: browse, search, import and upload the media an account owns, and favorite, archive or share any item. import also brings a deck in as a new canvas project. 15 tools.
 
 Every tool below is exposed by the hosted MCP server at `https://mcp.contenthero.ai` and by the `@contenthero/mcp` npm package. A <Badge>write</Badge> tool changes your account; a <Badge>read</Badge> tool does not.
 
@@ -106,7 +106,7 @@ Link each image's small copy instead of the file itself, where the library keeps
 
 <Badge>write</Badge>
 
-Bring something into ContentHero. Pass exactly one source, and what comes back follows it. url: a file address (an image, video or audio file) becomes library media, free; a video page address on a supported site becomes library media too, and spends credits: the most its download may cost is held and it is charged for what arrived. contentId: a tracked post's video is downloaded into the post's shared analysis copy, which the reading tools use; nothing lands in your library; it spends credits unless the copy already exists or is being made, which is free. pptxUrl (a PowerPoint or Google Slides file) or canvaDesignId (a Canva design, through the account's Canva connection) becomes a new canvas project with editable layers, free; cardId links it to its card in the same call. Pass getCost to see what an import would spend first: nothing runs and nothing is charged. Imported media is referenced by its outputId in generate_* and on a card via update_card. A media import still running at the end of the call returns pending: wait for it with get_status. A post's copy still downloading returns pending: import the same contentId again to follow it, which is free. Scopes: library:write for a url, studio:generate for a post, editor:write for a project (and planner:write with cardId).
+Bring something into your own library or a new project. Pass exactly one source, and what comes back follows it. url: a file address (an image, video or audio file) becomes library media, free; a video page address on a supported site becomes library media too, and spends credits: the most its download may cost is held and it is charged for what arrived. pptxUrl (a PowerPoint or Google Slides file) or canvaDesignId (a Canva design, through the account's Canva connection) becomes a new canvas project with editable layers, free; cardId links it to its card in the same call. Pass getCost to see what an import would spend first: nothing runs and nothing is charged. Imported media is referenced by its outputId in generate_* and on a card via update_card. A media import still running at the end of the call returns pending: wait for it with get_status. A tracked post's video is not imported: analyze_content with kind video downloads it for analysis. Scopes: library:write for a url, editor:write for a project (and planner:write with cardId).
 
 <ParamField body name="canvaDesignId" type="string">
 A Canva design id: imported into a new canvas project through the account's Canva connection (fails with canva_not_connected when it is not linked).
@@ -114,10 +114,6 @@ A Canva design id: imported into a new canvas project through the account's Canv
 
 <ParamField body name="cardId" type="string">
 With pptxUrl or canvaDesignId: the card this project is for. The new project is linked to it in the same call (it shows among the card's assets), so the card opens the edit from the moment it exists. Also needs the planner:write scope.
-</ParamField>
-
-<ParamField body name="contentId" type="string">
-A tracked post (from list_content, get_tracked_account, or a get_card inspiration asset): its video goes into the post's shared analysis copy, not your library.
 </ParamField>
 
 <ParamField body name="contentType" type="string">
@@ -129,7 +125,7 @@ With url: a file name (used for its extension).
 </ParamField>
 
 <ParamField body name="getCost" type="boolean">
-Return what this import would spend instead of importing (nothing runs, nothing is charged). 0 for a file address, a project, or a post whose copy exists or is being made.
+Return what this import would spend instead of importing (nothing runs, nothing is charged). 0 for a file address or a project.
 </ParamField>
 
 <ParamField body name="pptxUrl" type="string">
