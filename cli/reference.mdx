@@ -6,7 +6,7 @@ description: "Every ContentHero CLI command, its arguments and its options."
 {/* GENERATED FILE. Do not edit by hand. */}
 {/* Regenerate with `npm run generate:reference` in contenthero-docs. */}
 
-Every command the CLI exposes, grouped by resource. 117 commands.
+Every command the CLI exposes, grouped by resource. 118 commands.
 
 Run `contenthero schema get commands` to get this same information as JSON, which is the discovery path for agents.
 
@@ -529,6 +529,17 @@ List tracked content, ranked by outlier score, or by relevance when you pass --s
 | `--cursor <cursor>` | the previous page's cursor |
 | `--sort <field>` | the field to sort by |
 | `--order <order>` | the sort direction |
+
+## `download`
+
+### `contenthero download <id> [path]`
+
+Download any file of yours to disk: a generation, one of its outputs, an upload, an import, a library file, or a project's export (free)
+
+| Argument | Required | Purpose |
+| --- | --- | --- |
+| `id` | yes | a media id (a generation, -\<n\> for one of its outputs, an upload, an import, a library file) or an export id |
+| `path` | no | the file to write for one file, or the directory to write into for several (default: the current directory, under the names the server gives) |
 
 ## `element`
 
@@ -1567,18 +1578,23 @@ Move a tracked account within its list (requires inspiration:write)
 
 ## `transcribe`
 
-### `contenthero transcribe <audioUrl>`
+### `contenthero transcribe [audioUrl]`
 
-Transcribe an audio URL to text (speech-to-text)
+Transcribe speech to text: an audio URL, or a tracked post's downloaded video with --content-id (spends credits; a post is priced first with --cost)
 
 | Argument | Required | Purpose |
 | --- | --- | --- |
-| `audioUrl` | yes | public URL of the audio to transcribe |
+| `audioUrl` | no | public URL of the audio to transcribe (or name a post with --content-id) |
 
 | Option | Purpose |
 | --- | --- |
-| `--language <code>` | ISO language hint, e.g. en (auto-detected when omitted) |
-| `--diarize` | label each speaker (diarization) |
+| `--content-id <id>` | a tracked post whose video to transcribe, once content analyze --kind video has downloaded it |
+| `--slide <n>` | which video of a carousel post, by the 0-based slide content analyze reports (with --content-id) |
+| `--cost` | show what transcribing the post costs instead of transcribing it (nothing runs, nothing is charged); an audio file cannot be priced in advance |
+| `--language <code>` | ISO language hint for an audio file (auto-detected when omitted) |
+| `--diarize` | label each speaker (diarization), for an audio file |
+| `--no-wait` | return at once while a post's transcription is still running |
+| `--timeout <sec>` | how long to follow a post's transcription (default 600) |
 
 ## `upscale`
 

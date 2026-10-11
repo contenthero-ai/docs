@@ -1,12 +1,12 @@
 ---
 title: "Media"
-description: "The library: browse, search, import and upload the media an account owns, and favorite, archive or share any item. import also brings a deck in as a new canvas project."
+description: "The library: browse, search, import, upload and download the media an account owns, and favorite, archive or share any item. import also brings a deck in as a new canvas project."
 ---
 
 {/* GENERATED FILE. Do not edit by hand. */}
 {/* Regenerate with `npm run generate:reference` in contenthero-docs. */}
 
-The library: browse, search, import and upload the media an account owns, and favorite, archive or share any item. import also brings a deck in as a new canvas project. 15 tools.
+The library: browse, search, import, upload and download the media an account owns, and favorite, archive or share any item. import also brings a deck in as a new canvas project. 16 tools.
 
 Every tool below is exposed by the hosted MCP server at `https://mcp.contenthero.ai` and by the `@contenthero/mcp` npm package. A <Badge>write</Badge> tool changes your account; a <Badge>read</Badge> tool does not.
 
@@ -138,6 +138,16 @@ With pptxUrl or canvaDesignId: the new project's title.
 
 <ParamField body name="url" type="string">
 A public https address: a file, imported free into the library, or a video page on a supported site, whose video is downloaded into the library and spends.
+</ParamField>
+
+### `download`
+
+<Badge>read</Badge>
+
+Download any file of the account's out of ContentHero to keep: a generation (every output, or one output by its -\<n\> media id), an upload, an import, a library file, or a project's export, named by its media id or export id. Answers each file's name and a save link that names the file, needs no sign-in and does not expire: fetch the link for the file itself. Free: it reads what is already stored. A file not made yet is refused with the step that follows it.
+
+<ParamField body name="id" type="string" required>
+A media id (a generation, -\<n\> for one of its outputs, an upload, an import, a library file) or an export id.
 </ParamField>
 
 ### `create_media_upload`

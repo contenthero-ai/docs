@@ -59,6 +59,8 @@ The model roster is live: it is the `modelId` enum on the generate tools, resolv
 
 ContentHero gives your agent links to your files: images, video, audio and logos. Each link works without signing in and does not expire, so your agent can show a file, look at it, or download it.
 
+To keep a file, `download` takes any media id or export id and answers each file's name with a save link, which names the file when it is saved. It never spends. On the CLI, `contenthero download <id> [path]` writes the files to disk.
+
 Some agents run code in a cloud sandbox that can reach only the sites you allow. To let one download your files, allow this one host:
 
 <MediaHost />

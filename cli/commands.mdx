@@ -25,7 +25,8 @@ contenthero generate audio     --text "..."  --voice <voiceId>
 contenthero generate board     --image <url> --type <boardType>
 contenthero generate lip-sync  --image <url> --audio <url|outputId>
 contenthero upscale            --image <url>
-contenthero transcribe         --media <url>
+contenthero transcribe         <audioUrl>
+contenthero transcribe         --content-id <contentId> [--slide <n>] [--cost]  # a post's downloaded video
 contenthero model list         # the live roster
 ```
 
@@ -34,6 +35,12 @@ contenthero model list         # the live roster
 ```bash
 contenthero status <outputId>            # blocks until done
 contenthero status <outputId> --no-wait  # snapshot
+```
+
+## Your files
+
+```bash
+contenthero download <id> [path]   # any file of yours, or an export, written to disk (free)
 ```
 
 ## Cards (pipeline)

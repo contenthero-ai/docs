@@ -12,7 +12,7 @@ Base URL `https://app.contenthero.ai/api/v1`. All endpoints take a bearer API ke
 | `POST` | `/studio/generate` | generate | Image, video, audio, lip-sync, or upscale, selected by `type`. Smart-waits, then returns the asset or an `outputId`. Pass `getCost: true` to preview cost only. |
 | `GET` | `/studio/generate/{outputId}` | generate | Generation status and result for a pending `outputId`. Includes a `pollAfterSeconds` hint while in progress. |
 | `POST` | `/studio/reference-board` | generate | Generate a reference board from a source image and a board type. |
-| `POST` | `/studio/transcribe` | generate | Transcribe a media file to text. |
+| `POST` | `/studio/transcribe` | generate | Transcribe speech to text: an audio file (`audioUrl`), or a tracked post's video (`contentId`, `slide` for a carousel's video) once its video is downloaded with `kind: "video"` analysis. Pass `getCost: true` to price a post first; an audio file cannot be priced in advance. A long video answers `202` with `status: "running"`: ask again with the same post to follow it, free. |
 
 A generation reference (start frame, image input, audio) accepts a raw URL or a ContentHero output-id token `<uuid>-<N>`.
 
@@ -28,6 +28,7 @@ A generation reference (start frame, image input, audio) accepts a raw URL or a 
 | --- | --- | --- | --- |
 | `GET` | `/media` | read | List your media (creations, boards, looks), filterable by `kind`. |
 | `GET` | `/media/{token}` | read | Get one media item by id or output-id token. |
+| `GET` | `/download/{id}` | read | Any file of yours, or a project's export, by its media id or export id: `{ files: [{ mediaId?, name, url }] }`. Each `url` is a save link that names the file, needs no sign-in and does not expire. Never spends. `404` when the id names nothing of yours, `409` when the file is not made yet. |
 
 ## Avatars and voices
 

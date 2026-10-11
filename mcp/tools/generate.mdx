@@ -364,18 +364,30 @@ FILE mode: the audio file to process, as a URL or a previous output id. Omit in 
 
 <Badge>write</Badge>
 
-Transcribe an audio URL to text (speech-to-text). Returns the transcript directly (synchronous, no polling). SPENDS CREDITS, metered per minute of audio, and the cost cannot be previewed: the result reports the credits it cost after the fact. Zero only when the account runs on its own ElevenLabs key.
+Transcribe speech to text from one source: an audio file by its public URL (audioUrl), or a tracked post's video (contentId, with slide for a carousel's video) once analyze_content kind video has downloaded it. SPENDS CREDITS, metered by the length heard. A post can be priced first with getCost; an audio file cannot be priced in advance, so its result reports what it cost after the fact (zero only when the account runs on its own ElevenLabs key). A post is transcribed word by word: its one video becomes the post's transcript, which get_content then returns word-timed with transcript='segments'; a carousel slide's words stay with that slide. A post is charged once, to whoever asks first, for what was heard, and is free once its words exist or are being made. A long video returns running: call this again with the same contentId and slide to follow it, which is free.
 
-<ParamField body name="audioUrl" type="string" required>
-Public URL of the audio file to transcribe.
+<ParamField body name="audioUrl" type="string">
+Public URL of the audio file to transcribe. Pass this or contentId.
+</ParamField>
+
+<ParamField body name="contentId" type="string">
+The tracked post whose video to transcribe, from list_content or get_tracked_account. Its video must be downloaded first with analyze_content kind video. Pass this or audioUrl.
 </ParamField>
 
 <ParamField body name="diarize" type="boolean">
-Label each speaker (diarization).
+Label each speaker (diarization), for an audio file.
+</ParamField>
+
+<ParamField body name="getCost" type="boolean">
+Return the credit cost of transcribing the post instead of transcribing it (nothing runs, nothing is charged). 0 when its words exist or are being made. Only with contentId: an audio file cannot be priced in advance.
 </ParamField>
 
 <ParamField body name="languageCode" type="string">
-ISO language hint, e.g. "en". Auto-detected when omitted.
+ISO language hint for an audio file. Auto-detected when omitted; a post's language is always detected.
+</ParamField>
+
+<ParamField body name="slide" type="integer">
+Which video of a carousel post, by the 0-based slide analyze_content kind video reports it with. Only with contentId.
 </ParamField>
 
 ### `get_status`
