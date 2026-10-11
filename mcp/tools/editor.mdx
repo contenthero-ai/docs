@@ -214,7 +214,7 @@ Must be true to confirm the irreversible permanent delete.
 The project id to permanently delete.
 </ParamField>
 
-### `export_project`
+### `export`
 
 <Badge>write</Badge>
 
@@ -268,10 +268,10 @@ Keep the watermark. Defaults true; removing it is plan-gated.
 
 <Badge>read</Badge>
 
-Read one export started by export_project: its file, state and details, with the download URL and public share page once it finishes. To wait for one still running, use get_status with kind export. Requires the editor:read scope.
+Read one export started by export: its file, state and details, with the download URL and public share page once it finishes. To wait for one still running, use get_status with kind export. Requires the editor:read scope.
 
 <ParamField body name="exportId" type="string" required>
-The export id returned by export_project.
+The export id returned by export.
 </ParamField>
 
 ### `list_exports`
