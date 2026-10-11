@@ -6,7 +6,7 @@ description: "Projects, their timelines and canvases, the templates you place on
 {/* GENERATED FILE. Do not edit by hand. */}
 {/* Regenerate with `npm run generate:reference` in contenthero-docs. */}
 
-Projects, their timelines and canvases, the templates you place on them, and exports. 25 tools.
+Projects, their timelines and canvases, the templates you place on them, and exports. 24 tools.
 
 Every tool below is exposed by the hosted MCP server at `https://mcp.contenthero.ai` and by the `@contenthero/mcp` npm package. A <Badge>write</Badge> tool changes your account; a <Badge>read</Badge> tool does not.
 
@@ -212,32 +212,6 @@ Must be true to confirm the irreversible permanent delete.
 
 <ParamField body name="projectId" type="string" required>
 The project id to permanently delete.
-</ParamField>
-
-### `import_project`
-
-<Badge>write</Badge>
-
-Import a PowerPoint / Google Slides file (by URL) or a Canva design (by id) into a NEW canvas project with editable layers. Set sourceType to 'pptx' and pass fileUrl (a URL to a .pptx / slides file), or set sourceType to 'canva' and pass designId (uses the account's Canva connection; fails with canva_not_connected if not linked). Pass cardId to link the new project to its card in the same call. Returns the new project id + revision. Requires the editor:write scope (and planner:write with cardId).
-
-<ParamField body name="sourceType" type="`pptx` \| `canva`" required>
-'pptx' for a file URL, 'canva' for a Canva design id.
-</ParamField>
-
-<ParamField body name="cardId" type="string">
-The card this project is for: the new project is linked to it in the same call (it shows among the card's assets), so the card opens the edit from the moment it exists. Also needs the planner:write scope.
-</ParamField>
-
-<ParamField body name="designId" type="string">
-Required when sourceType is 'canva': the Canva design id.
-</ParamField>
-
-<ParamField body name="fileUrl" type="string">
-Required when sourceType is 'pptx': a URL to the .pptx / slides file.
-</ParamField>
-
-<ParamField body name="title" type="string">
-Title for the created project. Defaults to 'Imported deck'.
 </ParamField>
 
 ### `export_project`

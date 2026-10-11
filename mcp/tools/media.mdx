@@ -1,12 +1,12 @@
 ---
 title: "Media"
-description: "The library: browse, search, import and upload the media an account owns, and favorite, archive or share any item."
+description: "The library: browse, search, import and upload the media an account owns, and favorite, archive or share any item. import also brings a tracked post's video in for analysis, and a deck in as a new canvas project."
 ---
 
 {/* GENERATED FILE. Do not edit by hand. */}
 {/* Regenerate with `npm run generate:reference` in contenthero-docs. */}
 
-The library: browse, search, import and upload the media an account owns, and favorite, archive or share any item. 15 tools.
+The library: browse, search, import and upload the media an account owns, and favorite, archive or share any item. import also brings a tracked post's video in for analysis, and a deck in as a new canvas project. 15 tools.
 
 Every tool below is exposed by the hosted MCP server at `https://mcp.contenthero.ai` and by the `@contenthero/mcp` npm package. A <Badge>write</Badge> tool changes your account; a <Badge>read</Badge> tool does not.
 
@@ -102,29 +102,53 @@ How many to return.
 Link each image's small copy instead of the file itself, where the library keeps one: for drawing images small, as code that shows many at once does. Never for downloading or delivering a file, or showing it large.
 </ParamField>
 
-### `import_media`
+### `import`
 
 <Badge>write</Badge>
 
-Import a remote URL as first-class media: the server fetches and re-hosts it, returning its outputId + public URL (referenceable by outputId in generate_* and as an asset on a card via update_card). Use this for a file already on a public URL, or from a hosted client that cannot read local files. Requires the library:write scope.
+Bring something into ContentHero. Pass exactly one source, and what comes back follows it. url: a file address (an image, video or audio file) becomes library media, free; a video page address on a supported site becomes library media too, and spends credits: the most its download may cost is held and it is charged for what arrived. contentId: a tracked post's video is downloaded into the post's shared analysis copy, which the reading tools use; nothing lands in your library; it spends credits unless the copy already exists or is being made, which is free. pptxUrl (a PowerPoint or Google Slides file) or canvaDesignId (a Canva design, through the account's Canva connection) becomes a new canvas project with editable layers, free; cardId links it to its card in the same call. Pass getCost to see what an import would spend first: nothing runs and nothing is charged. Imported media is referenced by its outputId in generate_* and on a card via update_card. A media import still running at the end of the call returns pending: wait for it with get_status. A post's copy still downloading returns pending: import the same contentId again to follow it, which is free. Scopes: library:write for a url, studio:generate for a post, editor:write for a project (and planner:write with cardId).
 
-<ParamField body name="url" type="string" required>
-A public https URL to fetch and re-host.
+<ParamField body name="canvaDesignId" type="string">
+A Canva design id: imported into a new canvas project through the account's Canva connection (fails with canva_not_connected when it is not linked).
+</ParamField>
+
+<ParamField body name="cardId" type="string">
+With pptxUrl or canvaDesignId: the card this project is for. The new project is linked to it in the same call (it shows among the card's assets), so the card opens the edit from the moment it exists. Also needs the planner:write scope.
+</ParamField>
+
+<ParamField body name="contentId" type="string">
+A tracked post (from list_content, get_tracked_account, or a get_card inspiration asset): its video goes into the post's shared analysis copy, not your library.
 </ParamField>
 
 <ParamField body name="contentType" type="string">
-Optional MIME override (else taken from the response).
+With url: a MIME override (else taken from the response).
 </ParamField>
 
 <ParamField body name="fileName" type="string">
-Optional file name (used for its extension).
+With url: a file name (used for its extension).
+</ParamField>
+
+<ParamField body name="getCost" type="boolean">
+Return what this import would spend instead of importing (nothing runs, nothing is charged). 0 for a file address, a project, or a post whose copy exists or is being made.
+</ParamField>
+
+<ParamField body name="pptxUrl" type="string">
+A PowerPoint or Google Slides file address: imported into a new canvas project.
+</ParamField>
+
+<ParamField body name="title" type="string">
+With pptxUrl or canvaDesignId: the new project's title.
+</ParamField>
+
+<ParamField body name="url" type="string">
+A public https address: a file, imported free into the library, or a video page on a supported site, whose video is downloaded into the library and spends.
 </ParamField>
 
 ### `create_media_upload`
 
 <Badge>write</Badge>
 
-Upload local files as first-class media (phase 1 of 2). Accepts 1-25 files in one call. Returns, for each file, a signed uploadUrl and the exact headers to send; PUT each file's bytes to its URL with those headers unchanged, then call complete_media_upload once with every returned outputId. The finished media is referenceable by outputId in generate_* and as an asset on a card via update_card. For a file already on a public URL, use import_media instead. Requires the library:write scope.
+Upload local files as first-class media (phase 1 of 2). Accepts 1-25 files in one call. Returns, for each file, a signed uploadUrl and the exact headers to send; PUT each file's bytes to its URL with those headers unchanged, then call complete_media_upload once with every returned outputId. The finished media is referenceable by outputId in generate_* and as an asset on a card via update_card. For a file already on a public URL, use import instead. Requires the library:write scope.
 
 <ParamField body name="files" type="object[]" required>
 1-25 files to upload.

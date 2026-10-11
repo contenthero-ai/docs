@@ -382,7 +382,7 @@ ISO language hint, e.g. "en". Auto-detected when omitted.
 
 <Badge>read</Badge>
 
-Check any background job: generations and edits, exports, brand kit reads, avatars, a post's analysis or scenes, and transcripts. Pass the ids the calls that started them returned; an id alone names its job. Pass kind only for a full UUID, for scenes or a transcript (the id is the post or media it belongs to), or when the answer says an id is ambiguous. BY DEFAULT THIS BLOCKS until the jobs finish, up to ~40s per call, because that is almost always what you want after starting one; a job still running comes back with where it is and a poll_after_seconds hint, so call again. Pass wait:false for an instant snapshot with no blocking. A finished generation answers with its final URLs.
+Check any background job: generations and edits, exports, brand kit reads, avatars, a post's analysis or scenes, and transcripts. Pass the ids the calls that started them returned; an id alone names its job. Each id answers on its own line, so one that names no job of yours says why and the others still answer. Pass kind only for a full UUID, for scenes or a transcript (the id is the post or media it belongs to), or when the answer says an id is ambiguous. BY DEFAULT THIS BLOCKS until the jobs finish, up to ~40s per call, because that is almost always what you want after starting one; a job still running comes back with where it is and a poll_after_seconds hint, so call again. Pass wait:false for an instant snapshot with no blocking. A finished generation answers with its final URLs.
 
 <ParamField body name="ids" type="string[]" required>
 The jobs to check, each by the id the call that started it returned.

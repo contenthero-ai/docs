@@ -6,7 +6,7 @@ description: "Every ContentHero CLI command, its arguments and its options."
 {/* GENERATED FILE. Do not edit by hand. */}
 {/* Regenerate with `npm run generate:reference` in contenthero-docs. */}
 
-Every command the CLI exposes, grouped by resource. 118 commands.
+Every command the CLI exposes, grouped by resource. 117 commands.
 
 Run `contenthero schema get commands` to get this same information as JSON, which is the discovery path for agents.
 
@@ -781,6 +781,29 @@ Generate a video from a prompt (optionally with frames / references)
 | `--placement <json>` | placement intent as JSON, e.g. \{"mode":"atPlayhead"\} (omit to place at the playhead when known, else append) |
 | `--playhead <frame>` | current playhead frame, for playhead-relative placement |
 
+## `import`
+
+### `contenthero import [url]`
+
+Bring something into ContentHero: a url (a file, free, or a video page on a supported site, which spends) into the library, a tracked post into its shared analysis copy (--content), or a deck into a new canvas project (--pptx, --canva). See --cost
+
+| Argument | Required | Purpose |
+| --- | --- | --- |
+| `url` | no | a public https address: a file, or a video page on a supported site |
+
+| Option | Purpose |
+| --- | --- |
+| `--content <id>` | a tracked post: its video goes into the post's shared analysis copy, not your library |
+| `--pptx <url>` | a PowerPoint or Google Slides file address: imported into a new canvas project |
+| `--canva <id>` | a Canva design id: imported into a new canvas project through the account's Canva connection |
+| `--content-type <mime>` | with a url: MIME type override (else taken from the response) |
+| `--name <name>` | with a url: file name override (used for the extension) |
+| `--title <text>` | with --pptx or --canva: the new project's title |
+| `--card <id>` | with --pptx or --canva: link the new project to this card in the same call (also needs planner:write) |
+| `--cost` | show what the import would spend instead of importing (nothing runs, nothing is charged) |
+| `--no-wait` | return at once instead of waiting for a url import or a post's copy |
+| `--timeout <seconds>` | how long to wait before handing back Defaults to `600`. |
+
 ## `kling-element`
 
 ### `contenthero kling-element create`
@@ -864,21 +887,6 @@ Get one media item by id (studio output, or an upload/stock item with --source)
 | --- | --- |
 | `--source <source>` | which library the id belongs to: creations, uploads, stock (default creations) |
 | `--save <dir>` | download each output to \<dir\> (materialize the bytes for local viewing or re-ingestion) |
-
-### `contenthero media import <url>`
-
-Import a remote URL as first-class media (requires library:write)
-
-| Argument | Required | Purpose |
-| --- | --- | --- |
-| `url` | yes | public https URL to fetch and re-host |
-
-| Option | Purpose |
-| --- | --- |
-| `--content-type <mime>` | MIME type override (else taken from the response) |
-| `--name <name>` | file name override (used for the extension) |
-| `--no-wait` | return the outputId immediately instead of waiting for the import |
-| `--timeout <seconds>` | how long to wait before handing back the outputId Defaults to `600`. |
 
 ### `contenthero media list`
 
@@ -1108,18 +1116,6 @@ Read a project's composition + revision (summary by default; requires editor:rea
 | `--to <frame>` | timeline only: end frame of the window |
 | `--track <trackId>` | timeline only: scope to one track by id |
 | `--slide <slideId>` | canvas only: scope to one slide by id (applies to --detail full too) |
-
-### `contenthero project import`
-
-Import a PPTX/Slides file URL or a Canva design into a new canvas project (requires editor:write)
-
-| Option | Purpose |
-| --- | --- |
-| `--source-type <type>` | pptx | canva |
-| `--file-url <url>` | PPTX / slides file URL (when --source-type pptx) |
-| `--design-id <id>` | Canva design id (when --source-type canva) |
-| `--title <text>` | title for the created project |
-| `--card <id>` | link the new project to this card in the same call (also needs planner:write) |
 
 ### `contenthero project list`
 

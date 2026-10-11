@@ -20,8 +20,9 @@ They mean opposite things, which is why the distinction is worth keeping straigh
 | Posts, ranked by outlier score | `list_content` |
 | One post in full: transcript, analysis, scenes | `get_content` |
 | A post's Break It Down, or its scenes | `analyze_content` (`kind: "breakdown"` or `"scenes"`) |
+| A post's video, downloaded into its shared analysis copy | `import` with `contentId` |
 
-Reads need no scope; moving a tracked account within its list needs `inspiration:write`. Full parameters are in the [inspiration tool reference](/mcp/tools/inspiration).
+Reads need no scope; moving a tracked account within its list needs `inspiration:write`. Importing a post's video needs `studio:generate`: it downloads into the post's shared analysis copy, which the reading tools use, and nothing lands in your library. It spends credits unless that copy already exists or is being made, in which case it is free; pass `getCost` to see the spend first. While the copy is still downloading, call `import` again with the same `contentId` to follow it, at no charge. Full parameters are in the [inspiration tool reference](/mcp/tools/inspiration).
 
 ## What an outlier score is
 
