@@ -166,7 +166,7 @@ Only content at or above this view count.
 
 <Badge>read</Badge>
 
-Get one tracked post in full: engagement stats, outlier score, hashtags, keywords, mentions and audio info. Works for a creator's post and for the owner's own. THE TRANSCRIPT IS OPT-IN because a long video is a large document: pass transcript='text' for the whole thing, or transcript='segments' for timed slices, and then narrow with startMs/endMs or transcriptSearch to pull only the part that matters. The transcript reports a status: 'complete', 'not_applicable' (there is nothing to transcribe), 'failed' (it will be retried), 'processing', or 'absent' (never attempted), so an empty result is never ambiguous. THE BREAK IT DOWN ANALYSIS IS OPT-IN THE SAME WAY: availability (status + section names) is always reported; pass analysis='full' for every section, or analysisSections for only the ones the task needs. SCENES ARE OPT-IN THE SAME WAY: availability is always reported; pass scenes='map' for each scene's time range, what happens in it and what is said, or scenes='frames' to also see a frame of each scene. startMs/endMs narrow either. Scenes exist once analyze_content has run with kind scenes. transcriptSegments is excluded from 'full' because the transcript params above are the one transcript path.
+Get one tracked post in full: engagement stats, outlier score, hashtags, keywords, mentions and audio info. Works for a creator's post and for the owner's own. THE TRANSCRIPT IS OPT-IN because a long video is a large document: pass transcript='text' for the whole thing, or transcript='segments' for timed slices, and then narrow with startMs/endMs or transcriptSearch to pull only the part that matters. The transcript reports a status: 'complete', 'not_applicable' (there is nothing to transcribe), 'failed' (it will be retried), 'processing', or 'absent' (never attempted), so an empty result is never ambiguous. THE BREAK IT DOWN ANALYSIS IS OPT-IN THE SAME WAY: availability (status + section names) is always reported; pass analysis='full' for every section, or analysisSections for only the ones the task needs. SCENES ARE OPT-IN THE SAME WAY: availability is always reported; pass scenes='map' for each scene's time range, what happens in it and what is said, or scenes='frames' to also see a frame of each scene. startMs/endMs narrow either. Scenes exist once analyze_content has run with kind scenes. Each of the post's videos is reported with its state; once analyze_content kind video has downloaded one, cuts adds where its picture changes. transcriptSegments is excluded from 'full' because the transcript params above are the one transcript path.
 
 <ParamField body name="contentId" type="string" required>
 The content id from list_content, get_tracked_account, or a get_card inspiration asset.
@@ -180,8 +180,12 @@ How much of the post's Break It Down analysis to include. Default 'none' (availa
 Only these analysis sections. The names differ by format, so take them from the availability line.
 </ParamField>
 
+<ParamField body name="cuts" type="boolean">
+Add each downloaded video's cut list: the seconds where its picture changes, measured once and free. startMs and endMs narrow the lists.
+</ParamField>
+
 <ParamField body name="endMs" type="number">
-Window end, ms from the start of the media. Narrows transcript segments and scenes.
+Window end, ms from the start of the media. Narrows transcript segments, scenes and cut lists.
 </ParamField>
 
 <ParamField body name="scenes" type="`none` \| `map` \| `frames`">
@@ -189,7 +193,7 @@ How much of the post's scene map to include. Default 'none' (availability still 
 </ParamField>
 
 <ParamField body name="startMs" type="number">
-Window start, ms from the start of the media. Narrows transcript segments and scenes.
+Window start, ms from the start of the media. Narrows transcript segments, scenes and cut lists.
 </ParamField>
 
 <ParamField body name="transcript" type="`none` \| `text` \| `segments`">

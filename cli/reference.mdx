@@ -492,12 +492,13 @@ Get one tracked post in full (engagement, hashtags, optional transcript and Brea
 | Option | Purpose |
 | --- | --- |
 | `--transcript [grain]` | include the transcript: none, text, segments (default none) |
-| `--start-ms <n>` | transcript window start, ms into the media |
-| `--end-ms <n>` | transcript window end, ms into the media |
+| `--start-ms <n>` | window start, ms into the media: narrows transcript segments, scenes and cut lists |
+| `--end-ms <n>` | window end, ms into the media: narrows transcript segments, scenes and cut lists |
 | `--transcript-search <text>` | only the transcript segments containing this phrase |
 | `--analysis` | include the full Break It Down analysis (availability always reports) |
 | `--analysis-sections <list>` | only these analysis sections, comma-separated (names come from the availability line) |
 | `--scenes <grain>` | the post's scenes: map, or frames (the same map with each scene's frame url); --start-ms/--end-ms narrow them |
+| `--cuts` | add each downloaded video's cut list: the seconds where its picture changes, measured once and free; --start-ms/--end-ms narrow the lists |
 
 ### `contenthero content list`
 
@@ -1610,26 +1611,28 @@ See what the user is looking at, and see or hear your own work (requires context
 | `--capture` | also capture a fresh screenshot of the live viewport (the user's screen; slower) |
 | `--render` | also render your work (images); ephemeral. Name several frames with --frames, --per-second or --count. Frames across a range are how you judge motion, timing and pacing: the closer together they are, the finer the motion they show. |
 | `--frame <n>` | image: which single timeline frame (omit for the current playhead) |
-| `--slide <id>` | image (canvas): which slide id (omit for the focused slide) |
+| `--slide <id|n>` | image (canvas): which slide id (omit for the focused slide). With --content-id: which video of a carousel post, by the slide content analyze reports for it |
 | `--slide-index <n>` | image (canvas): 1-based slide index (alternative to --slide) |
 | `--frames <list>` | image (editor): exactly these timeline frames, in this order, separated by commas |
 | `--from-frame <n>` | start timeline frame of the range (several frames, sound or video) |
 | `--to-frame <n>` | end timeline frame of the range |
-| `--count <n>` | how many frames to spread evenly across the range, or across a clip's window (omit for one at the focus point) |
-| `--per-second <n>` | how many frames to take per second of the range, up to every frame |
+| `--count <n>` | how many frames to spread evenly across the range, or across a source's window (omit for one at the focus point, or about one a second of a range) |
+| `--per-second <n>` | how many frames to take per second of the range, up to every frame, or of a source's window |
 | `--layout <layout>` | 'frames' returns each frame as its own image; 'sheets' tiles them into contact sheets, each frame numbered under its tile (omit to choose by how many fit one response) |
-| `--sound` | render the range's sound instead of its picture, mixed as an export mixes it, and measure it |
-| `--video` | watch the range play with its sound, to judge motion, timing, transitions and pacing; a terminal cannot take video, so it returns frames across the range and the sound measured. Takes --from-frame and --to-frame, or a clip's window |
+| `--sound` | hear and measure sound: your edit's range mixed as an export mixes it, instead of its picture, by --from-frame and --to-frame; or a source's window as it is, by --from-sec and --to-sec, beside any frames asked for |
+| `--video` | watch the range play with its sound, to judge motion, timing, transitions and pacing; a terminal cannot take video, so it returns frames across the range and the sound measured. Takes --from-frame and --to-frame, or a source's window |
 | `--render-id <id>` | read a render already started, by the renderId it returned |
 | `--page <n>` | which page of the render to read, starting at 1 |
 | `--wait <seconds>` | how long to wait for results before answering; what is not ready is read later with --render-id |
-| `--width <n>` | image: the width in pixels to render at, or of a clip's frames, to check legibility at the size it will be seen. Height follows the aspect ratio. The size used is reported with the result. |
-| `--region <x,y,w,h>` | image: render only this rectangle, in composition units (get_project's compositionSpace), to inspect detail at full resolution. Without --width, it renders at native scale; rendered reports pixelsPerCompositionUnit. For a source clip, the rectangle is in the clip's own pixels, and each of its frames is cut to it. |
-| `--asset <id>` | a raw source clip to see, by its asset id, rather than your edit (or --media-url) |
-| `--media-url <url>` | a raw source clip to see, by its media URL, rather than your edit (or --asset) |
-| `--from-sec <n>` | start of the clip's window, in its own seconds (omit to start at its beginning) |
-| `--to-sec <n>` | end of the clip's window, in its own seconds (omit to run to its end) |
-| `--save <path>` | write the produced image(s), a render's or a clip's keyframes, to this file (several append -1, -2, ...) |
+| `--width <n>` | image: the width in pixels to render at, or of a source's frames, to check legibility at the size it will be seen. Height follows the aspect ratio. The size used is reported with the result. |
+| `--region <x,y,w,h>` | image: render only this rectangle, x,y,width,height in composition units (get_project's compositionSpace), to inspect detail at full resolution. Without --width, it renders at native scale. For a source, the rectangle is in its own pixels, and each of its frames is cut to it. |
+| `--asset <id>` | a clip of the user's to see and hear, by its asset id, rather than your edit (or --media-url or --content-id) |
+| `--media-url <url>` | a clip of the user's to see and hear, by its media URL, rather than your edit (or --asset or --content-id) |
+| `--content-id <id>` | a tracked post's video to see and hear, by its content id, once content analyze --kind video has downloaded it (or --asset or --media-url); --slide names a carousel's video |
+| `--from-sec <n>` | start of a source's window, in its own seconds (omit to start at its beginning) |
+| `--to-sec <n>` | end of a source's window, in its own seconds (omit to run to its end) |
+| `--at-sec <list>` | frames at exactly these seconds of a source, such as its cut list's times, instead of spread across a window, separated by commas |
+| `--save <path>` | write the produced image(s), a render's, or a source's keyframes and its sound's picture, to this file (several append -1, -2, ...) |
 
 ## `voice`
 

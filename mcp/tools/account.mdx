@@ -32,18 +32,26 @@ The monthly spend cap in credits, or null for no cap.
 
 <Badge>read</Badge>
 
-See what the user is looking at, and see or hear your own work. With no render input it returns the live context of the open app: the active surface, the focused element, the playhead and the selection, from the most recently active session, with the live participants. It is fast and does not disturb the page. Set capture to also get a picture of the user's screen as shown now, including unsaved and transient state; capturing takes a moment and briefly interrupts the page. To see your work as it will play, rendered from the saved project: render shows one composed frame or slide, the one in focus unless frame, slideId or slideIndex names another; for an editor timeline, frames, perSecond over a range, or count over a range name several frames, which come back one by one when they fit one result and otherwise as contact sheets with each frame's number under its tile, in pages. sound renders a range of the mix as an export mixes it and measures it (integrated loudness, true peak, loudness range, sample peak, where sounds start, stereo width, band balance), with a waveform and spectrogram picture and a link to the audio. video watches a range play with its sound; where video cannot be received, as here, it returns frames across the range and the sound measured. To see a raw source clip rather than your edit, name it with assetId or mediaUrl and window it with fromSec and toSec. A render is a job: what finishes within the call comes back with a renderId, and the rest is read by calling again with renderId and page. Renders are ephemeral, count against nothing and need no live tab, only a projectId when no one is viewing. Check your work here, never with export_project, which makes a file the user keeps. Requires the context:read scope.
+See what the user is looking at, and see or hear your own work. With no render input it returns the live context of the open app: the active surface, the focused element, the playhead and the selection, from the most recently active session, with the live participants. It is fast and does not disturb the page. Set capture to also get a picture of the user's screen as shown now, including unsaved and transient state; capturing takes a moment and briefly interrupts the page. To see your work as it will play, rendered from the saved project: render shows one composed frame or slide, the one in focus unless frame, slideId or slideIndex names another; for an editor timeline, frames, perSecond over a range, or count over a range name several frames, which come back one by one when they fit one result and otherwise as contact sheets with each frame's number under its tile, in pages. sound renders a range of the mix as an export mixes it and measures it (integrated loudness, true peak, loudness range, sample peak, where sounds start, stereo width, band balance), with a waveform and spectrogram picture and a link to the audio. video watches a range play with its sound; where video cannot be received, as here, it returns frames across the range and the sound measured. To see and hear a source rather than your edit, name a clip of the user's with assetId or mediaUrl, or a tracked post's video with contentId (and slide for a carousel) once analyze_content kind video has downloaded it, and window it with fromSec and toSec. Its frames come spread across the window, at the seconds atSec names, or perSecond across it; sound measures the window as it is, beside any frames; with video you watch it play. A render is a job: what finishes within the call comes back with a renderId, and the rest is read by calling again with renderId and page. Renders are ephemeral, count against nothing and need no live tab, only a projectId when no one is viewing. Check your work here, never with export_project, which makes a file the user keeps. Requires the context:read scope.
 
 <ParamField body name="assetId" type="string">
-A raw source clip to see, by its asset id, rather than your edit. Or pass mediaUrl.
+A clip of the user's to see and hear, by its asset id, rather than your edit. Or pass mediaUrl or contentId.
+</ParamField>
+
+<ParamField body name="atSec" type="number[]">
+Frames at exactly these seconds of a source, such as its cut list's times, instead of spread across a window.
 </ParamField>
 
 <ParamField body name="capture" type="boolean">
 Also return a picture of the user's screen as shown now, including unsaved and transient state. Use it only when the task depends on what the screen shows; to see your work, render it instead.
 </ParamField>
 
+<ParamField body name="contentId" type="string">
+A tracked post's video to see and hear, by its content id, once analyze_content kind video has downloaded it. Or pass assetId or mediaUrl.
+</ParamField>
+
 <ParamField body name="count" type="integer">
-How many frames to spread evenly across the range, or across a clip's window. Omit for one frame at the focus point, or about one a second of a range.
+How many frames to spread evenly across the range, or across a source's window. Omit for one frame at the focus point, or about one a second of a range.
 </ParamField>
 
 <ParamField body name="frame" type="integer">
@@ -59,7 +67,7 @@ Start timeline frame of the range, for several frames, sound or video. Omit to s
 </ParamField>
 
 <ParamField body name="fromSec" type="number">
-Start of the clip's window, in its own seconds. Omit to start at its beginning.
+Start of a source's window, in its own seconds. Omit to start at its beginning.
 </ParamField>
 
 <ParamField body name="layout" type="`frames` \| `sheets`">
@@ -67,7 +75,7 @@ Start of the clip's window, in its own seconds. Omit to start at its beginning.
 </ParamField>
 
 <ParamField body name="mediaUrl" type="string">
-A raw source clip to see, by its media URL, rather than your edit. Or pass assetId.
+A clip of the user's to see and hear, by its media URL, rather than your edit. Or pass assetId or contentId.
 </ParamField>
 
 <ParamField body name="page" type="integer">
@@ -75,7 +83,7 @@ Which page of the render to read, starting at 1.
 </ParamField>
 
 <ParamField body name="perSecond" type="number">
-How many frames to take per second of the range, up to every frame.
+How many frames to take per second of the range, up to every frame, or of a source's window.
 </ParamField>
 
 <ParamField body name="projectId" type="string">
@@ -83,7 +91,7 @@ The project to view or render. Omit for the surface the user is on now. Needed t
 </ParamField>
 
 <ParamField body name="region" type="object">
-Render only this rectangle, in composition units (get_project's compositionSpace), to inspect detail at full resolution. Without width, it renders at native scale; rendered reports pixelsPerCompositionUnit. For a source clip, the rectangle is in the clip's own pixels, and each of its frames is cut to it.
+Render only this rectangle, \{ x, y, width, height \} in composition units (get_project's compositionSpace), to inspect detail at full resolution. Without width, it renders at native scale. For a source, the rectangle is in its own pixels, and each of its frames is cut to it.
 </ParamField>
 
 <ParamField body name="render" type="boolean">
@@ -92,6 +100,10 @@ Render your work from the saved project: one composed frame or slide, the one in
 
 <ParamField body name="renderId" type="string">
 Read a render already started, by the renderId it returned. Pass only page with it.
+</ParamField>
+
+<ParamField body name="slide" type="integer">
+Which video of a carousel post, by the slide analyze_content reports for it. Only with contentId.
 </ParamField>
 
 <ParamField body name="slideId" type="string">
@@ -103,7 +115,7 @@ Canvas: the 1-based slide index to render (alternative to slideId).
 </ParamField>
 
 <ParamField body name="sound" type="boolean">
-Render the range's sound instead of its picture, mixed as an export mixes it, and measure it. Takes fromFrame and toFrame only.
+Hear and measure sound: your edit's range mixed as an export mixes it, instead of its picture, by fromFrame and toFrame; or a source's window as it is, by fromSec and toSec, beside any frames asked for.
 </ParamField>
 
 <ParamField body name="toFrame" type="integer">
@@ -111,15 +123,15 @@ End timeline frame of the range. Omit to run to the end.
 </ParamField>
 
 <ParamField body name="toSec" type="number">
-End of the clip's window, in its own seconds. Omit to run to its end.
+End of a source's window, in its own seconds. Omit to run to its end.
 </ParamField>
 
 <ParamField body name="video" type="boolean">
-Watch the range play with its sound, to judge motion, timing, transitions and pacing. Where video cannot be received, as here, it returns frames across the range and the sound measured. Takes fromFrame and toFrame, or a clip's window.
+Watch the range play with its sound, to judge motion, timing, transitions and pacing. Takes fromFrame and toFrame, or a source's window.
 </ParamField>
 
 <ParamField body name="width" type="integer">
-The width in pixels to render at, or of a clip's frames, to check legibility at the size it will be seen. Height follows the aspect ratio. The size used is reported with the result.
+The width in pixels to render at, or of a source's frames, to check legibility at the size it will be seen. Height follows the aspect ratio. The size used is reported with the result.
 </ParamField>
 
 ### `get_schema`
