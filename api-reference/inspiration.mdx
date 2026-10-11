@@ -12,7 +12,7 @@ Base URL `https://app.contenthero.ai/api/v1`. Every endpoint takes a bearer API 
 | `GET` | `/accounts` | The social accounts you track, both kinds. Filter with `account_type` (`inspiration` or `brand`) and `brand_kit_id`. |
 | `GET` | `/accounts/{id}` | One account with its performance: totals, averages, top and recent content. |
 | `GET` | `/content` | Posts, ranked by outlier score, across the creators you watch and your own accounts (`scope`). Every row carries `isOwn`. |
-| `GET` | `/content/{id}` | One post in full. Transcript (`transcript`, windowed with `start_ms`/`end_ms`), Break It Down (`analysis`) and scenes (`scenes=map` or `frames`) are opt-in; their availability always reports. |
+| `GET` | `/content/{id}` | One post in full. Transcript (`transcript`, windowed with `start_ms`/`end_ms`), Break It Down (`analysis`) and scenes (`scenes=map`: each scene's range, what happens and what is said; a scene's frames come from `view`) are opt-in; their availability always reports. |
 | `POST` | `/content/{id}/analysis` | Make a post's Break It Down (`kind: "breakdown"`, the default) or its scenes (`kind: "scenes"`). Free when it exists; otherwise charged once when stored. Pass `getCost: true` to see the price first. |
 
 ## The mining pattern
