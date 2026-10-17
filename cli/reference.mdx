@@ -6,7 +6,7 @@ description: "Every ContentHero CLI command, its arguments and its options."
 {/* GENERATED FILE. Do not edit by hand. */}
 {/* Regenerate with `npm run generate:reference` in contenthero-docs. */}
 
-Every command the CLI exposes, grouped by resource. 118 commands.
+Every command the CLI exposes, grouped by resource. 122 commands.
 
 Run `contenthero schema get commands` to get this same information as JSON, which is the discovery path for agents.
 
@@ -99,6 +99,35 @@ Isolate vocals from an audio file (remove background noise and music)
 | `--cost` | estimate the credit cost instead of running |
 | `--no-wait` | return the outputId immediately instead of waiting |
 | `--timeout <seconds>` | how long to wait before handing back the outputId Defaults to `600`. |
+
+### `contenthero audio split <source>`
+
+Split an audio or video file into vocals, drums, bass and other sounds (four files). Asynchronous.
+
+| Argument | Required | Purpose |
+| --- | --- | --- |
+| `source` | yes | source file (URL or output id) to split: one of your stored files |
+
+| Option | Purpose |
+| --- | --- |
+| `--duration <seconds>` | source length in seconds (required for --cost) |
+| `--cost` | estimate the credit cost instead of running |
+| `--no-wait` | return the outputId immediately instead of waiting |
+| `--timeout <seconds>` | how long to wait before handing back the outputId Defaults to `600`. |
+
+### `contenthero audio split-clips <projectId>`
+
+Split the audio of clips into vocals, drums, bass and other sounds, in place.
+
+| Argument | Required | Purpose |
+| --- | --- | --- |
+| `projectId` | yes | the editor project whose clips to split |
+
+| Option | Purpose |
+| --- | --- |
+| `--clips <ids...>` | clip ids to split (omit for every audible clip on the timeline) |
+| `--no-wait` | return the outputIds immediately instead of waiting |
+| `--timeout <seconds>` | how long to wait before handing back the outputIds Defaults to `600`. |
 
 ## `auth`
 
@@ -216,7 +245,7 @@ Create a brand kit: empty, imported from its websites and accounts, or as a copy
 | `--extract` | import the kit from its websites and own --brand-account profiles (returns immediately) |
 | `--duplicate-from <id>` | copy an existing brand kit instead of starting empty |
 | `--sections <json>` | section content as JSON: [\{ key, body \}] to fill a starter section, [\{ sectionName, tab, body? \}] to add one |
-| `--brand-account <ref>` | the owner's OWN profile: a tracked-account id, or a profile url / platform:handle to ADD one. Repeatable |
+| `--brand-account <ref>` | the brand's own profile, linked to this kit as its brand side: a tracked account by any reference, or a profile url / platform:handle to ADD one. Repeatable |
 | `--inspiration-account <ref>` | a competitor/creator profile: same forms as --brand-account. Repeatable |
 | `--logo <ref>` | a logo: a url, or a generation id to copy in (e.g. out9-2). Repeatable; the first is primary |
 | `--display-logo <ref>` | the logo for compact places: one of the --logo refs; at most one per kit |
@@ -338,7 +367,7 @@ Update a brand kit: section content, colors and fonts, media and accounts, and i
 | `--website-url <url>` | one of the brand's websites. Repeatable; the first is the primary site. Replaces the list |
 | `--default` | make this the default brand kit, un-defaulting every other |
 | `--sections <json>` | section writes as JSON, only the sections you change, all or nothing: [\{ key, body, expectedVersion \}] edits one (or revertTo, sectionName, width; afterId, beforeId or position moves it in its tab); [\{ sectionName, tab, body? \}] adds one |
-| `--brand-account <ref>` | the owner's OWN profile: a tracked-account id, or a profile url / platform:handle to ADD one. Repeatable. REPLACES the list |
+| `--brand-account <ref>` | the brand's own profile, linked to this kit as its brand side: a tracked account by any reference, or a profile url / platform:handle to ADD one. Repeatable. REPLACES the list |
 | `--inspiration-account <ref>` | a competitor/creator profile: same forms as --brand-account. Repeatable. REPLACES the list |
 | `--logo <ref>` | a logo: a url, or a generation id to copy in (e.g. out9-2). Repeatable; the first is primary. REPLACES the list |
 | `--display-logo <ref>` | the logo for compact places: one of the --logo refs; at most one per kit |
@@ -472,12 +501,13 @@ Analyze a tracked post: Break It Down, its scenes with --kind scenes, or its vid
 
 | Argument | Required | Purpose |
 | --- | --- | --- |
-| `id` | yes | the content id (from content list, a tracked account, or a card inspiration asset) |
+| `id` | yes | the post: its id or short id, its link, or the platform's own id for it |
 
 | Option | Purpose |
 | --- | --- |
 | `--kind <kind>` | breakdown (default), scenes (the scene map, each scene's range, what happens and what is said, priced per minute of video), or video (every video the post holds in shared analysis copies, each with its cut list once stored, charged for what the downloads moved) |
 | `--cost` | show the credit cost instead of analyzing (nothing runs, nothing is charged) |
+| `--resolution <720p|1080p>` | Most detail for the stored copy (kind video); the best offered up to it is downloaded |
 | `--no-wait` | return at once instead of waiting for a running analysis |
 | `--timeout <sec>` | how long to wait for a running analysis (default 600) |
 
@@ -487,11 +517,11 @@ Get one tracked post in full (engagement, hashtags, optional transcript and Brea
 
 | Argument | Required | Purpose |
 | --- | --- | --- |
-| `id` | yes | the content id (from content list, a tracked account, or a card inspiration asset) |
+| `id` | yes | the post: its id or short id, its link, or the platform's own id for it |
 
 | Option | Purpose |
 | --- | --- |
-| `--transcript [grain]` | include the transcript: none, text, segments (default none) |
+| `--transcript [grain]` | include the transcript: none, text, segments, words (default none); 'words' adds each word's start and end to the segments, where the post has word timing |
 | `--start-ms <n>` | window start, ms into the media: narrows transcript segments, scenes and cut lists |
 | `--end-ms <n>` | window end, ms into the media: narrows transcript segments, scenes and cut lists |
 | `--transcript-search <text>` | only the transcript segments containing this phrase |
@@ -499,6 +529,7 @@ Get one tracked post in full (engagement, hashtags, optional transcript and Brea
 | `--analysis-sections <list>` | only these analysis sections, comma-separated (names come from the availability line) |
 | `--scenes <grain>` | the post's scenes: map, each scene's range, what happens and what is said (view --content-id --at-sec shows its frames); --start-ms/--end-ms narrow them |
 | `--cuts` | add each downloaded video's cut list: the seconds where its picture changes, measured once and free; --start-ms/--end-ms narrow the lists |
+| `--audio-map` | add each video's audio map window: speech, sound candidates with their measured descriptors, music, loudness and each stem's level, measured once and free; each video's summary reports either way; --start-ms/--end-ms narrow the window |
 
 ### `contenthero content list`
 
@@ -521,7 +552,7 @@ List tracked content, ranked by outlier score, or by relevance when you pass --s
 | `--published-after <iso>` | published on or after this ISO timestamp (wins over --since) |
 | `--published-before <iso>` | published on or before this ISO timestamp |
 | `--search <text>` | finds posts by meaning and by keyword across title, creator, description and transcript, ranked by relevance; returns only the posts judged relevant, so no rows means nothing matched |
-| `--account <id>` | limit to this tracked account; repeatable |
+| `--account <id>` | limit to this tracked account, by its id or short id, its profile link, its handle, or the platform's own id for it; repeatable |
 | `--added-by-you` | only the one-off posts saved by url |
 | `--brand-kit <id>` | scope to the accounts linked to this brand kit |
 | `--favorite` | only content the account has favorited |
@@ -1129,6 +1160,10 @@ Read a project's composition + revision (summary by default; requires editor:rea
 | `--to <frame>` | timeline only: end frame of the window |
 | `--track <trackId>` | timeline only: scope to one track by id |
 | `--slide <slideId>` | canvas only: scope to one slide by id (applies to --detail full too) |
+| `--clips <ids>` | read only these clips: each one's summary line, or whole with its code and the modules it imports with --detail full; nothing else of the project (separated by commas) |
+| `--modules <names>` | read these project modules' code (separated by commas) |
+| `--source-asset <id>` | with --at-sec: the recording whose moments to place on the timeline, by the assetId a clip's source names |
+| `--at-sec <list>` | with --source-asset: the seconds of that recording to place (separated by commas) |
 
 ### `contenthero project list`
 
@@ -1162,6 +1197,8 @@ Read a project's transcript mapped to its timeline clips (requires editor:read)
 | `--pace-threshold <ms>` | word mode: minimum pause (ms) to report as a silence ("Pace"); defaults to the project setting, else 500 |
 | `--padding-start <ms>` | word mode: breathing room (ms) kept after speech at a silence start edge (negative tightens) |
 | `--padding-end <ms>` | word mode: breathing room (ms) kept before speech at a silence end edge (negative tightens) |
+| `--limit <n>` | How many clip segments a page holds. Omit for the default. |
+| `--cursor <cursor>` | The answer's nextCursor, to read the next page of segments with the same other inputs. |
 
 ### `contenthero project update <projectId>`
 
@@ -1545,13 +1582,26 @@ Change one of your own templates, or move it among them: only the flags given
 
 ## `tracked-account`
 
+### `contenthero tracked-account add <profile>...`
+
+Track social accounts by handle or profile URL (requires inspiration:write)
+
+| Argument | Required | Purpose |
+| --- | --- | --- |
+| `profile` | yes | profile urls, or platform:handle for a bare handle, in the order they are listed |
+
+| Option | Purpose |
+| --- | --- |
+| `--kind <kind>` | which list they join: inspiration (the default) or brand |
+| `--brand-kit <id>` | also link each account to this brand kit |
+
 ### `contenthero tracked-account get <id>`
 
 Get one tracked account with its performance and top content
 
 | Argument | Required | Purpose |
 | --- | --- | --- |
-| `id` | yes | the tracked account id |
+| `id` | yes | one of your tracked accounts: its id or short id, its profile link, its handle, or the platform's own id for it |
 
 ### `contenthero tracked-account list`
 
@@ -1564,13 +1614,21 @@ List tracked accounts (both kinds by default)
 | `--limit <n>` | how many to return |
 | `--cursor <cursor>` | the previous page's cursor |
 
+### `contenthero tracked-account remove <id>`
+
+Stop tracking an account; its posts are kept (requires inspiration:write)
+
+| Argument | Required | Purpose |
+| --- | --- | --- |
+| `id` | yes | one of your tracked accounts: its id or short id, its profile link, its handle, or the platform's own id for it |
+
 ### `contenthero tracked-account update <id>`
 
 Move a tracked account within its list (requires inspiration:write)
 
 | Argument | Required | Purpose |
 | --- | --- | --- |
-| `id` | yes | the tracked account id |
+| `id` | yes | one of your tracked accounts: its id or short id, its profile link, its handle, or the platform's own id for it |
 
 | Option | Purpose |
 | --- | --- |
@@ -1582,7 +1640,7 @@ Move a tracked account within its list (requires inspiration:write)
 
 ### `contenthero transcribe [audioUrl]`
 
-Transcribe speech to text: an audio URL, or a tracked post's downloaded video with --content-id (spends credits; a post is priced first with --cost)
+Transcribe speech to text: an audio URL, or a tracked post's downloaded video with --content-id (spends credits; price it first with --cost)
 
 | Argument | Required | Purpose |
 | --- | --- | --- |
@@ -1590,9 +1648,9 @@ Transcribe speech to text: an audio URL, or a tracked post's downloaded video wi
 
 | Option | Purpose |
 | --- | --- |
-| `--content-id <id>` | a tracked post whose video to transcribe, once content analyze --kind video has downloaded it |
+| `--content-id <id>` | the tracked post whose video to transcribe: its id or short id, its link, or the platform's own id for it, once content analyze --kind video has downloaded it |
 | `--slide <n>` | which video of a carousel post, by the 0-based slide content analyze reports (with --content-id) |
-| `--cost` | show what transcribing the post costs instead of transcribing it (nothing runs, nothing is charged); an audio file cannot be priced in advance |
+| `--cost` | show what transcribing costs instead of transcribing (nothing runs, nothing is charged) |
 | `--language <code>` | ISO language hint for an audio file (auto-detected when omitted) |
 | `--diarize` | label each speaker (diarization), for an audio file |
 | `--no-wait` | return at once while a post's transcription is still running |
@@ -1634,23 +1692,33 @@ See what the user is looking at, and see or hear your own work (requires context
 | `--frames <list>` | image (editor): exactly these timeline frames, in this order, separated by commas |
 | `--from-frame <n>` | start timeline frame of the range (several frames, sound or video) |
 | `--to-frame <n>` | end timeline frame of the range |
-| `--count <n>` | how many frames to spread evenly across the range, or across a source's window (omit for one at the focus point, or about one a second of a range) |
-| `--per-second <n>` | how many frames to take per second of the range, up to every frame, or of a source's window |
-| `--layout <layout>` | 'frames' returns each frame as its own image; 'sheets' tiles them into contact sheets, each frame numbered under its tile (omit to choose by how many fit one response) |
+| `--count <n>` | how many frames to spread from the first frame of the range, or of a source's window, to its last, both included (omit for one at the focus point, or about one a second of a range) |
+| `--per-second <n>` | how many frames to take per second of the range, or of a source's window, stepping from its first frame; never more than the footage has |
+| `--layout <layout>` | 'frames' returns each frame as its own image; 'sheets' tiles them into contact sheets, an edit's frames numbered and a source's labeled with its second under each tile (omit to choose by how many fit one response) |
 | `--sound` | hear and measure sound: your edit's range mixed as an export mixes it, instead of its picture, by --from-frame and --to-frame; or a source's window as it is, by --from-sec and --to-sec, beside any frames asked for |
 | `--video` | watch the range play with its sound, to judge motion, timing, transitions and pacing; a terminal cannot take video, so it returns frames across the range and the sound measured. Takes --from-frame and --to-frame, or a source's window |
 | `--render-id <id>` | read a render already started, by the renderId it returned |
-| `--page <n>` | which page of the render to read, starting at 1 |
+| `--page <n>` | which page of the render, or of a source's frames, to read, starting at 1 |
 | `--wait <seconds>` | how long to wait for results before answering; what is not ready is read later with --render-id |
-| `--width <n>` | image: the width in pixels to render at, or of a source's frames, to check legibility at the size it will be seen. Height follows the aspect ratio. The size used is reported with the result. |
-| `--region <x,y,w,h>` | image: render only this rectangle, x,y,width,height in composition units (get_project's compositionSpace), to inspect detail at full resolution. Without --width, it renders at native scale. For a source, the rectangle is in its own pixels, and each of its frames is cut to it. |
-| `--asset <id>` | a clip of the user's to see and hear, by its asset id, rather than your edit (or --media-url or --content-id) |
+| `--width <n>` | image: the width in pixels of each image returned, the crop's when a region is named, to check legibility at the size it will be seen. Height follows the aspect ratio. Anything the server changed is listed in adjusted. |
+| `--region <x,y,w,h>` | image: render only this rectangle, x,y,width,height in composition units (get_project's compositionSpace), to inspect detail. Without --width it comes back at native pixels. For a source, the rectangle is in its own pixels. |
+| `--asset <id>` | a clip of the user's to see and hear, by its asset id: the id get_project reports in a clip's source (or --media-url or --content-id) |
 | `--media-url <url>` | a clip of the user's to see and hear, by its media URL, rather than your edit (or --asset or --content-id) |
-| `--content-id <id>` | a tracked post's video to see and hear, by its content id, once content analyze --kind video has downloaded it (or --asset or --media-url); --slide names a carousel's video |
+| `--content-id <id>` | a tracked post's video to see and hear, by its id or short id, its link, or the platform's own id for it, once content analyze --kind video has downloaded it (or --asset or --media-url); --slide names a carousel's video |
 | `--from-sec <n>` | start of a source's window, in its own seconds (omit to start at its beginning) |
 | `--to-sec <n>` | end of a source's window, in its own seconds (omit to run to its end) |
-| `--at-sec <list>` | frames at exactly these seconds of a source, such as its cut list's times, instead of spread across a window, separated by commas |
-| `--save <path>` | write the produced image(s), a render's, or a source's keyframes and its sound's picture, to this file (several append -1, -2, ...) |
+| `--at-sec <list>` | frames at exactly these seconds of a source, instead of spread across a window, separated by commas |
+| `--live` | also return what the user is looking at beside a render |
+| `--tracks <ids>` | render only these tracks, every clip on them, picture and sound, on the timeline's own frame numbers; the project is untouched (separated by commas) |
+| `--clips <ids>` | render only these clips, picture and sound, on the timeline's own frame numbers; the project is untouched (separated by commas) |
+| `--find <text>` | Describe what to look for in the picture. Returns the moments of the source or project window that show it, best first, as times (and timeline frames for a project), matching what is pictured, the text on screen and the words spoken over it, each naming which of the three found it. The moments are candidates: confirm the ones that matter by viewing frames at their times, or ask where. |
+| `--where` | Also where on the frame each thing find describes may be: candidates, best first, each with an id, a confidence, its time span, its box normalized to the frame, what found it, and a time and box to check it on. View that frame to confirm the one you mean, then pass its id as track. When none is the thing, view the window's frames yourself, find it, and pass its time and box as track. Small things are found less often: check their candidates before trusting the first. Slower the first time a phrase is asked of a file, and a read after that. |
+| `--picture` | The window's picture analysis: its cuts, fades, black, camera movement, the text on screen and where faces are (never who), each with its times and position. For a project it reads each clip's source and maps it to the timeline, and adds the edit's own cuts in editCuts: where a clip starts where the one before it ends without playing on from it. It does not see what covers a clip or what has no source, and names each clip it does not see with why; a render of the range shows those. Where a screen recording's pointer is, and its shape. To follow it to the exact frame, ask where with detector pointer and track the candidate. |
+| `--detector <class>` | The class of thing where answers from the file's own analysis instead of a phrase: a screen recording's pointer, or faces (where, never who). Leave find out. With track, a box you give is followed as that class. One of: pointer, face. |
+| `--track <id-or-seed>` | Follow one thing on every frame of the window: a candidate's id from a where answer, or a time of the source and a box on its frame that you found yourself. Returns one track per stretch it is seen, its box on each frame as keyframes, and its edges where it appears and leaves. An edge is not always on the exact frame: view the frames either side before cutting on it. A thing without a firm outline is followed with a loose box, and very fast motion can end a track early or split it. Slower the first time a seed is asked, and a read after that. Pass a candidate's id, or a seed as JSON: \{"atSec":\<seconds\>,"box":\{"x":..,"y":..,"w":..,"h":..\}\}. |
+| `--limit <n>` | How many items of each list a page of find, where or picture holds. Omit for the default. |
+| `--cursor <cursor>` | Read the next page of every list of find, where or picture: pass the answer's nextCursor, with the same other inputs. |
+| `--save <path>` | write the produced image(s), a render's (with a heard range's evidence sheet), or a source's keyframes, its evidence sheet and its sound's picture, to this file (several append -1, -2, ...) |
 
 ## `voice`
 

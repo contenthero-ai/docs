@@ -318,30 +318,30 @@ Return the credit cost estimate instead of upscaling (nothing runs, nothing is c
 
 <Badge>write</Badge>
 
-Transform existing audio with an audio-processing model, in one of TWO shapes. FILE mode: pass sourceUrl to process a standalone file into a new library asset. Voice isolation removes background noise and music and returns the processed URL directly; audio enhancement levels loudness and cleans up background noise, is asynchronous, and returns an outputId to poll with get_status. Optionally pass projectId to place the result onto that editor project's timeline in the same call, controlled by an optional placement. IN-PLACE mode: pass projectId with clipIds (or enhanceClips for the whole timeline) to enhance the audio OF EXISTING CLIPS instead of producing a new asset, which is how you clean up a recording already on a timeline. In-place returns a LIST of jobs, one per SOURCE, because the vendor estimates a noise profile per production: one recording's clips are concatenated and enhanced together so the level and noise floor stay consistent across cuts, while separate recordings stay separate jobs. Poll every job's outputId. The enhanced audio is applied to the clips automatically when each job lands: an audio clip has its source swapped, and a video clip is muted with the enhanced audio placed on its own clip. Silenced clips are skipped. In-place mode is enhancement only and needs no sourceUrl. SPENDS CREDITS: pass getCost to preview the price first, which runs nothing and charges nothing.
+Transform existing audio with an audio-processing model, in one of TWO shapes. FILE mode: pass sourceUrl to process a standalone file into a new library asset. Voice isolation removes background noise and music and returns the processed URL directly; audio enhancement levels loudness and cleans up background noise, is asynchronous, and returns an outputId to poll with get_status. Splitting gives a recording's four stems (vocals, drums, bass, and other: everything else, sound effects included) as four files of your own: at once when the file has been analyzed before, otherwise once its analysis lands; it returns an outputId and its status to poll with get_status. Optionally pass projectId to place the result onto that editor project's timeline in the same call, controlled by an optional placement. IN-PLACE mode: pass projectId with clipIds (or inPlace for the whole timeline) to enhance or split the audio OF EXISTING CLIPS instead of producing a new asset, which is how you clean up a recording already on a timeline. In-place returns a LIST of jobs, one per SOURCE, because the vendor estimates a noise profile per production: one recording's clips are concatenated and enhanced together so the level and noise floor stay consistent across cuts, while separate recordings stay separate jobs. Poll every job's outputId. The enhanced audio is applied to the clips automatically when each job lands: an audio clip has its source swapped, and a video clip is muted with the enhanced audio placed on its own clip. A split mutes each clip and places its four stems under it, each on its own track. Silenced clips are skipped. In-place mode needs no sourceUrl. SPENDS CREDITS: pass getCost to preview the price first, which runs nothing and charges nothing.
 
 <ParamField body name="clipIds" type="string[]">
-IN-PLACE mode: enhance the audio of these clips on projectId. Omit with enhanceClips:true to enhance every audible clip on the timeline.
+IN-PLACE mode: enhance or split the audio of these clips on projectId. Omit with inPlace:true to edit every audible clip on the timeline.
 </ParamField>
 
 <ParamField body name="durationSeconds" type="number">
 Source audio length in seconds. Required for getCost, and for enhancement pricing when the source is not a stored ContentHero asset.
 </ParamField>
 
-<ParamField body name="enhanceClips" type="boolean">
-IN-PLACE mode for the whole timeline, without naming clips. Implied when clipIds is given.
-</ParamField>
-
 <ParamField body name="getCost" type="boolean">
 Return the credit cost estimate instead of running (nothing runs, nothing is charged).
+</ParamField>
+
+<ParamField body name="inPlace" type="boolean">
+IN-PLACE mode for the whole timeline, without naming clips. Implied when clipIds is given.
 </ParamField>
 
 <ParamField body name="modelId" type="string">
 Instead of operation: an audio model that takes one audio file and returns audio (it resolves to the operation it performs). list_models (contentType audio) names them; get_model gives one model's inputs and whether it finishes at once or is polled with get_status.
 </ParamField>
 
-<ParamField body name="operation" type="`isolate` \| `enhance`">
-isolate: voice isolation. enhance: loudness leveling and noise cleanup. The server picks the model that performs it. Omitted: enhance in in-place mode, else isolate.
+<ParamField body name="operation" type="`isolate` \| `enhance` \| `split`">
+isolate: voice isolation. enhance: loudness leveling and noise cleanup. split: vocals, drums, bass and other as four files, or four tracks in in-place mode. The server picks the model that performs it. Omitted: enhance in in-place mode, else isolate.
 </ParamField>
 
 <ParamField body name="placement" type="object or object">
@@ -353,7 +353,7 @@ The current playhead frame, for playhead-relative placement.
 </ParamField>
 
 <ParamField body name="projectId" type="string">
-The editor project: where to PLACE the result in file mode, or which timeline to enhance in in-place mode. Omit for a standalone library output.
+The editor project: where to PLACE the result in file mode, or which timeline to edit in in-place mode. Omit for a standalone library output.
 </ParamField>
 
 <ParamField body name="sourceUrl" type="string">
@@ -364,14 +364,14 @@ FILE mode: the audio file to process, as a URL or a previous output id. Omit in 
 
 <Badge>write</Badge>
 
-Transcribe speech to text from one source: an audio file by its public URL (audioUrl), or a tracked post's video (contentId, with slide for a carousel's video) once analyze_content kind video has downloaded it. SPENDS CREDITS, metered by the length heard. A post can be priced first with getCost; an audio file cannot be priced in advance, so its result reports what it cost after the fact (zero only when the account runs on its own ElevenLabs key). A post is transcribed word by word: its one video becomes the post's transcript, which get_content then returns word-timed with transcript='segments'; a carousel slide's words stay with that slide. A post is charged once, to whoever asks first, for what was heard, and is free once its words exist or are being made. A long video returns running: call this again with the same contentId and slide to follow it, which is free.
+Transcribe speech to text from one source: an audio file by its public URL (audioUrl), or a tracked post's video (contentId, with slide for a carousel's video) once analyze_content kind video has downloaded it. SPENDS CREDITS, metered by the length heard. Pass getCost to see the price first: nothing runs and nothing is charged. A post is priced from its stored copy's length and an audio file from its own; a file whose length cannot be read is priced only once it is transcribed, and the preview says so. A file run on the account's own ElevenLabs key costs nothing. A post is transcribed word by word: its one video becomes the post's transcript, which get_content then returns word-timed with transcript='words'; a carousel slide's words stay with that slide. A post is charged once, to whoever asks first, for what was heard, and is free once its words exist or are being made. A long video returns running: call this again with the same contentId and slide to follow it, which is free.
 
 <ParamField body name="audioUrl" type="string">
 Public URL of the audio file to transcribe. Pass this or contentId.
 </ParamField>
 
 <ParamField body name="contentId" type="string">
-The tracked post whose video to transcribe, from list_content or get_tracked_account. Its video must be downloaded first with analyze_content kind video. Pass this or audioUrl.
+The tracked post whose video to transcribe: its id or short id, its link, or the platform's own id for it. Its video must be downloaded first with analyze_content kind video. Pass this or audioUrl.
 </ParamField>
 
 <ParamField body name="diarize" type="boolean">
@@ -379,7 +379,7 @@ Label each speaker (diarization), for an audio file.
 </ParamField>
 
 <ParamField body name="getCost" type="boolean">
-Return the credit cost of transcribing the post instead of transcribing it (nothing runs, nothing is charged). 0 when its words exist or are being made. Only with contentId: an audio file cannot be priced in advance.
+Return the credit cost estimate instead of transcribing (nothing runs, nothing is charged).
 </ParamField>
 
 <ParamField body name="languageCode" type="string">

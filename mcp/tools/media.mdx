@@ -14,7 +14,7 @@ Every tool below is exposed by the hosted MCP server at `https://mcp.contenthero
 
 <Badge>read</Badge>
 
-List the library's files: every file the account keeps, or one part of the library with `source`, each item naming the part it is in. Filter by contentType, kind, favorited or archived; order with sort and order; page with limit and cursor. Each item shows its media id, its file name and size, its asset id (the id get_project reports as a clip's sourceId) and its resolved URL inline, so you can reference it directly. Call get_media to SEE an item (image blocks), or view to see a clip's frames.
+List the library's files: every file the account keeps, or one part of the library with `source`, each item naming the part it is in. Filter by contentType, kind, favorited or archived; order with sort and order; page with limit and cursor. Each item shows its media id, its file name and size, its asset id (the id get_project reports in a clip's source) and its resolved URL inline, so you can reference it directly. Call get_media to SEE an item (image blocks), or view to see a clip's frames.
 
 <ParamField body name="archived" type="boolean">
 Only archived files.
