@@ -302,13 +302,13 @@ A media id, for media. A bare id for a generation with several outputs is refuse
 
 <Badge>write</Badge>
 
-Archive or UNarchive an asset: pass archived:false to restore it (default true). ContentHero never hard-deletes, so this is always reversible. For one output of a generation, pass its mediaId (a1B2c3D4-2 for one output of several). For anything else, pass assetType + id (card, brand_kit, brand_kit_section, project, space, template). Archiving is a timestamp and nothing else is touched, so a scheduled card restores as scheduled. Requires the favorites:write scope. Idempotent in both directions.
+Archive or UNarchive an asset: pass archived:false to restore it (default true). ContentHero never hard-deletes, so this is always reversible. For one output of a generation, pass its mediaId (a1B2c3D4-2 for one output of several). For anything else, pass assetType + id (card, brand_kit, brand_kit_section, project, space, template, style_library). Archiving is a timestamp and nothing else is touched, so a scheduled card restores as scheduled. Requires the favorites:write scope. Idempotent in both directions.
 
 <ParamField body name="archived" type="boolean">
 Default true. Pass false to RESTORE (unarchive).
 </ParamField>
 
-<ParamField body name="assetType" type="`card` \| `brand_kit` \| `brand_kit_section` \| `project` \| `space` \| `template`">
+<ParamField body name="assetType" type="`card` \| `brand_kit` \| `brand_kit_section` \| `project` \| `space` \| `template` \| `style_library`">
 The kind of asset, for anything that is not media. Pass with id.
 </ParamField>
 

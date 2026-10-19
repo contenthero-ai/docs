@@ -1,12 +1,12 @@
 ---
 title: "Editor and canvas"
-description: "Projects, their timelines and canvases, the templates you place on them, and exports."
+description: "Projects, their timelines and canvases, the templates you place on them, the style libraries they pin, and exports."
 ---
 
 {/* GENERATED FILE. Do not edit by hand. */}
 {/* Regenerate with `npm run generate:reference` in contenthero-docs. */}
 
-Projects, their timelines and canvases, the templates you place on them, and exports. 24 tools.
+Projects, their timelines and canvases, the templates you place on them, the style libraries they pin, and exports. 28 tools.
 
 Every tool below is exposed by the hosted MCP server at `https://mcp.contenthero.ai` and by the `@contenthero/mcp` npm package. A <Badge>write</Badge> tool changes your account; a <Badge>read</Badge> tool does not.
 
@@ -740,5 +740,113 @@ Delete one of the user's own templates. Clips placed from it keep everything. To
 
 <ParamField body name="templateId" type="string" required>
 The template id.
+</ParamField>
+
+### `list_style_libraries`
+
+<Badge>read</Badge>
+
+List the style libraries on this account. A style library is shared code that projects pin and import: components, design tokens, motion and sound cues, never a CSS style. Each entry gives its name, description, latest version and when it was last updated. Archived libraries are left out unless archived is true. Returns a page at a time; pass the answer's cursor for the next.
+
+<ParamField body name="archived" type="boolean">
+Only archived style libraries.
+</ParamField>
+
+<ParamField body name="cursor" type="string">
+The previous page's cursor.
+</ParamField>
+
+<ParamField body name="limit" type="integer">
+How many to return.
+</ParamField>
+
+<ParamField body name="order" type="`asc` \| `desc`">
+The sort direction.
+</ParamField>
+
+<ParamField body name="search" type="string">
+Search style library names.
+</ParamField>
+
+<ParamField body name="sort" type="`updatedAt` \| `name`">
+The field to sort by.
+</ParamField>
+
+### `get_style_library`
+
+<Badge>read</Badge>
+
+Read one style library by name: its description and every published version with its notes, newest first. With a version, read that version's modules instead, each by name with its code. A published version never changes. A project uses a library only after set_style_library pins a version in it.
+
+<ParamField body name="name" type="string" required>
+The style library name.
+</ParamField>
+
+<ParamField body name="cursor" type="string">
+The previous page's cursor.
+</ParamField>
+
+<ParamField body name="limit" type="integer">
+How many to return.
+</ParamField>
+
+<ParamField body name="version" type="integer">
+The version to read, with each module's code.
+</ParamField>
+
+### `create_style_library`
+
+<Badge>write</Badge>
+
+Create a style library on this account, and publish its first version when modules are sent. A style library is shared code, not a CSS style. Its modules come from `modules` sent inline, from `fromProject` (modules of one project, read from its saved state, with imports between them rewritten to the library's own), or both; a name sent by both is refused. A library module may import the sandbox's modules and its own library's modules, never a project module. The name is fixed once created, because the code of every clip that imports the library names it. Publishing runs the same checks as saving a project module: code that does not compile, an import it cannot resolve, or a module that reads something another module does not provide is refused with the reason.
+
+<ParamField body name="name" type="string" required>
+The style library name.
+</ParamField>
+
+<ParamField body name="description" type="string">
+What the style library is for.
+</ParamField>
+
+<ParamField body name="fromProject" type="object">
+Modules of one project: \{ projectId, modules, revision \}. The revision guards against a project that changed.
+</ParamField>
+
+<ParamField body name="modules" type="object">
+Modules by name: \{ code \}, \{ edits \} against baseVersion, or null to drop one.
+</ParamField>
+
+<ParamField body name="notes" type="string">
+What this version changes.
+</ParamField>
+
+### `update_style_library`
+
+<Badge>write</Badge>
+
+Publish the next version of a style library, edit its description, or both. A published version never changes: publishing adds one, and `notes` says what changed. Send modules inline (`code`, `edits` against `baseVersion`, or `null` to drop a module), from a project with `fromProject`, or both. A project that pins an earlier version is untouched until its own set_style_library moves it. Archive a style library with the archive tool, never by deleting: its versions are kept so every project that pins one still renders.
+
+<ParamField body name="name" type="string" required>
+The style library name.
+</ParamField>
+
+<ParamField body name="baseVersion" type="integer">
+The version the change builds on.
+</ParamField>
+
+<ParamField body name="description" type="string,null">
+What the style library is for.
+</ParamField>
+
+<ParamField body name="fromProject" type="object">
+Modules of one project: \{ projectId, modules, revision \}. The revision guards against a project that changed.
+</ParamField>
+
+<ParamField body name="modules" type="object">
+Modules by name: \{ code \}, \{ edits \} against baseVersion, or null to drop one.
+</ParamField>
+
+<ParamField body name="notes" type="string">
+What this version changes.
 </ParamField>
 

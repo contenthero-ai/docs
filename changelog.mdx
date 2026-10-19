@@ -3,6 +3,12 @@ title: "Changelog"
 description: "Updates to the ContentHero developer platform: SDK, MCP, CLI, and skills."
 ---
 
+<Update label="2026-10-19" tags={["Editor", "SDK", "MCP", "CLI"]}>
+  **Style libraries.** A style library is shared code that projects pin and import. Four new tools manage them: `list_style_libraries`, `get_style_library`, `create_style_library` and `update_style_library`, with a `contenthero style-library` command group in the CLI. A published version never changes. A project uses a library only after the `set_style_library` operation, available in `update_timeline` and `update_canvas`, pins it to a version, and its code imports a module as `@style/<library>/<module>`. `get_project` lists each pin with the newer versions and their notes. `archive` takes `style_library`, and there is no delete.
+
+  Packages: `sdk 0.4.35`, `mcp 0.4.42`, `cli 0.3.32`.
+</Update>
+
 <Update label="2026-10-17" tags={["Editor", "SDK", "MCP", "CLI"]}>
   **`view` finds and follows people and objects.** `view` gains `detector` (`pointer` or `face`) and `track` (a candidate's id, or a time and a box). `where` answers with candidates: each has an id, a confidence, one box and a check frame. On a project, `where` and `track` answer on the timeline.
 
