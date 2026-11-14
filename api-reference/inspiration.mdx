@@ -3,17 +3,129 @@ title: "Inspiration"
 description: "Tracked accounts, outliers, content, and brand-account performance endpoints."
 ---
 
-Base URL `https://app.contenthero.ai/api/v1`. Every endpoint takes a bearer API key. `POST /content/{id}/analysis` spends credits and needs `studio:generate`.
+Base URL `https://app.contenthero.ai/api/v1`. Every endpoint takes a bearer API key. The table below is generated from the route contract: the Scope column is the scope the key needs, and `None` means any valid key. Starting or stopping tracking needs `inspiration:write`, and `POST /content/{id}/analysis` spends credits and needs `studio:generate`.
 
 ## Accounts and content
 
-| Method | Path | Purpose |
-| --- | --- | --- |
-| `GET` | `/accounts` | The social accounts you track, both kinds. Filter with `account_type` (`inspiration` or `brand`) and `brand_kit_id`. |
-| `GET` | `/accounts/{id}` | One account with its performance: totals, averages, top and recent content. |
-| `GET` | `/content` | Posts, ranked by outlier score, across the creators you watch and your own accounts (`scope`). Every row carries `isOwn`. |
-| `GET` | `/content/{id}` | One post in full. Transcript (`transcript`, windowed with `start_ms`/`end_ms`), Break It Down (`analysis`) and scenes (`scenes=map`: each scene's range, what happens and what is said; a scene's frames come from `view`) are opt-in; their availability always reports. |
-| `POST` | `/content/{id}/analysis` | Make a post's Break It Down (`kind: "breakdown"`, the default) or its scenes (`kind: "scenes"`). Free when it exists; otherwise charged once when stored. Pass `getCost: true` to see the price first. |
+`GET /accounts` returns both kinds of tracked account; narrow it with `accountType` (`inspiration` or `brand`) and `brandKitId`. `GET /content` ranks posts across the creators you watch and your own accounts; `scope` picks which. On `GET /content/{id}`, the transcript (`transcript`, windowed with `startMs` and `endMs`), the Break It Down (`analysis`) and the scenes (`scenes=map`: each scene's range, what happens and what is said; a scene's frames come from `view`) are opt-in, and their availability always reports. `POST /content/{id}/analysis` makes a post's Break It Down (`kind: "breakdown"`, the default), its scenes (`kind: "scenes"`) or its video copies (`kind: "video"`). It is free when the result exists and otherwise charged once when stored; pass `getCost: true` to see the price first.
+
+{/* rest:begin inspiration */}
+
+| Method | Path | Scope | Purpose |
+| --- | --- | --- | --- |
+| `GET` | `/accounts` | None | The social accounts you track, both kinds (`accountType`: `inspiration` or `brand`), a page at a time. |
+| `POST` | `/accounts` | `inspiration:write` | Start tracking accounts. |
+| `GET` | `/accounts/{id}` | None | One tracked account with its performance: totals, averages, top and recent content. |
+| `PATCH` | `/accounts/{id}` | `inspiration:write` | Change a tracked account's placement in your lists. |
+| `DELETE` | `/accounts/{id}` | `inspiration:write` | Stop tracking an account. |
+| `GET` | `/content` | None | Tracked posts, ranked by outlier score by default, across the creators you watch and your own accounts (`scope`). |
+| `GET` | `/content/{id}` | None | One tracked post in full: engagement, outlier score, and on request its transcript and analysis. |
+| `POST` | `/content/{id}/analysis` | `studio:generate` | Analyze a post: its Break It Down (`kind: "breakdown"`, the default), its scenes, or its video. Pass `getCost` to price it first. |
+
+<AccordionGroup>
+
+<Accordion title="GET /accounts">
+
+**Query**
+
+| Field | Type | Required | Description |
+| --- | --- | --- | --- |
+| `accountType` | `inspiration` \| `brand` |  | Narrow to one kind. Omitted, both come back. |
+| `brandKitId` | string |  | Scope to the accounts linked to this brand kit (from get_brand_kit). |
+| `cursor` | string |  | The previous page's cursor. |
+| `limit` | integer |  | How many to return. |
+
+</Accordion>
+
+<Accordion title="POST /accounts">
+
+**Body**
+
+| Field | Type | Required | Description |
+| --- | --- | --- | --- |
+| `accounts` | object[] | Yes | The accounts to track, in the order they are listed. |
+| `accountType` | `inspiration` \| `brand` |  | Which list they join: inspiration (the default) or brand. |
+| `brandKitId` | string |  | Also link each account to this brand kit (from list_brand_kits). |
+
+</Accordion>
+
+<Accordion title="PATCH /accounts/{id}">
+
+**Body**
+
+| Field | Type | Required | Description |
+| --- | --- | --- | --- |
+| `afterId` | string |  | Place it immediately after this item of the same list. |
+| `beforeId` | string |  | Place it immediately before this item of the same list. |
+| `position` | `top` \| `bottom` |  | Place it at an end of the list instead of beside an item. Name neighbors or a position, not both. |
+
+</Accordion>
+
+<Accordion title="GET /content">
+
+**Query**
+
+| Field | Type | Required | Description |
+| --- | --- | --- | --- |
+| `accountIds` | string[] |  | Limit to these tracked accounts, each by its id or short id, its profile link, its handle, or the platform's own id for it. |
+| `addedByYou` | boolean |  | Only the one-off posts the owner saved by url. |
+| `brandKitId` | string |  | Scope to the accounts linked to this brand kit. |
+| `contentType` | string |  | Filter by content type, e.g. 'video', 'short', 'reel'. |
+| `cursor` | string |  | The previous page's cursor. |
+| `durationMax` | number |  | Maximum duration in seconds. |
+| `durationMin` | number |  | Minimum duration in seconds. |
+| `favorited` | boolean |  | Only content the account has favorited. |
+| `limit` | integer |  | How many to return. |
+| `order` | `asc` \| `desc` |  | The sort direction. |
+| `outlierScoreMax` | number |  | Only content at or below this outlier score. |
+| `outlierScoreMin` | number |  | Only content at or above this outlier score. |
+| `platform` | `youtube` \| `instagram` |  | Filter to one platform. |
+| `publicationDate` | `week` \| `month` \| `3months` \| `6months` \| `year` \| `2years` |  | Published within this window. Use publishedAfter for an exact date instead. |
+| `publishedAfter` | string |  | ISO timestamp. Wins over publicationDate. |
+| `publishedBefore` | string |  | ISO timestamp. |
+| `scope` | `all` \| `inspiration` \| `brand` |  | 'inspiration' = creators they watch, 'brand' = their own accounts, 'all' = both (default). |
+| `search` | string |  | Finds posts by meaning and by keyword across title, creator, description and transcript, ranked by relevance, or the one post a pasted link names. Returns only the posts judged relevant, never the unranked candidates. An empty result carries emptyReason: nothing matched, the relevance judge was unavailable (try again), or the link names no post this list covers. |
+| `sort` | `relevance` \| `outlierScore` \| `publishedAt` \| `viewCount` \| `engagementRate` |  | The field to sort by. |
+| `subscribersMax` | number |  | Maximum follower count of the post's account. |
+| `subscribersMin` | number |  | Minimum follower count of the post's account. |
+| `viewsMax` | number |  | Only content at or below this view count. |
+| `viewsMin` | number |  | Only content at or above this view count. |
+
+</Accordion>
+
+<Accordion title="GET /content/{id}">
+
+**Query**
+
+| Field | Type | Required | Description |
+| --- | --- | --- | --- |
+| `analysis` | `none` \| `full` |  | How much of the post's Break It Down analysis to include. Default 'none' (availability + section names still report). |
+| `analysisSections` | string[] |  | Only these analysis sections. The names differ by format, so take them from the availability line. |
+| `audioMap` | boolean |  | Add each video's audio map window: speech, sound candidates with their measured descriptors, music, loudness and each stem's level, measured once and free. Each video's summary reports either way. startMs and endMs narrow the window. |
+| `cuts` | boolean |  | Add each downloaded video's cut list: the seconds where its picture changes, measured once and free. startMs and endMs narrow the lists. |
+| `endMs` | number |  | Window end, ms from the start of the media. Narrows transcript segments, scenes and cut lists. |
+| `scenes` | `none` \| `map` |  | How much of the post's scene map to include. Default 'none' (availability still reports). 'map' adds each scene's range, what happens and what is said; view shows its frames. |
+| `startMs` | number |  | Window start, ms from the start of the media. Narrows transcript segments, scenes and cut lists. |
+| `transcript` | `none` \| `text` \| `segments` \| `words` |  | How much transcript to include. Default 'none'. 'words' adds each word's start and end to the segments, where the post has word timing. |
+| `transcriptSearch` | string |  | Return only the segments containing this phrase. Implies segments. |
+
+</Accordion>
+
+<Accordion title="POST /content/{id}/analysis">
+
+**Body**
+
+| Field | Type | Required | Description |
+| --- | --- | --- | --- |
+| `getCost` | boolean |  | Return the credit cost instead of analyzing (nothing runs, nothing is charged). 0 when the result already exists, or for video when its copies are being made. |
+| `kind` | `breakdown` \| `scenes` \| `video` |  | breakdown (default): the Break It Down analysis. scenes: the scene map, each scene's range, what happens and what is said, priced per minute of video. video: every video the post holds in shared analysis copies, each with its cut list once stored, charged for what the downloads moved. |
+| `resolution` | `720p` \| `1080p` |  | Only with kind video. The most detail the stored copy should have: the best the platform offers up to this is downloaded, charged for what arrives. A copy already at or above it costs nothing. Leave it out to keep the stored copy, or to get one at the standard detail. |
+
+</Accordion>
+
+</AccordionGroup>
+
+{/* rest:end inspiration */}
 
 ## The mining pattern
 

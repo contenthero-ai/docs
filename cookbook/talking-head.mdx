@@ -10,7 +10,7 @@ A presenter clip from a script you supply.
     `generate_audio` (a TTS model, your script, a `voiceId`). Capture the audio output id.
   </Step>
   <Step title="Lip-sync">
-    `generate_lip_sync` (a portrait image plus the audio output id) for the talking-head video.
+    `generate_video` with a lip-sync model (a portrait image plus the audio output id) for the talking-head video.
   </Step>
   <Step title="Assemble and publish">
     `create_card`, then one `update_card` carrying the video in `assets`, the platform in `posts`, and `scheduledAt`.

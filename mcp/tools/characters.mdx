@@ -3,8 +3,7 @@ title: "Avatars, voices and Kling elements"
 description: "The identity layer: avatars with their looks, the voices they speak with, and the Kling elements that keep a character, location or prop consistent across Kling generations."
 ---
 
-{/* GENERATED FILE. Do not edit by hand. */}
-{/* Regenerate with `npm run generate:reference` in contenthero-docs. */}
+{/* GENERATED FILE from the ContentHero tool contract. Do not edit by hand. */}
 
 The identity layer: avatars with their looks, the voices they speak with, and the Kling elements that keep a character, location or prop consistent across Kling generations. 12 tools.
 
@@ -14,7 +13,7 @@ Every tool below is exposed by the hosted MCP server at `https://mcp.contenthero
 
 <Badge>read</Badge>
 
-List the account's avatars. Each avatar has an imageUrl (its base look) and a defaultVoiceId, which feed generate_lip_sync. Call get_avatar for full detail and the avatar's looks.
+List the account's avatars. Each avatar has an imageUrl (its base look) and a defaultVoiceId, which feed generate_video with a lip-sync model. Call get_avatar for full detail and the avatar's looks.
 
 <ParamField body name="cursor" type="string">
 The previous page's cursor.
@@ -28,10 +27,10 @@ How many to return.
 
 <Badge>read</Badge>
 
-Get one avatar by id: its base image (use as generate_lip_sync imageUrl), default voice, traits, and its looks (outfit variations).
+Get one avatar by id: its base image (use as a generate_video reference image for a lip-sync model), default voice, traits, and its looks (outfit variations).
 
 <ParamField body name="avatarId" type="string" required>
-The avatar id from list_avatars.
+The avatar id from list_avatars. Either its short id or its UUID.
 </ParamField>
 
 ### `create_avatar`
@@ -84,10 +83,10 @@ Visual style hint for the portrait, e.g. "editorial", "cinematic". Not stored on
 
 <Badge>write</Badge>
 
-Update an avatar and/or change its looks. Fields: name, defaultLookId (also becomes the avatar's profile photo), defaultVoiceId. Looks are changed through ops, the same shape update_timeline and update_canvas use: add_look files images the account ALREADY OWNS onto the avatar, remove_look trashes one (recoverable for 30 days). Ops run before the fields, so one call can add a look and make it the default. To GENERATE a new look instead of filing an existing image, call generate_image with avatarId.
+Update an avatar and/or change its looks. Fields: name, description, defaultLookId (also becomes the avatar's profile photo), defaultVoiceId. Looks are changed through ops, the same shape update_timeline and update_canvas use: add_look files images the account ALREADY OWNS onto the avatar, remove_look trashes one (recoverable for 30 days). Ops run before the fields, so one call can add a look and make it the default. To GENERATE a new look instead of filing an existing image, call generate_image with avatarId.
 
 <ParamField body name="avatarId" type="string" required>
-The avatar id from list_avatars.
+The avatar id from list_avatars. Either its short id or its UUID.
 </ParamField>
 
 <ParamField body name="afterId" type="string">
@@ -104,6 +103,10 @@ A look id from get_avatar. Becomes the avatar's default look AND its profile pho
 
 <ParamField body name="defaultVoiceId" type="string,null">
 A voiceId from list_voices, or null to clear it.
+</ParamField>
+
+<ParamField body name="description" type="string">
+What the avatar is, in words. An empty string clears it.
 </ParamField>
 
 <ParamField body name="name" type="string">
@@ -125,14 +128,14 @@ Place it at an end of the list instead of beside an item. Name neighbors or a po
 Delete an avatar. Soft: the avatar stops appearing, but ITS LOOKS SURVIVE as library images and can be filed onto another avatar with update_avatar's add_look. Use this to retire a duplicate or an abandoned character, after moving any looks worth keeping.
 
 <ParamField body name="avatarId" type="string" required>
-The avatar id from list_avatars.
+The avatar id from list_avatars. Either its short id or its UUID.
 </ParamField>
 
 ### `list_voices`
 
 <Badge>read</Badge>
 
-List the account's saved voices (favorites first). Set favorited=true to show only favorites. Each has a voiceId for generate_lip_sync / generate_audio (TTS). Call get_voice for full detail.
+List the account's saved voices (favorites first). Set favorited=true to show only favorites. Each has a voiceId for generate_video with a lip-sync model and for generate_audio (TTS). Call get_voice for full detail.
 
 <ParamField body name="cursor" type="string">
 The previous page's cursor.
@@ -177,7 +180,7 @@ How many to return.
 Get one saved Kling element by id: its name, category, description, and images.
 
 <ParamField body name="klingElementId" type="string" required>
-The Kling element id.
+The Kling element id. Either its short id or its UUID.
 </ParamField>
 
 ### `create_kling_element`
@@ -213,7 +216,7 @@ A single video URL or output-id token (alternative to images).
 Update a saved Kling element's name, description, or category.
 
 <ParamField body name="klingElementId" type="string" required>
-The Kling element id.
+The Kling element id. Either its short id or its UUID.
 </ParamField>
 
 <ParamField body name="category" type="`auto` \| `character` \| `location` \| `prop`">
@@ -235,6 +238,6 @@ Rename the Kling element.
 Permanently delete a saved Kling element. Videos already generated with it are unaffected.
 
 <ParamField body name="klingElementId" type="string" required>
-The Kling element id.
+The Kling element id. Either its short id or its UUID.
 </ParamField>
 

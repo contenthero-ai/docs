@@ -3,8 +3,7 @@ title: "Brand"
 description: "Brand kits and the knowledge base that grounds generations in your voice."
 ---
 
-{/* GENERATED FILE. Do not edit by hand. */}
-{/* Regenerate with `npm run generate:reference` in contenthero-docs. */}
+{/* GENERATED FILE from the ContentHero tool contract. Do not edit by hand. */}
 
 Brand kits and the knowledge base that grounds generations in your voice. 9 tools.
 
@@ -39,7 +38,7 @@ How many to return.
 Get one brand kit. A brand kit is a set of named sections, each one Markdown document, plus its visual identity. THREE WAYS TO READ, chosen by what you pass: (1) detail:'summary' lists every section with its key, role, version, length and outline (its own headings) but NO body, the cheap first read, so start there and decide what the task needs; (2) any of keys, roles or tabs returns just those sections with their bodies (the filters combine with AND), and history:true adds each one's earlier versions; (3) neither returns the whole kit: every section, visual identity (logos, colors, typography), linked brand and inspiration accounts, and a knowledge-base summary. A section's key is stable and is how you address it; its role says what a starter section means and is the same in every kit, whatever the user named it. Every section carries a version: pass it back as expectedVersion when you change it with update_brand_kit.
 
 <ParamField body name="brandKitId" type="string" required>
-The brand kit id from list_brand_kits.
+The brand kit id from list_brand_kits. Either its short id or its UUID.
 </ParamField>
 
 <ParamField body name="detail" type="`summary` \| `full`">
@@ -119,7 +118,7 @@ The brand's websites, primary first. The first gives the logos, colors and fonts
 Update a brand kit: its section content, colors and fonts, brand media, which kit is the DEFAULT, and which tracked accounts it is LINKED to. Only what you pass changes. Get the current kit first with get_brand_kit. SECTION CONTENT is written with sections, naming only the sections you change, all or nothing. An entry with a key edits that section: body (Markdown) replaces the whole section, revertTo restores an earlier version as a new one, sectionName renames it, width sets its card to full or half. An entry without a key adds a section of your own, with sectionName and tab. Pass each edited section's version as expectedVersion: if any of them changed since you read it, NOTHING is written and the error lists each stale section's current version and body, so re-read, reapply your change, and retry. To remove a section, archive it with archive (assetType brand_kit_section). A section entry's afterId, beforeId or position moves that section within its tab; its neighbors are section ids. Requires the brand:write scope. afterId, beforeId or position moves the kit itself among the caller's kits. extract:true RE-RUNS the import: the visuals from its first website and the analysis of its websites and own accounts, which writes only into sections still empty and returns immediately (poll analysisStatus and extractionStatus via get_brand_kit). logos/assets/brandAccounts/inspirationAccounts are DECLARATIVE: a patch REPLACES the whole list, so pass the full set and use [] to clear. THIS IS ALSO HOW YOU ADD NEW MEDIA TO A KIT: a logo or asset entry names either a url it already has, or outputId to bring in a generation that is not in the kit yet ('\<id\>', or '\<id\>-2' for variation 2 of a batch), whose bytes get COPIED into the kit so trashing that generation later cannot empty it. To add a logo, read the kit, append one entry, and send the whole list back; sending an outputId twice adds it twice. brandAccounts are the brand's own profiles (its performance), linked to the kit as its brand side, which never marks them as the user's own; inspirationAccounts are competitors and creators they watch; they are separate lists because they mean opposite things. AN ENTRY IS EITHER one of your tracked accounts, by its id or short id, its profile link, its handle, or the platform's own id for it, OR \{ platform?, handleOrUrl \} to ADD a profile that is not tracked yet, which is what STARTS ingesting its posts (a full profile url carries its own platform, so platform is only needed for a bare handle). isDefault only accepts true (passing false would leave the account with no default at all, so to move the default, name the kit that should hold it).
 
 <ParamField body name="brandKitId" type="string" required>
-The brand kit id.
+The brand kit id. Either its short id or its UUID.
 </ParamField>
 
 <ParamField body name="afterId" type="string">
@@ -185,7 +184,7 @@ The brand's websites, primary first. REPLACES the list; [] clears it. Stored onl
 The complete, paginated index of a brand kit's knowledge items (titles and metadata, no bodies). Use it to browse what exists, or to find an item's id before get_brand_knowledge or remove_brand_knowledge. For relevance retrieval, use search_brand_knowledge instead. Requires the brand:read scope.
 
 <ParamField body name="brandKitId" type="string" required>
-The brand kit id.
+The brand kit id. Either its short id or its UUID.
 </ParamField>
 
 <ParamField body name="cursor" type="string">
@@ -203,11 +202,11 @@ How many to return.
 Get one knowledge item's stored body by id (the capped anchor text; the full document is embedded for search, not stored verbatim). Use search_brand_knowledge for the deep content. Requires the brand:read scope.
 
 <ParamField body name="brandKitId" type="string" required>
-The brand kit id.
+The brand kit id. Either its short id or its UUID.
 </ParamField>
 
 <ParamField body name="knowledgeId" type="string" required>
-The knowledge item id (from list_brand_knowledge or search_brand_knowledge).
+The knowledge item id (from list_brand_knowledge or search_brand_knowledge). Either its short id or its UUID.
 </ParamField>
 
 ### `add_brand_knowledge`
@@ -217,7 +216,7 @@ The knowledge item id (from list_brand_knowledge or search_brand_knowledge).
 Add an item to a brand kit's knowledge base so it can be searched later. This is how the brand's knowledge grows over time: capture a lesson learned, a brand decision, an asset description, an article, or a video. Source can be text (a note), url (a page to scrape), youtube (a video transcript), or file. For a file, pass either fileData (base64, best for small documents and images) or fileUrl (a hosted URL the server fetches, needed for large files and video/audio). Requires the brand:write scope. SPENDS CREDITS for images, video and audio (text, links, YouTube and documents are free): pass getCost to preview the price first, which runs nothing and charges nothing.
 
 <ParamField body name="brandKitId" type="string" required>
-The brand kit id.
+The brand kit id. Either its short id or its UUID.
 </ParamField>
 
 <ParamField body name="sourceType" type="`text` \| `url` \| `youtube` \| `file`" required>
@@ -259,11 +258,11 @@ For sourceType "url" or "youtube": the link.
 Remove a knowledge item and its embedding chunks from a brand kit's knowledge base. Requires the brand:write scope.
 
 <ParamField body name="brandKitId" type="string" required>
-The brand kit id.
+The brand kit id. Either its short id or its UUID.
 </ParamField>
 
 <ParamField body name="knowledgeId" type="string" required>
-The knowledge item id to remove.
+The knowledge item id to remove. Either its short id or its UUID.
 </ParamField>
 
 ### `search_brand_knowledge`
@@ -273,7 +272,7 @@ The knowledge item id to remove.
 Semantic search over a brand kit's knowledge base (everything the owner has uploaded: notes, docs, articles, video transcripts). Returns the most relevant passages, ranked. This is the deep-grounding read: use it to pull what the brand has said about a topic before drafting or deciding. Requires the brand:read scope.
 
 <ParamField body name="brandKitId" type="string" required>
-The brand kit id (from list_brand_kits / get_brand_kit).
+The brand kit id (from list_brand_kits / get_brand_kit). Either its short id or its UUID.
 </ParamField>
 
 <ParamField body name="query" type="string" required>

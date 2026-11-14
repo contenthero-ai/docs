@@ -1,0 +1,212 @@
+---
+title: "Library"
+description: "Uploads, imports, library folders, and the favorite, archive and share endpoints."
+---
+
+Base URL `https://app.contenthero.ai/api/v1`. All endpoints take a bearer API key. The tables on this page are generated from the route contract.
+
+## Uploads and imports
+
+An upload is three calls: `POST /media/uploads` reserves the file and answers an upload target, you send the bytes to it, then `POST /media/uploads/{outputId}/complete` finishes it. A large file uses a multipart session: sign the parts that still need bytes, send them, then complete. An import takes a public https URL instead and runs in the background: poll `GET /status/{id}`.
+
+{/* rest:begin uploads */}
+
+| Method | Path | Scope | Purpose |
+| --- | --- | --- | --- |
+| `POST` | `/media/uploads` | `library:write` | Begin an upload. Reserves the file in your library and answers an upload target: one URL to PUT the whole file to, or a multipart session. |
+| `POST` | `/media/uploads/{outputId}/parts` | `library:write` | Sign the parts of a multipart upload that still need bytes. Idempotent, so a paused upload resumes by asking again. |
+| `GET` | `/media/uploads/{outputId}/parts` | `library:write` | List the parts of a multipart upload the store already holds. |
+| `POST` | `/media/uploads/{outputId}/complete` | `library:write` | Finish an upload once its bytes are sent. Idempotent: completing twice answers the same media. |
+| `DELETE` | `/media/uploads/{outputId}` | `library:write` | Abort an upload that has not completed. A completed upload is refused: delete the media instead. |
+| `POST` | `/media/imports` | `library:write` | Import a file from a public https URL as library media. Asynchronous: poll `GET /status/{id}` with the returned id. |
+
+<AccordionGroup>
+
+<Accordion title="POST /media/uploads">
+
+**Body**
+
+| Field | Type | Required | Description |
+| --- | --- | --- | --- |
+| `contentType` | string | Yes | The MIME type of the file. |
+| `fileName` | string | Yes | The file name, used for its extension. |
+| `sizeBytes` | integer | Yes | The size of the file in bytes. The store chooses how the file is uploaded from it. |
+
+</Accordion>
+
+<Accordion title="POST /media/uploads/{outputId}/parts">
+
+**Body**
+
+| Field | Type | Required | Description |
+| --- | --- | --- | --- |
+| `partNumbers` | integer[] | Yes | The numbers of the parts to sign, counted from 1. |
+
+</Accordion>
+
+<Accordion title="POST /media/uploads/{outputId}/complete">
+
+**Body**
+
+| Field | Type | Required | Description |
+| --- | --- | --- | --- |
+| `parts` | object[] |  | Multipart files only: the number and ETag of every part, exactly as the store answered its PUT. |
+
+</Accordion>
+
+<Accordion title="POST /media/imports">
+
+**Body**
+
+| Field | Type | Required | Description |
+| --- | --- | --- | --- |
+| `url` | string | Yes | A public https address: a file, imported free into the library, or a video page on a supported site, whose video is downloaded into the library and spends. |
+| `contentType` | string |  | With url: a MIME override (else taken from the response). |
+| `fileName` | string |  | With url: a file name (used for its extension). |
+| `getCost` | boolean |  | Return what this import would spend instead of importing (nothing runs, nothing is charged). 0 for a file address or a project. |
+
+</Accordion>
+
+</AccordionGroup>
+
+{/* rest:end uploads */}
+
+## Folders
+
+{/* rest:begin folders */}
+
+| Method | Path | Scope | Purpose |
+| --- | --- | --- | --- |
+| `GET` | `/library/folders` | None | List library folders. |
+| `POST` | `/library/folders` | `library:write` | Create a library folder. |
+| `GET` | `/library/folders/{id}` | None | One folder and what it holds, a page at a time. |
+| `PATCH` | `/library/folders/{id}` | `library:write` | Rename a folder, move it under another, or move files into it. |
+| `DELETE` | `/library/folders/{id}` | `library:write` | Delete a folder. |
+
+<AccordionGroup>
+
+<Accordion title="GET /library/folders">
+
+**Query**
+
+| Field | Type | Required | Description |
+| --- | --- | --- | --- |
+| `cursor` | string |  | The previous page's cursor. |
+| `limit` | integer |  | How many to return. |
+
+</Accordion>
+
+<Accordion title="POST /library/folders">
+
+**Body**
+
+| Field | Type | Required | Description |
+| --- | --- | --- | --- |
+| `name` | string | Yes | The folder name. |
+| `parentId` | string |  | Nest the new folder under this parent folder id. |
+| `query` | object or null |  |  |
+| `type` | `manual` \| `smart` |  | 'manual' (a collection you file items into) or 'smart' (a saved live query). Defaults to manual. |
+
+</Accordion>
+
+<Accordion title="GET /library/folders/{id}">
+
+**Query**
+
+| Field | Type | Required | Description |
+| --- | --- | --- | --- |
+| `cursor` | string |  | The previous page's cursor. |
+| `limit` | integer |  | How many to return. |
+| `smallCopies` | boolean |  | Link each image's small copy instead of the file itself, where the library keeps one: for drawing images small, as code that shows many at once does. Never for downloading or delivering a file, or showing it large. |
+
+**Response**
+
+| Field | Type | Required | Description |
+| --- | --- | --- | --- |
+| `folder` | object or null | Yes |  |
+| `items` | value[] | Yes |  |
+| `nextCursor` | string or null | Yes |  |
+| `derivedKey` | string |  |  |
+
+</Accordion>
+
+<Accordion title="PATCH /library/folders/{id}">
+
+**Body**
+
+| Field | Type | Required | Description |
+| --- | --- | --- | --- |
+| `addItems` | value[] |  | File these items into the folder(s). A delta: their other folders are untouched. |
+| `color` | string or null |  | The folder's color, or null to clear it. |
+| `folderIds` | string[] |  | Patch several folders at once. Attribute fields (name, query) still need exactly one. |
+| `icon` | string or null |  | The folder's icon name, or null to clear it. |
+| `moveItem` | object |  | Move one item within this manual folder: after or before another of its items, or to an end (position). Each item is named as addItems names one. Name neighbors or a position, not both. |
+| `name` | string |  | A new name. |
+| `parentId` | string or null |  | A new parent folder id, or null to move to the top level. MOVES the folder. |
+| `query` | object or null |  |  |
+| `removeItems` | value[] |  | Unfile these items. Only the pointer goes; the asset is never deleted. |
+
+</Accordion>
+
+</AccordionGroup>
+
+{/* rest:end folders */}
+
+## Favorite, archive and share
+
+One route each, for every kind of item. Archiving is reversible; deleting is a separate call on each resource.
+
+{/* rest:begin marks */}
+
+| Method | Path | Scope | Purpose |
+| --- | --- | --- | --- |
+| `POST` | `/favorite` | `favorites:write` | Favorite or unfavorite any asset: a media item by `mediaId`, anything else by `assetType` and `id`. |
+| `POST` | `/archive` | `favorites:write` | Archive or restore any asset. Reversible; deleting is a separate call on each resource. |
+| `POST` | `/share` | `studio:write` and `editor:write` | Make an item's public link, or stop sharing it. One route for every shareable kind. |
+
+<AccordionGroup>
+
+<Accordion title="POST /favorite">
+
+**Body**
+
+| Field | Type | Required | Description |
+| --- | --- | --- | --- |
+| `assetType` | `card` \| `voice` \| `brand_kit` \| `project` \| `inspiration_content` \| `gallery` \| `transition` \| `caption-template` \| `template` \| `space` |  | The kind of asset, for anything that is not media. Pass with id. |
+| `favorited` | boolean |  | Default true. Pass false to UNfavorite. |
+| `id` | string |  | The asset's id, with assetType. |
+| `mediaId` | string |  | A media id, for media. A bare id for a generation with several outputs is refused with their media ids listed. |
+
+</Accordion>
+
+<Accordion title="POST /archive">
+
+**Body**
+
+| Field | Type | Required | Description |
+| --- | --- | --- | --- |
+| `archived` | boolean |  | Default true. Pass false to RESTORE (unarchive). |
+| `assetType` | `card` \| `brand_kit` \| `brand_kit_section` \| `project` \| `space` \| `template` \| `style_library` |  | The kind of asset, for anything that is not media. Pass with id. |
+| `id` | string |  | The asset's id, with assetType. |
+| `mediaId` | string |  | A generated output's media id. A bare id for a generation with several outputs is refused with their media ids listed. |
+
+</Accordion>
+
+<Accordion title="POST /share">
+
+**Body**
+
+| Field | Type | Required | Description |
+| --- | --- | --- | --- |
+| `assetType` | `project` |  | The kind of item, for anything that is not media. Pass with id. |
+| `id` | string |  | The item's id, with assetType. |
+| `mediaIds` | string[] |  | For media: one or more media ids of outputs of your finished generations. To stop sharing, one. |
+| `shareUrl` | string |  | For media, with shared:false: the media link to stop. |
+| `shared` | boolean |  | Default true. Pass false to stop sharing. |
+| `title` | string |  | For media: a title for a set of two or more. |
+
+</Accordion>
+
+</AccordionGroup>
+
+{/* rest:end marks */}

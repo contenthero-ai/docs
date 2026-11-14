@@ -1,6 +1,6 @@
 ---
 title: "Generate"
-description: "Image, video, audio, reference boards, and lip-sync, with output-id chaining and cost preflight."
+description: "Image, video and audio, with every model operation behind one tool per medium, output-id chaining and cost preflight."
 ---
 
 The generate tools turn an idea into media: you bring the prompt, ContentHero produces the asset. Drafting the prompt in the user's voice is the [pipeline](/guides/pipeline)'s job, not this one.
@@ -16,10 +16,9 @@ The roster is live, resolved from the registry. It is exposed as the `modelId` e
 | Image | `generate_image` | `contenthero generate image` |
 | Video | `generate_video` | `contenthero generate video` |
 | Audio (TTS) | `generate_audio` | `contenthero generate audio` |
-| Reference board | `generate_board` | `contenthero generate board` |
-| Lip-sync | `generate_lip_sync` | `contenthero generate lip-sync` |
-| Upscale | `upscale` | `contenthero upscale` |
 | Transcribe | `transcribe` | `contenthero transcribe` |
+
+There is one generate tool per medium. The model you pick decides the operation: `generate_image` also runs upscaling, background removal, layer separation and reference boards, and `generate_video` also runs lip-sync models. `get_model` names a model's operation and the inputs it takes.
 
 Reads: `list_media` / `get_media` (spanning creations, boards, and looks via the `kind` filter), `list_avatars` / `get_avatar`, `list_voices` / `get_voice`.
 
@@ -63,7 +62,7 @@ contenthero generate image "on a rooftop at golden hour" \
   --model nano-banana-2 --avatar <avatarId> --ref <avatarLookUrlOrId>
 ```
 
-The MCP takes the same field: `generate_image` with `avatarId`, and `generate_board` with `avatarId` to file a character sheet against the avatar it was built for. Pass a reference image of the avatar alongside it to keep the subject on-model; `avatarId` decides where the result is filed, not what it looks like.
+The MCP takes the same field: `generate_image` with `avatarId`, including with a reference board model to file a character sheet against the avatar it was built for. Pass a reference image of the avatar alongside it to keep the subject on-model; `avatarId` decides where the result is filed, not what it looks like.
 
 The avatar must be one you own. An id you do not own is rejected rather than ignored.
 

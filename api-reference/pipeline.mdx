@@ -3,35 +3,248 @@ title: "Pipeline"
 description: "Spaces, stages and cards, the posts that publish a card, what a card can hold, scheduling, publishing, and connected accounts."
 ---
 
-Base URL `https://app.contenthero.ai/api/v1`. All endpoints take a bearer API key. Reads need no scope; writes need the scope listed.
+Base URL `https://app.contenthero.ai/api/v1`. All endpoints take a bearer API key. The tables are generated from the route contract: the Scope column is the scope the key needs, and `None` means any valid key.
 
-## Spaces and stages
+## Spaces
 
-A space is a board; each space has its own stages, in order.
+A space is a board.
+
+{/* rest:begin spaces */}
 
 | Method | Path | Scope | Purpose |
 | --- | --- | --- | --- |
-| `GET` | `/spaces` | read | List your spaces. |
-| `POST` | `/spaces` | `planner:write` | Create a space. |
-| `GET` | `/spaces/{id}` | read | Get one space. |
-| `PATCH` | `/spaces/{id}` | `planner:write` | Update a space. |
-| `DELETE` | `/spaces/{id}` | `planner:write` | Delete a space. |
-| `GET` | `/stages` | read | List a space's stages, in order. |
-| `POST` | `/stages` | `planner:write` | Create a stage. |
-| `PATCH` | `/stages/{id}` | `planner:write` | Update a stage. |
-| `DELETE` | `/stages/{id}` | `planner:write` | Delete a stage. |
+| `GET` | `/spaces` | None | List your spaces, each with its card count, a page at a time. |
+| `POST` | `/spaces` | `planner:write` | Create a space, optionally duplicating another one. |
+| `GET` | `/spaces/{id}` | None | One space with its live card count. |
+| `PATCH` | `/spaces/{id}` | `planner:write` | Rename a space or change its cover. |
+| `DELETE` | `/spaces/{id}` | `planner:write` | Delete an empty space. A space that still holds cards is refused. |
+
+<AccordionGroup>
+
+<Accordion title="GET /spaces">
+
+**Query**
+
+| Field | Type | Required | Description |
+| --- | --- | --- | --- |
+| `archived` | boolean |  | Only archived spaces. Archived spaces are excluded by default, matching the grid in the app. |
+| `cursor` | string |  | The previous page's cursor. |
+| `favorited` | boolean |  | Only favorited spaces. |
+| `limit` | integer |  | How many to return. |
+| `order` | `asc` \| `desc` |  | The sort direction. |
+| `search` | string |  | Search space names. |
+| `sort` | `updatedAt` \| `name` \| `cardCount` |  | The field to sort by. |
+
+</Accordion>
+
+<Accordion title="POST /spaces">
+
+**Body**
+
+| Field | Type | Required | Description |
+| --- | --- | --- | --- |
+| `name` | string | Yes | The space name. |
+| `coverPosition` | object or null |  |  |
+| `coverUrl` | string or null |  | A cover image URL for the space tile. |
+| `duplicateFrom` | string |  | Copy this space's stages into the new one. Cards are never copied. |
+
+</Accordion>
+
+<Accordion title="PATCH /spaces/{id}">
+
+**Body**
+
+| Field | Type | Required | Description |
+| --- | --- | --- | --- |
+| `coverPosition` | object or null |  |  |
+| `coverUrl` | string or null |  | A new cover image URL. Pass an empty string to remove the cover entirely. |
+| `name` | string |  | A new name. |
+
+</Accordion>
+
+</AccordionGroup>
+
+{/* rest:end spaces */}
+
+## Stages
+
+Each space has its own stages, in order.
+
+{/* rest:begin stages */}
+
+| Method | Path | Scope | Purpose |
+| --- | --- | --- | --- |
+| `GET` | `/stages` | None | List a space's pipeline stages in order, seeding the default stages on first access. |
+| `POST` | `/stages` | `planner:write` | Create a stage (a column). |
+| `PATCH` | `/stages/{id}` | `planner:write` | Rename, recolor or reposition a stage. `spaceId` is required. |
+| `DELETE` | `/stages/{id}` | `planner:write` | Delete a stage, reassigning its cards. `spaceId` is required. |
+
+<AccordionGroup>
+
+<Accordion title="GET /stages">
+
+**Query**
+
+| Field | Type | Required | Description |
+| --- | --- | --- | --- |
+| `cursor` | string |  | The previous page's cursor. |
+| `limit` | integer |  | How many to return. |
+| `spaceId` | string |  | Which space's stages, from list_spaces. Omit only when you mean the account's default space; an account with no space gets an empty list. |
+
+</Accordion>
+
+<Accordion title="POST /stages">
+
+**Body**
+
+| Field | Type | Required | Description |
+| --- | --- | --- | --- |
+| `name` | string | Yes | The column name, for example "In Review". Must contain a letter or number. |
+| `afterId` | string |  | Place it immediately after this item of the same list. |
+| `beforeId` | string |  | Place it immediately before this item of the same list. |
+| `color` | string or null |  | A hex color such as "#3B82F6". |
+| `position` | `top` \| `bottom` |  | Place it at an end of the list instead of beside an item. Name neighbors or a position, not both. |
+| `spaceId` | string |  | Which board, from list_spaces. Omit only when you mean the account's default space; an account with no space is refused until one is created. |
+
+</Accordion>
+
+<Accordion title="PATCH /stages/{id}">
+
+**Body**
+
+| Field | Type | Required | Description |
+| --- | --- | --- | --- |
+| `spaceId` | string | Yes | The board this stage is on, from list_stages or list_spaces. |
+| `afterId` | string |  | Place it immediately after this item of the same list. |
+| `beforeId` | string |  | Place it immediately before this item of the same list. |
+| `color` | string or null |  | A new hex color such as "#3B82F6". |
+| `name` | string |  | A new name. The slug follows it automatically. |
+| `position` | `top` \| `bottom` |  | Place it at an end of the list instead of beside an item. Name neighbors or a position, not both. |
+
+</Accordion>
+
+<Accordion title="DELETE /stages/{id}">
+
+**Body**
+
+| Field | Type | Required | Description |
+| --- | --- | --- | --- |
+| `spaceId` | string | Yes | The board this stage is on. |
+| `targetStageId` | string or null |  | Where this column's cards should go. Required unless the column is empty. |
+
+</Accordion>
+
+</AccordionGroup>
+
+{/* rest:end stages */}
 
 ## Cards
 
 A card is the unit of work: its title, notes and cover, the posts that publish it (one per platform), and what it holds (its assets).
 
+{/* rest:begin cards */}
+
 | Method | Path | Scope | Purpose |
 | --- | --- | --- | --- |
-| `GET` | `/cards` | read | List a space's cards. |
-| `POST` | `/cards` | `planner:write` | Create a card. Without a space it lands on your default board. |
-| `GET` | `/cards/{id}` | read | Get a card with its posts and assets. |
-| `PATCH` | `/cards/{id}` | `planner:write` | Update a card: its fields, its `posts`, its `assets` and its schedule. |
-| `POST` | `/cards/{id}/publish` | `publish:write` | Publish now, to every post on the card or to one platform. |
+| `GET` | `/cards` | None | List your cards in one space (or all), filtered and sorted, a page at a time. |
+| `POST` | `/cards` | `planner:write` | Create a card. Without a space it lands on your default board; an account with no space is refused until one is created. |
+| `GET` | `/cards/{id}` | None | One card with its posts, destinations and assets. |
+| `PATCH` | `/cards/{id}` | `planner:write` | Update a card: its fields, its posts and destinations, its assets and its schedule. |
+| `POST` | `/cards/{id}/publish` | `publish:write` | Publish now, to every post on the card or to one `platform`. Each post publishes independently and answers its own result. |
+
+<AccordionGroup>
+
+<Accordion title="GET /cards">
+
+**Query**
+
+| Field | Type | Required | Description |
+| --- | --- | --- | --- |
+| `archived` | boolean |  | Only ARCHIVED cards. Archived cards are excluded by default, matching the board. |
+| `cursor` | string |  | The previous page's cursor. |
+| `isFavorite` | boolean |  | Only favorited cards. |
+| `limit` | integer |  | How many to return. |
+| `order` | `asc` \| `desc` |  | The sort direction. |
+| `platform` | `youtube` \| `instagram` \| `tiktok` \| `facebook` \| `linkedin` \| `x` \| `threads` \| `general` |  | Filter by the post platform. |
+| `search` | string |  | Case-insensitive title search, scoped to the chosen space. |
+| `sort` | `updatedAt` \| `createdAt` \| `scheduledAt` \| `title` \| `position` |  | The field to sort by. |
+| `spaceId` | string |  | Which space's board to list, from list_spaces, or 'all' for every space. Omit ONLY when you mean the account's default space (an account with no space gets an empty list); omitting it does not search every board. |
+| `stage` | string |  | Filter by a stage id, slug, or name. Resolved within the chosen space. Needed for sort position, which reads that stage's own order. |
+| `tag` | string |  | Only cards carrying this tag: its short id, its UUID, or a word in its name. |
+
+</Accordion>
+
+<Accordion title="POST /cards">
+
+**Body**
+
+| Field | Type | Required | Description |
+| --- | --- | --- | --- |
+| `platform` | `youtube` \| `instagram` \| `tiktok` \| `facebook` \| `linkedin` \| `x` \| `threads` \| `general` | Yes | Primary platform for the post. |
+| `title` | string | Yes | Post title (required). |
+| `afterId` | string |  | Place it immediately after this item of the same list. |
+| `assets` | object[] |  | The assets to attach on creation, in order. |
+| `beforeId` | string |  | Place it immediately before this item of the same list. |
+| `contentType` | string or null |  | What kind of content the card holds, in a word. |
+| `coverOutputId` | string or null |  | A media token (short id, output id or first 8 characters, optionally with "-N") for the cover, resolved to its URL. Use this or coverUrl. |
+| `coverPosition` | object or null |  |  |
+| `coverUrl` | string or null |  | Public URL for the post cover (the card thumbnail). |
+| `notes` | string or null |  | Working notes on the card. Plain text or markdown; tables render here. No emojis. |
+| `position` | `top` \| `bottom` |  | Place it at an end of the list instead of beside an item. Name neighbors or a position, not both. |
+| `posts` | object[] |  | The posts to attach on creation, each \{ platform, ... \}, one per platform. |
+| `spaceId` | string or null |  | Which board to create the card on, from list_spaces. Omit only when you mean the account's default space; an account with no space is refused until one is created. |
+| `stage` | string or null |  | Stage id, slug, or name. Defaults to the first stage. |
+| `tags` | string[] |  | Tag names to set on the post (must already exist; see list_tags / create_tag). Replaces the set. |
+
+</Accordion>
+
+<Accordion title="PATCH /cards/{id}">
+
+**Body**
+
+| Field | Type | Required | Description |
+| --- | --- | --- | --- |
+| `afterId` | string |  | Place it immediately after this item of the same list. |
+| `assets` | object[] |  | The post's assets IN ORDER, each \{ id \} to keep an existing one or ONE of \{ outputId \} \| \{ assetUrl, assetType? \} \| \{ contentId \} \| \{ projectId \} to add. REPLACES the list; [] clears it. |
+| `beforeId` | string |  | Place it immediately before this item of the same list. |
+| `cardIds` | string[] |  | Update several cards at once. Fields that describe ONE card (title, notes, cover) still require exactly one. |
+| `contentType` | string or null |  | What kind of content the card holds, in a word. An empty string clears it. |
+| `coverOutputId` | string or null |  | A media token (short id, output id or first 8 characters, optionally with "-N") for the cover, resolved to its URL. |
+| `coverPosition` | object or null |  |  |
+| `coverUrl` | string or null |  | Public URL for the post cover. |
+| `expectedRevision` | integer |  | REQUIRED when writing notes: the revision get_card reported for this card. A card's notes have four independent writers, each reading the whole document and writing it back, so without this the last writer silently erases the others and still gets a success. If the card changed since you read it, the call fails with a conflict carrying the current notes and revision: merge onto those and retry with the revision they came with. Never guess it or add one to it, because it only advances when notes actually change. |
+| `isFavorite` | boolean |  | Favorite or unfavorite the card. |
+| `metadata` | object or null |  | The card's metadata. |
+| `notes` | string or null |  | Working notes on the card. Plain text or markdown; tables render here. No emojis. |
+| `notesEdits` | object[] |  | Change the notes in place without resending them. Each edit is \{ append: text \}, which adds to the end, or \{ find, replace \}, where find must match exactly one place in the current notes. Edits apply in order, all or none, to the notes as they are when the call arrives, so no expectedRevision is needed. Prefer this to notes for any change smaller than a rewrite. |
+| `platform` | `youtube` \| `instagram` \| `tiktok` \| `facebook` \| `linkedin` \| `x` \| `threads` \| `general` |  | The card's primary platform. This is a label on the card; what actually publishes is its posts. |
+| `position` | `top` \| `bottom` |  | Place it at an end of the list instead of beside an item. Name neighbors or a position, not both. |
+| `posts` | object[] |  | The card's posts, each \{ platform, format?, connectedAccountId?, platformSpecificData?, scheduledAt?, status? \}. REPLACES the set, keyed by platform; [] detaches all. |
+| `publishUrl` | string or null |  | Where the card was published. |
+| `publishedAt` | string or null |  | When the card was published. |
+| `scheduledAt` | string or null |  | ISO time to publish. Sets the card AND every post. null clears the schedule. |
+| `script` | string or null |  | The card's script. |
+| `spaceId` | string or null |  | Move the card to a different space (id or slug). Without a stage, it lands in that space's stage whose slug matches its current one, or that space's first stage. |
+| `stage` | string or null |  | Move the card to this stage (id, slug, or name). |
+| `status` | string |  | The card's status. |
+| `tags` | string[] |  | Tag names to set on the post (must already exist; replaces the set). Omit to leave tags unchanged. |
+| `title` | string |  | Rename the card. Keep it short: a long title wraps and makes the column unreadable. |
+
+</Accordion>
+
+<Accordion title="POST /cards/{id}/publish">
+
+**Body**
+
+| Field | Type | Required | Description |
+| --- | --- | --- | --- |
+| `platform` | `youtube` \| `instagram` \| `tiktok` \| `facebook` \| `linkedin` \| `x` \| `threads` \| `general` |  | Publish only this platform. Omit to publish all posts. |
+
+</Accordion>
+
+</AccordionGroup>
+
+{/* rest:end cards */}
 
 To archive a card, `POST /archive` with `assetType: "card"`. Scheduling is the `scheduledAt` field on `PATCH /cards/{id}`: it sets the card and every post, and a post can carry its own to override it.
 
@@ -65,12 +278,93 @@ PATCH /cards/{id}
 
 `GET /cards/{id}` reads each kind back under the field that attached it: an inspiration asset carries `contentId` (with its creator, outlier score and views), and a linked project carries `projectId`. `assetId` is still returned as a deprecated alias.
 
-## Connected accounts
+## Tags
+
+{/* rest:begin tags */}
 
 | Method | Path | Scope | Purpose |
 | --- | --- | --- | --- |
-| `GET` | `/connected-accounts` | read | List your connected social accounts (safe projection; no credentials). |
-| `GET` | `/connected-accounts/{id}` | read | Get one connected account with its enabled capabilities. |
+| `GET` | `/tags` | None | List the account's tags by name, a page at a time. |
+| `POST` | `/tags` | `planner:write` | Create a tag (the name is lowercased). |
+| `PATCH` | `/tags/{id}` | `planner:write` | Rename a tag. Its post assignments stay. |
+| `DELETE` | `/tags/{id}` | `planner:write` | Delete a tag from the account and from every post that carries it. |
+
+<AccordionGroup>
+
+<Accordion title="GET /tags">
+
+**Query**
+
+| Field | Type | Required | Description |
+| --- | --- | --- | --- |
+| `cursor` | string |  | The previous page's cursor. |
+| `limit` | integer |  | How many to return. |
+
+</Accordion>
+
+<Accordion title="POST /tags">
+
+**Body**
+
+| Field | Type | Required | Description |
+| --- | --- | --- | --- |
+| `name` | string | Yes | The tag name (lowercased on save). |
+
+</Accordion>
+
+<Accordion title="PATCH /tags/{id}">
+
+**Body**
+
+| Field | Type | Required | Description |
+| --- | --- | --- | --- |
+| `name` | string | Yes | The new tag name (lowercased on save). |
+
+</Accordion>
+
+</AccordionGroup>
+
+{/* rest:end tags */}
+
+## Publishing
+
+Connected accounts are the publish targets. Connecting one is a web-only flow.
+
+{/* rest:begin publishing */}
+
+| Method | Path | Scope | Purpose |
+| --- | --- | --- | --- |
+| `GET` | `/connected-accounts` | None | List your connected social accounts, the publish targets (no credentials). Connecting one is a web-only flow. |
+| `GET` | `/connected-accounts/{id}` | None | One connected account with its capabilities. |
+| `GET` | `/platforms` | None | The platforms you can publish to, their formats, and whether you have a connected account for each. |
+| `GET` | `/platforms/{platform}` | None | The full publishing shape of one platform: the fields, options and limits of a post's `platformSettings`. |
+
+<AccordionGroup>
+
+<Accordion title="GET /connected-accounts">
+
+**Query**
+
+| Field | Type | Required | Description |
+| --- | --- | --- | --- |
+| `cursor` | string |  | The previous page's cursor. |
+| `limit` | integer |  | How many to return. |
+
+</Accordion>
+
+<Accordion title="GET /platforms/{platform}">
+
+**Query**
+
+| Field | Type | Required | Description |
+| --- | --- | --- | --- |
+| `format` | string |  | A format to narrow to (e.g. "reel", "short", "story", "thread"). |
+
+</Accordion>
+
+</AccordionGroup>
+
+{/* rest:end publishing */}
 
 <Note>
 Encrypted credential fields on a connected account are never exposed through the API. A post names the connected account it publishes through.

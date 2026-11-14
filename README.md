@@ -19,7 +19,7 @@ Open the local URL Mintlify prints. Edits hot-reload.
 
 ## Publishing
 
-Pushes to the default branch deploy automatically through the connected Mintlify project.
+This repository is a one-way mirror of the `apps/docs/` folder of the ContentHero source repository, copied on each release. Pushes to its default branch deploy through the connected Mintlify project. The tool and CLI reference pages are generated from the tool contract and the CLI, so they always match the release that produced them.
 
 ## Source material
 

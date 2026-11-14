@@ -3,16 +3,110 @@ title: "Brand"
 description: "Brand kit and knowledge-base endpoints."
 ---
 
-Base URL `https://app.contenthero.ai/api/v1`. All endpoints take a bearer API key.
+Base URL `https://app.contenthero.ai/api/v1`. All endpoints take a bearer API key. The tables on this page are generated from the route contract: the Scope column is the scope the key needs, and `None` means any valid key. Reading a kit's sections needs no scope; reading its knowledge base needs `brand:read`.
 
 ## Brand kit
 
+Every new kit starts with the eight starter sections. A kit can be created empty, imported (`websiteUrls` and/or its own accounts in `brandAccounts`, with `extract: true`, which answers at once: poll `analysisStatus` and `extractionStatus`), from a social profile, or as a copy. To archive a kit send `{ "archive": true }` in the `PATCH` body, alone (reversible).
+
+{/* rest:begin brand-kits */}
+
 | Method | Path | Scope | Purpose |
 | --- | --- | --- | --- |
-| `GET` | `/brand-kits` | `brand:read` | List your brand kits. |
-| `POST` | `/brand-kits` | `brand:write` | Create a brand kit: empty, imported (`websiteUrls` and/or its own accounts in `brandAccounts`, with `extract: true`), from a social profile, or as a copy. Every new kit starts with the eight starter sections. An import returns at once; poll `analysisStatus` and `extractionStatus`. |
-| `GET` | `/brand-kits/{brandKitId}` | `brand:read` | Read one brand kit, three ways (below). |
-| `PATCH` | `/brand-kits/{brandKitId}` | `brand:write` | Update the kit: section content (`sections`), media, colors, typography and linked accounts. Send `{ "archive": true }` to archive (reversible). |
+| `GET` | `/brand-kits` | None | List your brand kits, the default first. |
+| `POST` | `/brand-kits` | `brand:write` | Create a brand kit: empty, or extracted from a website in the same call. The plan's kit cap applies. |
+| `GET` | `/brand-kits/{brandKitId}` | None | Read one brand kit three ways: `detail=summary` (every section, no bodies), selected sections (`keys`, `roles`, `tabs`), or the whole kit. |
+| `PATCH` | `/brand-kits/{brandKitId}` | `brand:write` | Update a kit: section content, media, colors, typography and linked accounts. |
+| `POST` | `/brand-kits/{brandKitId}/duplicate` | `brand:write` | Copy a brand kit with its sections and media. The plan's kit cap applies to the copy. |
+| `POST` | `/brand-kits/{brandKitId}/extract` | `brand:write` | Re-run a kit's import: visual extraction from its first website and the analysis of every source. Only empty sections are written. |
+
+<AccordionGroup>
+
+<Accordion title="GET /brand-kits">
+
+**Query**
+
+| Field | Type | Required | Description |
+| --- | --- | --- | --- |
+| `archived` | boolean |  | Only archived brand kits (default excludes archived). |
+| `cursor` | string |  | The previous page's cursor. |
+| `favorited` | boolean |  | Only favorited brand kits. |
+| `limit` | integer |  | How many to return. |
+
+</Accordion>
+
+<Accordion title="POST /brand-kits">
+
+**Body**
+
+| Field | Type | Required | Description |
+| --- | --- | --- | --- |
+| `assets` | object[] |  | The kit's brand assets, each \{ url \| outputId, name? \}. |
+| `brandAccounts` | value[] |  | The brand's own profiles, linked to this kit as its brand side. Each entry is one of your tracked accounts, by its id or short id, its profile link, its handle, or the platform's own id for it, or \{ platform?, handleOrUrl \} to ADD one and start ingesting it. |
+| `brandColors` | object[] |  | The kit's palette, each \{ hex, name?, role? \}. |
+| `extract` | boolean |  | Import the kit from websiteUrls and its own accounts in brandAccounts. Returns at once; poll analysisStatus and extractionStatus. |
+| `id` | string |  | A caller-minted UUID, so the create can be repeated safely. |
+| `inspirationAccounts` | value[] |  | Competitor/creator profiles they watch. Same entry shape as brandAccounts. |
+| `logos` | object[] |  | The kit's logos, each \{ url \| outputId, name?, isPrimary?, isDisplay?, layout?, colorMode? \}. Use outputId to bring in a generation. |
+| `name` | string |  | The kit's name. Optional when websiteUrls or a social profile is given. |
+| `sections` | object[] |  | Section content, each \{ key, body \} to fill a starter section, or \{ sectionName, tab, body? \} to add your own. |
+| `sourceType` | string |  | Where the kit came from: url, manual or pdf. |
+| `typography` | object |  | The kit's fonts, \{ titleFont?, bodyFont? \}. |
+| `websiteUrls` | string[] |  | The brand's websites, primary first. The first gives the logos, colors and fonts; every one feeds the analysis. |
+
+</Accordion>
+
+<Accordion title="GET /brand-kits/{brandKitId}">
+
+**Query**
+
+| Field | Type | Required | Description |
+| --- | --- | --- | --- |
+| `detail` | `summary` \| `full` |  | 'summary' lists every section without its body; 'full', the default, returns the whole kit. Cannot be combined with a filter. |
+| `history` | boolean |  | With a filter, also return each section's earlier versions, newest first. |
+| `keys` | string[] |  | Section keys, as the summary lists them. |
+| `roles` | string[] |  | Section roles, as the summary lists them. |
+| `tabs` | string[] |  | 'overview', 'voice' or 'visual'. |
+
+</Accordion>
+
+<Accordion title="PATCH /brand-kits/{brandKitId}">
+
+**Body**
+
+| Field | Type | Required | Description |
+| --- | --- | --- | --- |
+| `afterId` | string |  | Place it immediately after this item of the same list. |
+| `archive` | boolean |  | Archive the kit. Not combined with any other field. |
+| `assets` | object[] |  | The kit's brand assets, each \{ url \| outputId, name? \}. REPLACES the list; [] clears it. |
+| `beforeId` | string |  | Place it immediately before this item of the same list. |
+| `brandAccounts` | value[] |  | The brand's own profiles, linked to this kit as its brand side. Each entry is one of your tracked accounts, by its id or short id, its profile link, its handle, or the platform's own id for it, or \{ platform?, handleOrUrl \} to ADD one and start ingesting it. REPLACES the list; [] clears it. |
+| `brandColors` | object[] |  | The kit's palette, each \{ hex, name?, role? \}. REPLACES the list; [] clears it. |
+| `extract` | boolean |  | Re-run this kit's import from its websites and own accounts. Returns immediately; poll analysisStatus and extractionStatus. |
+| `inspirationAccounts` | value[] |  | Competitor/creator profiles they watch. Same entry shape as brandAccounts. REPLACES the list; [] clears it. |
+| `isDefault` | boolean |  | Make this the default kit, un-defaulting every other. |
+| `logos` | object[] |  | The kit's logos, each \{ url \| outputId, name?, isPrimary?, isDisplay?, layout?: horizontal\|stacked\|icon\|wordmark, colorMode?: full_color\|light\|dark\|grayscale \}. REPLACES the list; [] clears it. Exactly one ends up primary (the kit's cover); name none and the first wins. |
+| `name` | string |  | Rename the kit. This is the label in the UI, not the business name. |
+| `position` | `top` \| `bottom` |  | Place it at an end of the list instead of beside an item. Name neighbors or a position, not both. |
+| `sections` | object[] |  | Section writes: only the sections you change, all or nothing. \{ key, body, expectedVersion \} edits one; \{ sectionName, tab, body? \} adds one. |
+| `typography` | object or null |  | The kit's fonts, \{ titleFont?, bodyFont? \}. MERGES: a font left out keeps its value; null clears both. |
+| `websiteUrls` | string[] |  | The brand's websites, primary first. REPLACES the list; [] clears it. Stored only: pass extract to import from them. |
+
+</Accordion>
+
+<Accordion title="POST /brand-kits/{brandKitId}/duplicate">
+
+**Body**
+
+| Field | Type | Required | Description |
+| --- | --- | --- | --- |
+| `name` | string |  | A name for the copy. |
+
+</Accordion>
+
+</AccordionGroup>
+
+{/* rest:end brand-kits */}
 
 ### Sections
 
@@ -66,18 +160,67 @@ The write is **all or nothing**, and it lands before anything else in the patch.
 Re-read, reapply your change to the current body, and send the new version.
 
 <Note>
-**Removed inputs.** `businessName`, `primaryOffer`, `nicheDefinition`, `positioning`, `audience`, `voiceProfile`, `contentStrategy`, `visualStyle`, `designPrinciples` and `fields` are no longer accepted or returned, and `GET /brand-kit-templates` is gone. Sending a removed input is a `400` that names the replacement: write the matching section with `sections`, using the keys from a `detail=summary` read. Visual style and design principles belong in the `design_guidelines` section.
+**Removed inputs.** `businessName`, `primaryOffer`, `nicheDefinition`, `positioning`, `audience`, `voiceProfile`, `contentStrategy`, `visualStyle`, `designPrinciples` and `fields` are no longer accepted or returned, and the brand kit templates endpoint is retired. Sending a removed input is a `400` that names the replacement: write the matching section with `sections`, using the keys from a `detail=summary` read. Visual style and design principles belong in the `design_guidelines` section.
 </Note>
 
 ## Knowledge base
 
+{/* rest:begin knowledge */}
+
 | Method | Path | Scope | Purpose |
 | --- | --- | --- | --- |
-| `GET` | `/brand-kits/{brandKitId}/knowledge` | `brand:read` | List the knowledge index (titles and metadata). |
-| `POST` | `/brand-kits/{brandKitId}/knowledge` | `brand:write` | Add an item. Source is `text`, `url`, `youtube`, or a file via `fileData` (base64) or `fileUrl` (hosted). |
-| `GET` | `/brand-kits/{brandKitId}/knowledge/{knowledgeId}` | `brand:read` | Get one item's stored body. |
+| `GET` | `/brand-kits/{brandKitId}/knowledge` | `brand:read` | List the kit's knowledge index (titles and metadata, no bodies). |
+| `POST` | `/brand-kits/{brandKitId}/knowledge` | `brand:write` | Add an item from `text`, `url`, `youtube` or a file. The plan's knowledge limits apply. |
+| `GET` | `/brand-kits/{brandKitId}/knowledge/{knowledgeId}` | `brand:read` | One item's stored body. |
 | `DELETE` | `/brand-kits/{brandKitId}/knowledge/{knowledgeId}` | `brand:write` | Remove an item and its embeddings. |
-| `GET` | `/brand-kits/{brandKitId}/knowledge/search?q=` | `brand:read` | Semantic search, ranked by similarity. |
+| `GET` | `/brand-kits/{brandKitId}/knowledge/search` | `brand:read` | Semantic search over the kit's knowledge, ranked by similarity. |
+
+<AccordionGroup>
+
+<Accordion title="GET /brand-kits/{brandKitId}/knowledge">
+
+**Query**
+
+| Field | Type | Required | Description |
+| --- | --- | --- | --- |
+| `cursor` | string |  | The previous page's cursor. |
+| `limit` | integer |  | How many to return. |
+
+</Accordion>
+
+<Accordion title="POST /brand-kits/{brandKitId}/knowledge">
+
+**Body**
+
+| Field | Type | Required | Description |
+| --- | --- | --- | --- |
+| `sourceType` | `text` \| `url` \| `youtube` \| `file` | Yes | How the content is provided. |
+| `fileData` | string |  | For sourceType "file": base64-encoded file bytes (small documents and images). |
+| `fileExt` | string |  | For sourceType "file": the extension without a dot, e.g. "pdf". Inferred from fileUrl when omitted. |
+| `fileUrl` | string |  | For sourceType "file": a hosted URL the server fetches (large files, video, audio). |
+| `getCost` | boolean |  | Return the credit cost estimate instead of adding (video and audio are measured, not processed; nothing is charged). |
+| `tags` | object[] |  | Tags to attach, each as \{ id \}. |
+| `text` | string |  | For sourceType "text": the note body. |
+| `title` | string |  | Optional title (otherwise derived from the content). |
+| `url` | string |  | For sourceType "url" or "youtube": the link. |
+
+</Accordion>
+
+<Accordion title="GET /brand-kits/{brandKitId}/knowledge/search">
+
+**Query**
+
+| Field | Type | Required | Description |
+| --- | --- | --- | --- |
+| `query` | string | Yes | What to search for, in natural language. |
+| `limit` | integer |  | Max matches (default 8). |
+| `threshold` | number |  | Minimum similarity 0-1 (default 0.45). |
+
+</Accordion>
+
+</AccordionGroup>
+
+{/* rest:end knowledge */}
 
 <Note>
 Large files and video or audio must be added by a hosted URL (`fileUrl`), which the server fetches and chunks. Base64 (`fileData`) is for small documents and images. Adding is plan-limited; a `limitReached` response means the brand kit is at its cap.

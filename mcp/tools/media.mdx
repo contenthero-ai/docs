@@ -3,10 +3,9 @@ title: "Media"
 description: "The library: browse, search, import, upload and download the media an account owns, and favorite, archive or share any item. import also brings a deck in as a new canvas project."
 ---
 
-{/* GENERATED FILE. Do not edit by hand. */}
-{/* Regenerate with `npm run generate:reference` in contenthero-docs. */}
+{/* GENERATED FILE from the ContentHero tool contract. Do not edit by hand. */}
 
-The library: browse, search, import, upload and download the media an account owns, and favorite, archive or share any item. import also brings a deck in as a new canvas project. 16 tools.
+The library: browse, search, import, upload and download the media an account owns, and favorite, archive or share any item. import also brings a deck in as a new canvas project. 18 tools.
 
 Every tool below is exposed by the hosted MCP server at `https://mcp.contenthero.ai` and by the `@contenthero/mcp` npm package. A <Badge>write</Badge> tool changes your account; a <Badge>read</Badge> tool does not.
 
@@ -14,10 +13,14 @@ Every tool below is exposed by the hosted MCP server at `https://mcp.contenthero
 
 <Badge>read</Badge>
 
-List the library's files: every file the account keeps, or one part of the library with `source`, each item naming the part it is in. Filter by contentType, kind, favorited or archived; order with sort and order; page with limit and cursor. Each item shows its media id, its file name and size, its asset id (the id get_project reports in a clip's source) and its resolved URL inline, so you can reference it directly. Call get_media to SEE an item (image blocks), or view to see a clip's frames.
+List media you can place. With no `source`, or a library source, it reads the account's own files: every file, or one part of the library, each item naming the part it is in. With `source` stock it reads the stock catalog instead: licensed photos, videos, GIFs, stickers and built-in sounds that are not the account's files until used. A stock read names one `collection` and may take a `query`; it comes back in the catalog's own order and does not take the library's filters or sort. Every item shows its media id, its name and its resolved URL. Place an item by its media id. Call get_media to SEE an item (image blocks), or view to see a clip's frames. A stock page can hold fewer items than asked, and repeating a read can return different items; only an absent `nextCursor` means there are no more.
 
 <ParamField body name="archived" type="boolean">
 Only archived files.
+</ParamField>
+
+<ParamField body name="collection" type="`photos` \| `videos` \| `gifs` \| `stickers` \| `sounds`">
+Stock only, and required with it. Which part of the stock catalog to read: 'photos', 'videos', 'gifs', 'stickers' or 'sounds'.
 </ParamField>
 
 <ParamField body name="contentType" type="string[]">
@@ -32,16 +35,24 @@ The previous page's cursor.
 Only favorited files.
 </ParamField>
 
-<ParamField body name="kind" type="`creation` \| `board` \| `look`">
-Creations only. Filter by asset class: 'creation' (normal generations), 'board' (reference boards), or 'look'. Omit to list all.
-</ParamField>
-
 <ParamField body name="limit" type="integer">
 How many to return.
 </ParamField>
 
 <ParamField body name="order" type="`asc` \| `desc`">
 The sort direction.
+</ParamField>
+
+<ParamField body name="orientation" type="`landscape` \| `portrait` \| `square`">
+Stock photos and videos only. Narrow the results to one shape: 'landscape', 'portrait' or 'square'. Omit it to read every shape.
+</ParamField>
+
+<ParamField body name="origin" type="`creation` \| `board` \| `look`">
+Creations only. Narrow to one kind of generation: 'creation' (normal generations), 'board' (reference boards), or 'look'. The same word an item's origin says. Omit to list all.
+</ParamField>
+
+<ParamField body name="query" type="string">
+Stock only. Describe what to find. Omit it to read the collection's featured items.
 </ParamField>
 
 <ParamField body name="smallCopies" type="boolean">
@@ -52,15 +63,15 @@ Link each image's small copy instead of the file itself, where the library keeps
 The field to sort by.
 </ParamField>
 
-<ParamField body name="source" type="`all` \| `creations` \| `uploads` \| `exports`">
-Which part of the library to read: 'all' (the default, every file), 'creations' (studio generations), 'uploads' (files the user uploaded), or 'exports' (renders of their projects).
+<ParamField body name="source" type="`all` \| `creations` \| `uploads` \| `exports` \| `stock`">
+Which media to read: 'all' (the default, every file the account keeps), 'creations' (studio generations), 'uploads' (files the user uploaded), 'exports' (renders of their projects), or 'stock' (the stock catalog, which is not part of 'all').
 </ParamField>
 
 ### `get_media`
 
 <Badge>read</Badge>
 
-SEE specific media, up to 5 items. This is for YOUR eyes only: it returns image blocks so you can judge a face, check legibility or compare variations, and it renders NOTHING for the person. If they should see it, call show_media, which displays up to 100 items and costs you almost no context. Pass a batch of items to view at once, returned as image blocks for you: each item is either a \{ url \} (e.g. a URL threaded from view, a layer/asset URL from get_project / get_card, or an upload URL from list_media source=uploads) or a \{ mediaId \} (the media id list_media, search_media and get_folder print: a1B2c3D4, or a1B2c3D4-2 for one output of a generation with several). Returns light metadata per item plus an IMAGE block for each image so you can actually see it. To see a clip's frames, use view; audio still returns metadata + the url. A bare id for a generation returns ONLY its primary output, named by its full media id, and lists the others' media ids; pass one of those to see it. To ZOOM into an image, set region \{ x, y, width, height \} on an item, in the image's own pixels: that part is cut from the original and returned at its own detail, never enlarged, so you can check small text or an edge. Use this to inspect the actual pixels, not just URLs.
+SEE specific media, up to 5 items. This is for YOUR eyes only: it returns image blocks so you can judge a face, check legibility or compare variations, and it renders NOTHING for the person. If they should see it, call show_media, which displays up to 100 items and costs you almost no context. Pass a batch of items to view at once, returned as image blocks for you: each item is either a \{ url \} (e.g. a URL threaded from view, a layer/asset URL from get_project / get_card, or an upload URL from list_media source=uploads) or a \{ mediaId \} (the media id list_media, search_media and get_folder print: a1B2c3D4, or a1B2c3D4-2 for one output of a generation with several). Returns light metadata per item plus an IMAGE block for each image so you can actually see it. To see a clip's frames, use view; audio still returns metadata + the url, and the metadata of an audio item names its size, duration and container with the stream facts the file states (its codec, sample rate and channels), each only when known. A bare id for a generation returns ONLY its primary output, named by its full media id, and lists the others' media ids; pass one of those to see it. To ZOOM into an image, set region \{ x, y, width, height \} on an item, in the image's own pixels: that part is cut from the original and returned at its own detail, never enlarged, so you can check small text or an edge. Use this to inspect the actual pixels, not just URLs.
 
 <ParamField body name="items" type="value[]" required>
 The media to LOOK at, up to 5 per call. Five is where the inline byte budget runs out, not a round number. Use show_media for a larger set you only need to display.
@@ -80,7 +91,7 @@ The media to show, up to 100 items per call.
 
 <Badge>read</Badge>
 
-Semantically search the account's editable media library (their generated creations, uploads, licensed stock, and brand assets) by describing the content in natural language. Returns matching assets ranked by relevance, each with its media kind, a description, tags, and, for videos, the timestamps of the specific scenes that matched, so a precise moment can be located. Use this to find existing material to place, reference, or build with, rather than generating new media, whenever the user refers to footage, images, audio, or clips they already have. Optionally restrict results to specific media kinds. This searches only the account's own usable library, never inspiration, published posts, or knowledge. Call get_media to SEE a match (image blocks), or view to see a clip's frames.
+Semantically search the account's editable media library (their generated creations, uploads, stock they have used, and brand assets) by describing the content in natural language. Returns matching assets ranked by relevance, each with its media kind, a description, tags, and, for videos, the timestamps of the specific scenes that matched, so a precise moment can be located. Use this to find existing material to place, reference, or build with, rather than generating new media, whenever the user refers to footage, images, audio, or clips they already have. Optionally restrict results to specific media kinds. This searches only the account's own usable library, never inspiration, published posts, or knowledge. To browse stock they have not used, call list_media with source stock. Call get_media to SEE a match (image blocks), or view to see a clip's frames.
 
 <ParamField body name="query" type="string" required>
 A natural-language description of the media to find, describing its visible or audible content.
@@ -150,24 +161,38 @@ Download any file of the account's out of ContentHero to keep: a generation (eve
 A media id (a generation, -\<n\> for one of its outputs, an upload, an import, a library file) or an export id.
 </ParamField>
 
-### `create_media_upload`
+### `create_upload`
 
 <Badge>write</Badge>
 
-Upload local files as first-class media (phase 1 of 2). Accepts 1-25 files in one call. Returns, for each file, a signed uploadUrl and the exact headers to send; PUT each file's bytes to its URL with those headers unchanged, then call complete_media_upload once with every returned outputId. The finished media is referenceable by outputId in generate_* and as an asset on a card via update_card. For a file already on a public URL, use import instead. Requires the library:write scope.
+Begin uploading local files as library media. Takes each file's name, type and size in bytes, and answers for each an upload target, which is a temporary write permission and not a media address. A single target: PUT the whole file to its url with exactly its headers. A multipart target: the file goes in parts of the size it states, each signed with sign_upload_parts; PUT each part to its url and keep the ETag header of the store's answer. Then call complete_upload once for the batch. The finished media is referenced by its outputId in generate_* and on a card via update_card. Besides images, video, audio and documents, it takes JSON data files and 3D models: binary glTF (.glb) or a self-contained .gltf (buffers and images inline as data: URIs). For a file already at a public address, use import. Requires the library:write scope.
 
 <ParamField body name="files" type="object[]" required>
-1-25 files to upload.
+The files to upload.
 </ParamField>
 
-### `complete_media_upload`
+### `sign_upload_parts`
 
 <Badge>write</Badge>
 
-Finalize uploads (phase 2 of 2) after each file's bytes were PUT to its signed uploadUrl from create_media_upload. Accepts 1-25 outputIds in one call: finalize a batch together, so the person sees it as one card. Publishes each file and returns its outputId and URL. Requires the library:write scope.
+Sign parts of a multipart upload. Takes the outputId create_upload answered and the numbers of the parts to send, counted from 1. Answers a url and headers for each: PUT that part's bytes to its url with exactly those headers and keep the ETag header of the store's answer. Part n starts at (n - 1) times the part size create_upload stated and is that long, the last part ending where the file ends. Signed when asked and safe to ask again, so a slow or interrupted upload asks only for the parts it still needs. Requires the library:write scope.
 
-<ParamField body name="outputIds" type="string[]" required>
-1-25 outputIds returned by create_media_upload.
+<ParamField body name="outputId" type="string" required>
+The outputId create_upload answered for the file.
+</ParamField>
+
+<ParamField body name="partNumbers" type="integer[]" required>
+The numbers of the parts to sign, counted from 1.
+</ParamField>
+
+### `complete_upload`
+
+<Badge>write</Badge>
+
+Finish uploads once their bytes were sent. Takes each file's outputId and, for a multipart file, the number and ETag of every part, exactly as the store answered. Finish a batch together, so the person sees it as one card. Publishes each file and answers its outputId and URL. Finishing twice answers the same media. A .glb or JSON file that is malformed, or a .gltf that points at separate files, is refused here and not kept. Requires the library:write scope.
+
+<ParamField body name="uploads" type="object[]" required>
+The files to finish.
 </ParamField>
 
 ### `list_folders`
@@ -235,7 +260,7 @@ For a smart folder: the live query that defines its membership (the same filters
 Update the account's own folders: rename one, MOVE folders under a different parent (or to the top level with a null parent), change a smart folder's saved query, and FILE or UNFILE items. addItems/removeItems are DELTAS of \{ mediaId \} (media, as list_media, search_media and get_folder print it), \{ projectId \} or \{ cardId \}, not a list to replace, because an item can sit in several folders at once and a replace would silently unfile it from the others. Filing never moves or copies anything: it adds a pointer, and only manual folders accept items (a smart folder computes its own membership). Pass folderIds to patch several folders at once, which crossed with addItems files the same items into all of them; renaming and re-querying still need exactly one folder. NOTE the asymmetry: nesting a FOLDER via parentId is a MOVE (a folder has one parent), while filing an ITEM is a pointer that leaves its other folders alone.
 
 <ParamField body name="folderId" type="string" required>
-The folder id to update.
+The folder id to update. Either its short id or its UUID.
 </ParamField>
 
 <ParamField body name="addItems" type="value[]">
@@ -273,7 +298,25 @@ Unfile these items. Only the pointer goes; the asset is never deleted.
 Delete one of the account's own folders and everything nested under it. This removes the folder structure only; the media and entities inside are pointers, so the underlying assets are never deleted. Confirm intent before deleting a folder that contains items.
 
 <ParamField body name="folderId" type="string" required>
-The folder id to delete.
+The folder id to delete. Either its short id or its UUID.
+</ParamField>
+
+### `update_media`
+
+<Badge>write</Badge>
+
+Rename a stored file or give it a description, after upload. Pass name, description or both; passing neither is refused. Only files in the library can be changed this way: a generated output or a stock item cannot. An empty description clears it. Returns the file as get_media reads it, with its new name and description. Requires the library:write scope.
+
+<ParamField body name="mediaId" type="string" required>
+The file's media id, as list_media, search_media and get_folder print it.
+</ParamField>
+
+<ParamField body name="description" type="string">
+A description of the file, in your own words.
+</ParamField>
+
+<ParamField body name="name" type="string">
+The new name for the file.
 </ParamField>
 
 ### `favorite`

@@ -160,9 +160,11 @@
             "pages": [
               "api-reference/overview",
               "api-reference/generate",
+              "api-reference/library",
               "api-reference/pipeline",
               "api-reference/brand",
               "api-reference/inspiration",
+              "api-reference/editor",
               "api-reference/account"
             ]
           }

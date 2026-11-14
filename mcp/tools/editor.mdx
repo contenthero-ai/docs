@@ -3,8 +3,7 @@ title: "Editor and canvas"
 description: "Projects, their timelines and canvases, the templates you place on them, the style libraries they pin, and exports."
 ---
 
-{/* GENERATED FILE. Do not edit by hand. */}
-{/* Regenerate with `npm run generate:reference` in contenthero-docs. */}
+{/* GENERATED FILE from the ContentHero tool contract. Do not edit by hand. */}
 
 Projects, their timelines and canvases, the templates you place on them, the style libraries they pin, and exports. 28 tools.
 
@@ -24,10 +23,6 @@ The previous page's cursor.
 archived -\> only archived; favorited -\> favorited and not archived; omitted -\> active (not archived).
 </ParamField>
 
-<ParamField body name="kind" type="`editor` \| `canvas`">
-Deprecated alias for `type`, accepted for one release window.
-</ParamField>
-
 <ParamField body name="limit" type="integer">
 How many to return.
 </ParamField>
@@ -44,10 +39,6 @@ Case-insensitive title search.
 The field to sort by.
 </ParamField>
 
-<ParamField body name="surface" type="`editor` \| `canvas`">
-Deprecated alias for `type`, accepted for one release window.
-</ParamField>
-
 <ParamField body name="type" type="`editor` \| `canvas`">
 Restrict to one project type; omitted returns both.
 </ParamField>
@@ -56,10 +47,10 @@ Restrict to one project type; omitted returns both.
 
 <Badge>read</Badge>
 
-Read a project: its title, revision and settings (its canvas size, and for a video project its frame rate, delivery loudness, magnetic main track, linkage and the kinds of track linkage reaches), with a summary of its composition by default or the whole composition with detail 'full'. The summary is each track's id, name, type and whether it is the main track, and each clip's id, type, place on the timeline, speed and source: a clip plays a file (its assetId, the same id view and get_media take, and the window of the file it plays, in the file's seconds) or code (the project modules it imports). Clips that share an assetId were cut from one recording; a clip's id never says so. For a canvas, the summary is each slide with its layers' ids, types and the start of each text layer's text. A timeline read can be narrowed to a frame window or one track, and a canvas read to one slide; a narrowed full read carries only the modules its clips import and names the rest. A read that names clipIds, moduleNames or sourceAssetId returns those parts alone: each clip named as its summary line, or whole with its code and the modules it imports with detail 'full'; each module named with its code; and with sourceAssetId and atSec, where moments of a recording play on the timeline: every clip and frame each second lands on, none where it was cut out. A read names parts or narrows the whole, not both. A project's read also lists the problems its code, modules and geometry hold, of the whole project or of the parts a read names: code reading what a project module does not provide, the compiler's warnings, modules no clip imports, and a zoom that shows a pinned region's own picture outside the pin. Pass the returned revision as expectedRevision for an edit that must not overwrite a concurrent change. update_project changes the settings. Requires the editor:read scope.
+Read a project: its title, revision and settings (its canvas size, and for a video project its frame rate, delivery loudness, magnetic main track, linkage and the kinds of track linkage reaches), with a summary of its composition by default or the whole composition with detail 'full'. The summary is each track's id, name, type, whether it is the main track and whether it is muted or hidden, and each clip's id, type, place on the timeline, speed, whether it is disabled and source: a clip plays a file (its assetId, the same id view and get_media take, and the window of the file it plays, in the file's seconds) or code (the project modules it imports). Clips that share an assetId were cut from one recording; a clip's id never says so. For a canvas, the summary is each slide with its layers' ids, types and the start of each text layer's text. A timeline read can be narrowed to a frame window or one track, and a canvas read to one slide; a narrowed full read carries only the modules its clips import and names the rest. A read that names clipIds, moduleNames, sourceAssetId or modulesIndex returns those parts alone: each clip named as its summary line, or whole with its code and the modules it imports with detail 'full'; each module named with its code; modulesIndex, every module's name, how many clips draw it, whether none does, and its size, without code; and with sourceAssetId and atSec, where moments of a recording play on the timeline: every clip and frame each second lands on, none where it was cut out. A read names parts or narrows the whole, not both. A project's read also lists the problems its code, modules and geometry hold, of the whole project or of the parts a read names: code reading what a project module does not provide, the compiler's warnings, modules no clip imports, and a zoom that shows a pinned region's own picture outside the pin. Pass the returned revision as expectedRevision on an edit, so a concurrent change to the same thing is refused rather than overwritten. update_project changes the settings. Requires the editor:read scope.
 
 <ParamField body name="projectId" type="string" required>
-The project id to read.
+The project id to read. Either its short id or its UUID.
 </ParamField>
 
 <ParamField body name="atSec" type="number[]">
@@ -80,6 +71,10 @@ Timeline only: start of a frame window; returns clips overlapping [fromFrame, to
 
 <ParamField body name="moduleNames" type="string[]">
 Read these project modules' code.
+</ParamField>
+
+<ParamField body name="modulesIndex" type="boolean">
+Read the index of the project's modules: each one's name, how many clips draw it, whether none does, and its size, without code. Read alone, like the other parts.
 </ParamField>
 
 <ParamField body name="slideId" type="string">
@@ -120,16 +115,8 @@ Frames per second for an editor project: 24, 25, 30, 50 or 60. Defaults to 30.
 Pixel height. Defaults from the orientation.
 </ParamField>
 
-<ParamField body name="kind" type="`editor` \| `canvas`">
-Deprecated alias for `type`, accepted for one release window.
-</ParamField>
-
 <ParamField body name="orientation" type="string">
 Aspect ratio, e.g. '16:9', '9:16', '1:1'. Defaults to '16:9'.
-</ParamField>
-
-<ParamField body name="surface" type="`editor` \| `canvas`">
-Deprecated alias for `type`, accepted for one release window.
 </ParamField>
 
 <ParamField body name="title" type="string">
@@ -148,13 +135,13 @@ Pixel width. Defaults from the orientation.
 
 <Badge>write</Badge>
 
-Change a project: its title, brand kit and cover, and its settings: canvas size, and for a video project its frame rate, delivery loudness, magnetic main track, linkage and the kinds of track linkage reaches. This is a PATCH: a field you omit is left alone. A setting belongs to the project and is shared by everyone who edits it; changing one is an edit, so undo_project_edit reverses it and every open editor shows it at once. To change what is in the composition, use update_timeline or update_canvas instead. get_project reads every setting. Returns the project with its settings as they now stand. Requires the editor:write scope.
+Change a project: its title, brand kit and cover, and its settings: canvas size, and for a video project its frame rate, delivery loudness, magnetic main track, linkage and the kinds of track linkage reaches. This is a PATCH: a field you omit is left alone. A setting belongs to the project and is shared by everyone who edits it; changing one is an edit, so undo_project_edit reverses it and every open editor shows it at once. To change what is in the composition, use update_timeline or update_canvas instead. get_project reads every setting. expectedRevision is the project revision you last read, and it means the same on update_project, update_timeline and update_canvas. An edit built on an older revision still applies when no change since touched what it touches. When one did, nothing is written and the answer is a conflict naming the current revision and what overlapped: read the project again and redo the edit. Omit it to apply to the project as it is. Returns the project with its settings as they now stand. Requires the editor:write scope.
 
 <ParamField body name="projectId" type="string" required>
-The project id.
+The project id. Either its short id or its UUID.
 </ParamField>
 
-<ParamField body name="brandKitId" type="string,null">
+<ParamField body name="brandKitId" type="string or null">
 A brand kit id from list_brand_kits, or null to clear it.
 </ParamField>
 
@@ -164,6 +151,10 @@ How the cover is chosen: 'auto' follows the composition, \{ frame \} is a chosen
 
 <ParamField body name="coverPosition" type="object or null">
 Where the cover is framed, as percentages of its width and height, or null for the default framing.
+</ParamField>
+
+<ParamField body name="expectedRevision" type="integer">
+The project revision you last read, from get_project or the last edit. An older one still applies when nothing since touched what the edit touches; otherwise nothing is written and the conflict names the current revision and what overlapped. Omit to apply to the project as it is. On update_project it guards the settings in the document; the title, brand kit and cover are not versioned.
 </ParamField>
 
 <ParamField body name="fps" type="number or number or number or number or number">
@@ -209,7 +200,7 @@ A pixel width, given with height.
 Copy a project: a new project with the same type, size, composition and brand kit, titled as the editor titles a copy. Pass versionId to make the copy from a saved version instead of the project as it is now; version history is a premium feature. Returns the new project. Requires the editor:write scope.
 
 <ParamField body name="projectId" type="string" required>
-The project id to copy.
+The project id to copy. Either its short id or its UUID.
 </ParamField>
 
 <ParamField body name="versionId" type="string">
@@ -227,7 +218,7 @@ Must be true to confirm the irreversible permanent delete.
 </ParamField>
 
 <ParamField body name="projectId" type="string" required>
-The project id to permanently delete.
+The project id to permanently delete. Either its short id or its UUID.
 </ParamField>
 
 ### `export`
@@ -237,7 +228,7 @@ The project id to permanently delete.
 Export (render) a project's saved composition to a downloadable file the user KEEPS: a permanent deliverable that counts against the user's storage. To preview or verify a frame or slide while editing, do NOT export; use view with render (ephemeral, stored nowhere). The formats, what each makes and the options each takes are listed by get_schema kind 'export'; read it before choosing one. format 'mp4' works for both editor and canvas (a video render; may take a while). 'png' / 'jpg' work for both project types too: a canvas project renders one image per slide (multiple slides come back as a zip), while an editor project renders a single composited frame of the timeline (pick which frame with `frame`; defaults to frame 0). Canvas projects additionally support 'pdf' and 'pptx'. An editor project also exports its sound (mp3, aac, wav), its subtitles (srt, vtt) and its transcript (txt, docx, rtf, md, html). Resolution and watermark apply to every picture format: a free account never exports above 720p and never removes the watermark. `quality` is mp4 only. Returns the download URL when the export finishes in time, otherwise an exportId: wait for it with get_status (kind export), then read its file with get_export. Requires the editor:write scope.
 
 <ParamField body name="projectId" type="string" required>
-The project to export.
+The project to export. Either its short id or its UUID.
 </ParamField>
 
 <ParamField body name="format" type="string">
@@ -287,7 +278,7 @@ Keep the watermark. Defaults true; removing it is plan-gated.
 Read one export started by export: its file, state and details, with the download URL and public share page once it finishes. To wait for one still running, use get_status with kind export. Requires the editor:read scope.
 
 <ParamField body name="exportId" type="string" required>
-The export id returned by export.
+The export id returned by export. Either its short id or its UUID.
 </ParamField>
 
 ### `list_exports`
@@ -297,7 +288,7 @@ The export id returned by export.
 List a project's exports, newest first, as the editor's Exports tab shows them: each finished one with its download and public share page, and the ones still running with their status (wait for one with get_status, kind export). A failed export is not listed. Requires the editor:read scope.
 
 <ParamField body name="projectId" type="string" required>
-The project id.
+The project id. Either its short id or its UUID.
 </ParamField>
 
 <ParamField body name="cursor" type="string">
@@ -315,7 +306,7 @@ How many to return.
 List a project's saved versions, newest first: each with its id, when and why it was saved, its name and who saved it. Bring one back with restore_project_version, or copy one into a new project with duplicate_project. Version history is a premium feature, as in the editor. Requires the editor:read scope.
 
 <ParamField body name="projectId" type="string" required>
-The project id.
+The project id. Either its short id or its UUID.
 </ParamField>
 
 <ParamField body name="cursor" type="string">
@@ -333,7 +324,7 @@ How many to return.
 Save the project's current state as a version, optionally named, so it can be brought back later. Requires the editor:write scope.
 
 <ParamField body name="projectId" type="string" required>
-The project id.
+The project id. Either its short id or its UUID.
 </ParamField>
 
 <ParamField body name="label" type="string">
@@ -347,7 +338,7 @@ A name for the version.
 Put a saved version back into the project, saving the current state as a version first so the restore can itself be undone by restoring that. To make a new project from a version instead, use duplicate_project with versionId. Version history is a premium feature. Requires the editor:write scope.
 
 <ParamField body name="projectId" type="string" required>
-The project id.
+The project id. Either its short id or its UUID.
 </ParamField>
 
 <ParamField body name="versionId" type="string" required>
@@ -365,7 +356,7 @@ The new name; empty clears it.
 </ParamField>
 
 <ParamField body name="projectId" type="string" required>
-The project id.
+The project id. Either its short id or its UUID.
 </ParamField>
 
 <ParamField body name="versionId" type="string" required>
@@ -379,7 +370,7 @@ The version id, from list_project_versions.
 Permanently remove a saved version. The project itself is not changed. Requires the editor:write scope.
 
 <ParamField body name="projectId" type="string" required>
-The project id.
+The project id. Either its short id or its UUID.
 </ParamField>
 
 <ParamField body name="versionId" type="string" required>
@@ -393,7 +384,7 @@ The version id, from list_project_versions.
 Reverse the project's most recent edit, as the editor's Undo does, whoever made it. The undo is itself an edit with its own revision, and redo_project_edit re-applies what it reversed. Requires the editor:write scope.
 
 <ParamField body name="projectId" type="string" required>
-The project id.
+The project id. Either its short id or its UUID.
 </ParamField>
 
 <ParamField body name="expectedRevision" type="integer">
@@ -411,7 +402,7 @@ A specific revision to reverse. Omit for the most recent edit.
 Re-apply the edit most recently undone, as the editor's Redo does. Requires the editor:write scope.
 
 <ParamField body name="projectId" type="string" required>
-The project id.
+The project id. Either its short id or its UUID.
 </ParamField>
 
 <ParamField body name="expectedRevision" type="integer">
@@ -422,14 +413,14 @@ The revision from get_project; rejects with a conflict if a concurrent edit land
 
 <Badge>write</Badge>
 
-Edit a video timeline with a batch of operations, the same ones every ContentHero agent uses, applied by the server and shown in the open editor at once. Each operation is an object with an `op` name and its fields. get_schema kind 'timeline' lists every operation with its shape and the rules they all follow; read an operation in full by its name before using one you have not read, and build a clip from its type's example there. A code clip imports project modules, which an operation sets. Read clip, track and transition ids from get_project. A batch is ordered and atomic: when any operation is refused, nothing is stored, and the result says which and why. The result reports each operation, with what the compiler found in any code an operation wrote, and what the edit left in the project that may not render as intended, clip by clip. Prefer an edit the person can review and turn back over one that cannot be reversed, and make a destructive one only when they asked for it. A clip's length on the timeline follows its source and its speed: change its speed, not its length. Project settings change with update_project. expectedRevision is optional: pass the revision you read to fail on a concurrent change rather than overwrite it. Every edit can be undone, and each returns the new revision. Requires the editor:write scope.
+Edit a video timeline with a batch of operations, the same ones every ContentHero agent uses, applied by the server and shown in the open editor at once. Each operation is an object with an `op` name and its fields. get_schema kind 'timeline' lists every operation with its shape and the rules they all follow; read an operation in full by its name before using one you have not read, and build a clip from its type's example there. A code clip imports project modules, which an operation sets or copies from another of your projects. Read clip, track and transition ids from get_project. A batch is ordered and atomic: when any operation is refused, nothing is stored, and the result says which and why. The result reports each operation, with what the compiler found in any code an operation wrote, and what the edit left in the project that may not render as intended, clip by clip. Prefer an edit the person can review and turn back over one that cannot be reversed, and make a destructive one only when they asked for it. A clip's length on the timeline follows its source and its speed: change its speed, not its length. Project settings change with update_project. expectedRevision is the project revision you last read, and it means the same on update_project, update_timeline and update_canvas. An edit built on an older revision still applies when no change since touched what it touches. When one did, nothing is written and the answer is a conflict naming the current revision and what overlapped: read the project again and redo the edit. Omit it to apply to the project as it is. Every edit can be undone, and each returns the new revision. A retry that repeats the same operation id returns the revision already committed and never applies the batch twice. Requires the editor:write scope.
 
 <ParamField body name="ops" type="object[]" required>
 The timeline ops to apply, in order.
 </ParamField>
 
 <ParamField body name="projectId" type="string" required>
-The editor project id.
+The editor project id. Either its short id or its UUID.
 </ParamField>
 
 <ParamField body name="userIntent" type="string" required>
@@ -437,21 +428,21 @@ A short description of what this edit does (for attribution).
 </ParamField>
 
 <ParamField body name="expectedRevision" type="integer">
-The revision from get_project; rejects with a conflict if a concurrent edit landed.
+The project revision you last read, from get_project or the last edit. An older one still applies when nothing since touched what the edit touches; otherwise nothing is written and the conflict names the current revision and what overlapped. Omit to apply to the project as it is.
 </ParamField>
 
 ### `update_canvas`
 
 <Badge>write</Badge>
 
-Edit a canvas (slides and layers) with a batch of operations, applied by the server and shown in the open editor at once. Each operation is an object with an `op` name and its fields. get_schema kind 'layer' lists every operation with its shape and the rules they all follow; read an operation or a layer type in full by its name before using one you have not read. Read slide and layer ids from get_project. A batch is ordered and atomic: when any operation is refused, nothing is stored, and the result says which and why. The result also reports what the edit left in the project that may not render as intended, layer by layer. Project settings change with update_project. expectedRevision is optional: pass the revision you read to fail on a concurrent change rather than overwrite it. Every edit can be undone, and each returns the new revision. Requires the editor:write scope.
+Edit a canvas (slides and layers) with a batch of operations, applied by the server and shown in the open editor at once. Each operation is an object with an `op` name and its fields. get_schema kind 'layer' lists every operation with its shape and the rules they all follow; read an operation or a layer type in full by its name before using one you have not read. A code layer imports project modules, which an operation sets or copies from another of your projects. Read slide and layer ids from get_project. A batch is ordered and atomic: when any operation is refused, nothing is stored, and the result says which and why. The result also reports what the edit left in the project that may not render as intended, layer by layer. Project settings change with update_project. expectedRevision is the project revision you last read, and it means the same on update_project, update_timeline and update_canvas. An edit built on an older revision still applies when no change since touched what it touches. When one did, nothing is written and the answer is a conflict naming the current revision and what overlapped: read the project again and redo the edit. Omit it to apply to the project as it is. Every edit can be undone, and each returns the new revision. Requires the editor:write scope.
 
 <ParamField body name="ops" type="object[]" required>
 The canvas ops to apply, in order.
 </ParamField>
 
 <ParamField body name="projectId" type="string" required>
-The canvas project id.
+The canvas project id. Either its short id or its UUID.
 </ParamField>
 
 <ParamField body name="userIntent" type="string" required>
@@ -459,18 +450,14 @@ A short description of what this edit does (for attribution).
 </ParamField>
 
 <ParamField body name="expectedRevision" type="integer">
-The revision from get_project; rejects with a conflict if a concurrent edit landed.
+The project revision you last read, from get_project or the last edit. An older one still applies when nothing since touched what the edit touches; otherwise nothing is written and the conflict names the current revision and what overlapped. Omit to apply to the project as it is.
 </ParamField>
 
 ### `get_transcript`
 
 <Badge>read</Badge>
 
-Read an EDITOR project's transcript mapped to its timeline clips, so you can do content-aware editing. Returns one segment per transcribable clip in timeline order, each carrying the words spoken within it plus its current state ([disabled] = cut/excluded from the render, [enabled] = kept) and its exact clipId. Use this to read what is said, see which parts are already disabled, then target the exact clipId(s) or source-time ranges with update_timeline (disable_ranges to non-destructively cut, set_disabled to toggle a whole clip). Pass `granularity: 'word'` to also get, per segment: word-level timing with ABSOLUTE timeline frames (so split / range ops are exact), per-word confidence + speaker, the derived silence gaps (for dead-air removal; already inset to the cuttable region so cutting them keeps breathing room), and the non-speech audio events; plus the distinct speaker set at the top level. In word mode each word, silence and audio event is a row of values in the order `fields` names. Segments come a page at a time in timeline order: pass the answer's nextCursor back as cursor for the next page, and limit sets how many a page holds. Scope it with `search` (a phrase to find) or `startMs`/`endMs` (a source-media window, which also clips the returned words) to read only the part that matters. Also returns the project's current `revision` so you can edit right away without a separate get_project: pass it as update_timeline's expectedRevision for a concurrency-safe edit, or omit expectedRevision to just apply to the current state. Returns mediaTranscribed:false when the media has not been transcribed yet. Requires the editor:read scope.
-
-<ParamField body name="projectId" type="string" required>
-The editor project id.
-</ParamField>
+Addresses the words one of two ways. With projectId it reads the words as the timeline plays them, in timeline order. With mediaId it reads the words of that recording itself, within an optional window of the recording's own seconds, including spans no timeline plays. Pass exactly one. The window is start inclusive and end exclusive. A media read's times are in the recording's own clock, and its words come a page at a time with word granularity. The rest of this describes the project read. Read an EDITOR project's transcript mapped to its timeline clips, so you can do content-aware editing. Returns one segment per transcribable clip in timeline order, each carrying the words spoken within it plus its current state ([disabled] = cut/excluded from the render, [enabled] = kept) and its exact clipId. Use this to read what is said, see which parts are already disabled, then target the exact clipId(s) or source-time ranges with update_timeline (disable_ranges to non-destructively cut, set_disabled to toggle a whole clip). Pass `granularity: 'word'` to also get, per segment: word-level timing with ABSOLUTE timeline frames (so split / range ops are exact), per-word confidence + speaker, the derived silence gaps (for dead-air removal; already inset to the cuttable region so cutting them keeps breathing room), and the non-speech audio events; plus the distinct speaker set at the top level. In word mode each word, silence and audio event is a row of values in the order `fields` names. Segments come a page at a time in timeline order: pass the answer's nextCursor back as cursor for the next page, and limit sets how many a page holds. Scope it with `search` (a phrase to find) or `startMs`/`endMs` (a source-media window, which also clips the returned words) to read only the part that matters. Also returns the project's current `revision` so you can edit right away without a separate get_project: pass it as update_timeline's expectedRevision for a concurrency-safe edit, or omit expectedRevision to just apply to the current state. Returns mediaTranscribed:false when the media has not been transcribed yet. Requires the editor:read scope.
 
 <ParamField body name="cursor" type="string">
 The answer's nextCursor, to read the next page of segments with the same other inputs.
@@ -480,12 +467,20 @@ The answer's nextCursor, to read the next page of segments with the same other i
 Source-media end time in ms; companion to startMs.
 </ParamField>
 
+<ParamField body name="endSeconds" type="number">
+With mediaId: where the window ends.
+</ParamField>
+
 <ParamField body name="granularity" type="`clip` \| `word`">
 'clip' (default) returns text per clip; 'word' adds word timing + absolute timeline frames + confidence + speaker, derived silences, and audio events.
 </ParamField>
 
 <ParamField body name="limit" type="integer">
 How many clip segments a page holds. Omit for the default.
+</ParamField>
+
+<ParamField body name="mediaId" type="string">
+The recording whose words to read. Use instead of projectId.
 </ParamField>
 
 <ParamField body name="paceThresholdMs" type="integer">
@@ -500,6 +495,10 @@ Word mode: breathing room (ms) kept before speech at a silence end edge (negativ
 Word mode: breathing room (ms) kept after speech at a silence start edge (negative tightens). Defaults to the saved padding, else 200.
 </ParamField>
 
+<ParamField body name="projectId" type="string">
+The project whose timeline words to read. Use instead of mediaId.
+</ParamField>
+
 <ParamField body name="search" type="string">
 Case-insensitive substring; returns only clip segments whose text contains it.
 </ParamField>
@@ -508,11 +507,15 @@ Case-insensitive substring; returns only clip segments whose text contains it.
 Source-media start time in ms; with endMs, returns only segments overlapping this window (and, in word mode, clips the returned words to it).
 </ParamField>
 
+<ParamField body name="startSeconds" type="number">
+With mediaId: where in the recording the window begins, in the recording's seconds.
+</ParamField>
+
 ### `list_templates`
 
 <Badge>read</Badge>
 
-List the templates you can place: ContentHero's and the user's own (the editor's Elements panel), without their code, a page at a time. Each is code, a shape or an animated emoji, with its category, version and default size. Place one with an insert_template op in update_timeline or update_canvas, branded with the project's brand kit; read one whole with get_template. Requires the editor:read scope.
+List the templates you can place: ContentHero's and the user's own (the editor's Elements panel), without their code, a page at a time. Each is code, a shape, an animated emoji or a logo, with its category, version and default size. Logos are listed only with kind logo, and search finds one by name or alias across the whole logo library. Place one with an insert_template op in update_timeline or update_canvas, branded with the project's brand kit; a logo's id is its slug; the logo library is a curated set kept in the product, so a brand's own logos are added through update_brand_kit; read one whole with get_template. Requires the editor:read scope.
 
 <ParamField body name="archived" type="boolean">
 true lists only archived templates, to restore one with archive.
@@ -526,7 +529,7 @@ Only templates in these categories.
 The previous page's cursor.
 </ParamField>
 
-<ParamField body name="kind" type="`code` \| `shape` \| `emoji`">
+<ParamField body name="kind" type="`code` \| `shape` \| `emoji` \| `logo`">
 Only templates that draw this.
 </ParamField>
 
@@ -539,7 +542,7 @@ system is ContentHero's, user is the user's own; all (the default) is both.
 </ParamField>
 
 <ParamField body name="search" type="string">
-Every word, in any order, in the name or the tags.
+Every word, in any order, in the name or the tags. For logos, also in a logo's other names, best match first.
 </ParamField>
 
 ### `get_template`
@@ -619,7 +622,7 @@ Place it at an end of the list instead of beside an item. Name neighbors or a po
 </ParamField>
 
 <ParamField body name="props" type="object">
-Its props as placed.
+Its props as placed. Media in them is a MediaRef (\{ assetId, role \}), never a stored URL.
 </ParamField>
 
 <ParamField body name="propsSchema" type="object or null">
@@ -646,7 +649,7 @@ Its default width, a fraction of the canvas's.
 
 <Badge>write</Badge>
 
-Change one of the user's own templates: only the fields given. ContentHero's templates are read-only; copy one with create_template fromTemplateId. Pass the version you read as expectedVersion to refuse a write over a change made since. Clips already placed from it keep what they had. Requires the editor:write scope.
+Change one of the user's own templates: only the fields given. ContentHero's templates are read-only; copy one with create_template fromTemplateId. Pass the version you read as expectedVersion to refuse a write over a change made since. Clips already placed from it keep what they had. A template's props may hold media only as a MediaRef, an object of assetId and role, at any depth including inside arrays; a stored media URL is refused by design, because it is bound to one audience and one account, and a MediaRef is resolved for whoever reads it. Requires the editor:write scope.
 
 <ParamField body name="templateId" type="string" required>
 The template id.
@@ -709,7 +712,7 @@ Place it at an end of the list instead of beside an item. Name neighbors or a po
 </ParamField>
 
 <ParamField body name="props" type="object">
-Its props as placed.
+Its props as placed. Media in them is a MediaRef (\{ assetId, role \}), never a stored URL.
 </ParamField>
 
 <ParamField body name="propsSchema" type="object or null">

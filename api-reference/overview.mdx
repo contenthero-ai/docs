@@ -21,7 +21,7 @@ https://app.contenthero.ai/api/v1
 Send your API key as a bearer token:
 
 ```bash
-curl https://app.contenthero.ai/api/v1/account/balance \
+curl https://app.contenthero.ai/api/v1/account \
   -H "Authorization: Bearer $CONTENTHERO_API_KEY"
 ```
 
@@ -52,18 +52,20 @@ The SDK is a hand-written kernel: typed inputs and outputs, idempotency keys, an
 - **Cost preflight:** generation accepts a cost-only mode (`getCost: true`) that charges nothing.
 - **Scopes:** keys are scope-gated; a `403` names the missing scope. See [API Keys](/authentication/api-keys).
 - **Rate limits:** per-key, returning `429` when exceeded.
-- **Idempotency:** generation accepts an idempotency key so a retried request does not double-charge.
+- **Idempotency:** a client-supplied `outputId` becomes the generation id, so a retried request returns the same job and does not double-charge.
 
 ## By domain
 
 <CardGroup cols={2}>
   <Card title="Generate" icon="wand-magic-sparkles" href="/api-reference/generate" />
+  <Card title="Library" icon="folder-open" href="/api-reference/library" />
   <Card title="Pipeline" icon="diagram-project" href="/api-reference/pipeline" />
   <Card title="Brand" icon="book" href="/api-reference/brand" />
   <Card title="Inspiration" icon="magnifying-glass-chart" href="/api-reference/inspiration" />
+  <Card title="Editor" icon="film" href="/api-reference/editor" />
   <Card title="Account" icon="wallet" href="/api-reference/account" />
 </CardGroup>
 
 <Note>
-These pages document the endpoints, their methods, scopes, and purpose. The authoritative contract for exact request and response shapes is the [SDK types](https://www.npmjs.com/package/@contenthero/sdk), and `contenthero schema get commands` dumps every command's input schema from the CLI.
+The endpoint tables on these pages are generated from the route contract, so every method, path and scope is checked against the route code before a release. Request fields come from the same contract. For the full shape of an answer, see the [SDK types](https://www.npmjs.com/package/@contenthero/sdk), and `contenthero schema get commands` dumps every command's input schema from the CLI.
 </Note>

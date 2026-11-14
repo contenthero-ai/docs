@@ -1,42 +1,402 @@
 ---
 title: "Generate"
-description: "Generation, status, boards, transcription, models, media, avatars, and voices endpoints."
+description: "Generation, status, boards, transcription, models, media, avatars, voices and Kling elements endpoints."
 ---
 
-Base URL `https://app.contenthero.ai/api/v1`. All endpoints take a bearer API key.
+Base URL `https://app.contenthero.ai/api/v1`. All endpoints take a bearer API key. The tables on this page are generated from the route contract: the Scope column is the scope the key needs (`None` means any valid key), and the fields under a route are its query, body and, where declared, its answer.
 
 ## Generation
 
-| Method | Path | Scope | Purpose |
-| --- | --- | --- | --- |
-| `POST` | `/studio/generate` | generate | Image, video, audio, lip-sync, or upscale, selected by `type`. Smart-waits, then returns the asset or an `outputId`. Pass `getCost: true` to preview cost only. |
-| `GET` | `/studio/generate/{outputId}` | generate | Generation status and result for a pending `outputId`. Includes a `pollAfterSeconds` hint while in progress. |
-| `POST` | `/studio/reference-board` | generate | Generate a reference board from a source image and a board type. |
-| `POST` | `/studio/transcribe` | generate | Transcribe speech to text: an audio file (`audioUrl`), or a tracked post's video (`contentId`, `slide` for a carousel's video) once its video is downloaded with `kind: "video"` analysis. Pass `getCost: true` to price a post first; an audio file cannot be priced in advance. A long video answers `202` with `status: "running"`: ask again with the same post to follow it, free. |
+`POST /studio/generate` takes a `contentType` (`image`, `video` or `audio`) and a `modelId`; the model registry decides which other fields apply. It smart-waits, then answers the asset or an `outputId` to poll. Pass `getCost: true` to preview the cost only. A long post transcription answers `202` with `status: "running"`: ask again with the same post to follow it, free.
 
 A generation reference (start frame, image input, audio) accepts a raw URL or a ContentHero output-id token `<uuid>-<N>`.
 
-## Models
+{/* rest:begin generation */}
 
 | Method | Path | Scope | Purpose |
 | --- | --- | --- | --- |
-| `GET` | `/models` | read | The live model roster, resolved from the registry. The authoritative list of valid `modelId` values. |
+| `POST` | `/studio/generate` | `studio:generate` | Generate an image, a video or audio (speech, music, sound effects), or run an upscale, background removal, layer separation or lip-sync. `contentType` picks the family and the model registry entry for `modelId` decides what else is accepted. Waits for a short job and answers a pending `outputId` for a long one. |
+| `GET` | `/studio/generate/{outputId}` | `studio:generate` | Poll one generation by its `outputId`: its status, and its files once it has finished. Reading never starts or finishes work. |
+| `POST` | `/studio/reference-board` | `studio:generate` | Generate a reference board: a typed panel layout drawn from a source image. |
+| `POST` | `/studio/audio/edit` | `studio:generate` | Edit existing audio: isolate a voice, enhance speech or split stems. The registry names the model that performs the operation. |
+| `POST` | `/studio/transcribe` | `studio:generate` | Transcribe speech to text from an audio file (`audioUrl`), a public video page (`videoUrl`) or a tracked post (`contentId`). Not free: pass `getCost` first to price it. |
+
+<AccordionGroup>
+
+<Accordion title="POST /studio/generate">
+
+**Body**
+
+| Field | Type | Required | Description |
+| --- | --- | --- | --- |
+| `modelId` | string | Yes | The model id, as list_models names it. |
+| `aspectRatio` | string |  | Validated per model. |
+| `audioEnabled` | boolean |  | Generate audio, on a model that supports it. |
+| `avatarId` | string |  | File the result onto this avatar as a new look (images only). |
+| `background` | string |  | Background handling declared by the model, subject to output format compatibility. |
+| `compositionPlan` | object |  | Music only, instead of prompt: the song section by section. Its length is the sum of its chunks, so durationSeconds is not sent with it. |
+| `contentType` | `image` \| `video` \| `audio` |  | The medium this call asks for. When given, a model of another medium is refused. |
+| `duration` | number |  | Clip length in seconds. Model-dependent. |
+| `durationSeconds` | number |  | Length in seconds, for music and sound effects. |
+| `frameCount` | integer or string |  | GIF frame count declared by the model. Available only for GIF output. |
+| `frameDurationMs` | integer |  | GIF frame duration in milliseconds, subject to the model limits. |
+| `frameSize` | string |  | GIF frame size from the model declared presets, subject to its sprite sheet limits. |
+| `getCost` | boolean |  | Return the credit cost estimate instead of generating (nothing runs, nothing is charged). |
+| `keepInputLength` | boolean |  | Video edit only: keep the input video's full length instead of a set duration. |
+| `kind` | `generate` \| `upscale` \| `lip-sync` \| `voice` \| `background-removal` \| `enhance` \| `layer-separation` \| `stem-separation` |  | The work this call asks for, in the registry's words. When given, a model that does other work is refused. |
+| `negativePrompt` | string |  | What to avoid, on a model that supports it. |
+| `numGenerations` | integer |  | Number of variations (video models). |
+| `numImages` | integer |  | Number of images (image models). |
+| `outputFormat` | string |  | Output format declared by the model, subject to its input and background restrictions. |
+| `outputId` | string |  | The caller's own id for this run, a UUID. A retry with the same id returns the job already started. |
+| `parameters` | object |  | Model-specific parameters passed to the provider. |
+| `placement` | object or object |  | Where the asset lands, interpreted against the project's type. VIDEO TIMELINE: append to the end, at a time, at the playhead, replacing an existing clip, or filling a time range (omitted places it at the playhead when known, else appends). CANVAS DESIGN: a layer on a slide (slideId / slideIndex, default the focused slide; fit contain\|cover\|none; a nine-point anchor; and design-pixel x/y/width/height). |
+| `playheadFrame` | number |  | The current playhead frame, for playhead-relative timeline placement. |
+| `projectId` | string |  | The project to place the result on. Omit for a standalone library output. |
+| `prompt` | string |  | The text prompt. |
+| `promptInfluence` | number |  | How literally a sound effect follows its prompt (0 to 1). |
+| `quality` | string |  | Quality mode, for models that expose it separately. Validated per model. |
+| `references` | object |  |  |
+| `resolution` | string |  | Validated per model. |
+| `seed` | number |  | A seed, on a model that supports one. |
+| `storeForInpainting` | boolean |  | Music only: keep the song with the provider so a later compositionPlan can reuse stretches of it, which is how one section is edited. |
+| `text` | string |  | The words to speak, for a speech model. |
+| `upgradeFromOutputId` | string |  | Upgrade a completed draft output owned by the caller. The model must declare draftUpgrade. Shot settings are inherited and cannot change. |
+| `upgradeSlot` | integer |  | The output slot of the source draft. Omitted selects the first output. |
+| `upscaleFactor` | string |  | Upscale factor, for an upscale model. Validated per model. |
+| `voiceId` | string |  | The voice id, for a speech model. |
+| `voiceName` | string |  | The voice name, for display only. |
+| `voiceSettings` | object |  | Voice delivery dials, for a speech model that declares them. |
+| `withTimestamps` | boolean |  | Music only: also return the sung words with their start and end times, and save them as the song's transcript. |
+
+</Accordion>
+
+<Accordion title="POST /studio/reference-board">
+
+**Body**
+
+| Field | Type | Required | Description |
+| --- | --- | --- | --- |
+| `boardType` | string | Yes | One of the board types listed by get_model('reference-boards'). |
+| `avatarId` | string |  | Optional avatar id from list_avatars. Associate the board with that avatar, so a character sheet built for an avatar stays filed against it. |
+| `boardName` | string |  | Optional name for the board. |
+| `getCost` | boolean |  | Return the credit cost estimate instead of generating (nothing runs, nothing is charged). |
+| `numImages` | integer |  | Number of board variations (1-4). Defaults to 1. |
+| `outputId` | string |  | The caller's own id for this run, a UUID. A retry with the same id returns the job already started. |
+| `prompt` | string |  | Describe the subject or how you will use the board. Required when no referenceImages are given (text-only boards); otherwise optional context (the source image leads). |
+| `referenceImages` | string[] |  | Source images the board is built from: each a URL or a previous output id (e.g. "\<id\>" or "\<id\>-2") to chain from an earlier generation. |
+
+</Accordion>
+
+<Accordion title="POST /studio/audio/edit">
+
+**Body**
+
+| Field | Type | Required | Description |
+| --- | --- | --- | --- |
+| `clipIds` | string[] |  | IN-PLACE mode: enhance or split the audio of these clips on projectId. Omit with inPlace:true to edit every audible clip on the timeline. |
+| `durationSeconds` | number |  | Source audio length in seconds. Required for getCost, and for enhancement pricing when the source is not a stored ContentHero asset. |
+| `getCost` | boolean |  | Return the credit cost estimate instead of running (nothing runs, nothing is charged). |
+| `inPlace` | boolean |  | IN-PLACE mode for the whole timeline, without naming clips. Implied when clipIds is given. |
+| `modelId` | string |  | Instead of operation: an audio model that takes one audio file and returns audio (it resolves to the operation it performs). list_models (contentType audio) names them; get_model gives one model's inputs and whether it finishes at once or is polled with get_status. |
+| `operation` | `isolate` \| `enhance` \| `split` |  | isolate: voice isolation. enhance: loudness leveling and noise cleanup. split: vocals, drums, bass and other as four files, or four tracks in in-place mode. The server picks the model that performs it. Omitted: enhance in in-place mode, else isolate. |
+| `outputId` | string |  | FILE mode: the caller's own id for this run, a UUID. A retry with the same id returns the job already started. |
+| `placement` | object |  | Where the clip lands: append to the end, at a time, at the playhead, replacing an existing clip, or filling a time range. Omitted places it at the playhead when known, else appends. |
+| `playheadFrame` | number |  | The current playhead frame, for playhead-relative placement. |
+| `projectId` | string |  | The editor project: where to PLACE the result in file mode, or which timeline to edit in in-place mode. Omit for a standalone library output. |
+| `sourceUrl` | string |  | FILE mode: the audio file to process, as a URL or a previous output id. Omit in in-place mode, where the sources come from the clips. |
+
+</Accordion>
+
+<Accordion title="POST /studio/transcribe">
+
+**Body**
+
+| Field | Type | Required | Description |
+| --- | --- | --- | --- |
+| `audioUrl` | string |  | Public URL of the audio file to transcribe. Pass one of audioUrl, videoUrl or contentId. |
+| `contentId` | string |  | The tracked post whose video to transcribe: its id or short id, its link, or the platform's own id for it. Its video must be downloaded first with analyze_content kind video. Pass one of audioUrl, videoUrl or contentId. |
+| `diarize` | boolean |  | Label each speaker (diarization), for an audio file. |
+| `getCost` | boolean |  | Return the credit cost estimate instead of transcribing (nothing runs, nothing is charged). |
+| `languageCode` | string |  | ISO language hint for an audio file. Auto-detected when omitted; a post's language is always detected. |
+| `slide` | integer |  | Which slide of a carousel post, by the position get_content reports for it: an image slide returns its image, a video slide its frames. Only with contentId. |
+| `videoUrl` | string |  | Link to a public video page (YouTube, Instagram, TikTok, X) whose spoken words to transcribe. Pass one of audioUrl, videoUrl or contentId. |
+
+</Accordion>
+
+</AccordionGroup>
+
+{/* rest:end generation */}
+
+## Models
+
+{/* rest:begin models */}
+
+| Method | Path | Scope | Purpose |
+| --- | --- | --- | --- |
+| `GET` | `/models` | None | The live model catalog, resolved from the registry: the authoritative list of valid `modelId` values and what each accepts. |
+| `GET` | `/models/{id}` | None | The full request shape of one model, so a generation can be built from its real parameters. |
+
+<AccordionGroup>
+
+<Accordion title="GET /models">
+
+**Query**
+
+| Field | Type | Required | Description |
+| --- | --- | --- | --- |
+| `contentType` | `image` \| `video` \| `audio` |  | Filter to one content type. |
+
+</Accordion>
+
+</AccordionGroup>
+
+{/* rest:end models */}
 
 ## Media
 
-| Method | Path | Scope | Purpose |
-| --- | --- | --- | --- |
-| `GET` | `/media` | read | List your media (creations, boards, looks), filterable by `kind`. |
-| `GET` | `/media/{token}` | read | Get one media item by id or output-id token. |
-| `GET` | `/download/{id}` | read | Any file of yours, or a project's export, by its media id or export id: `{ files: [{ mediaId?, name, url }] }`. Each `url` is a save link that names the file, needs no sign-in and does not expire. Never spends. `404` when the id names nothing of yours, `409` when the file is not made yet. |
+`GET /download/{id}` answers `404` when the id names nothing of yours and `409` when the file is not made yet. Each link it returns is a save link that names the file, needs no sign-in and does not expire. It never spends.
 
-## Avatars and voices
+{/* rest:begin media */}
 
 | Method | Path | Scope | Purpose |
 | --- | --- | --- | --- |
-| `GET` | `/avatars` | read | List your avatars. |
-| `GET` | `/avatars/{avatarId}` | read | Get one avatar with its looks. |
-| `GET` | `/voices` | read | List available voices. |
-| `GET` | `/voices/{voiceId}` | read | Get one voice. |
+| `GET` | `/media` | None | List the files in your library, or the stock catalog with `source=stock`, a page at a time. |
+| `GET` | `/media/{token}` | None | One media item in detail, by its short id or full id (a generation adds `-N` for one variation). |
+| `PATCH` | `/media/{token}` | `library:write` | Rename or describe a stored file you own. A generated output or a stock item has nothing to set and is refused. |
+| `GET` | `/media/search` | None | Semantic search over your library (creations, uploads, licensed stock, brand assets), ranked, with matched scene timestamps. |
+| `POST` | `/media/batch` | None | Resolve a mixed batch of media references (URLs or media ids) to vision-ready URLs and light metadata. |
+| `GET` | `/download/{id}` | None | Save links for a file of yours or a project export, by media id or export id: `{ files: [{ mediaId?, name, url }] }`. |
+
+<AccordionGroup>
+
+<Accordion title="GET /media">
+
+**Query**
+
+| Field | Type | Required | Description |
+| --- | --- | --- | --- |
+| `archived` | boolean |  | Only archived files. |
+| `collection` | `photos` \| `videos` \| `gifs` \| `stickers` \| `sounds` |  | Stock only, and required with it. Which part of the stock catalog to read: 'photos', 'videos', 'gifs', 'stickers' or 'sounds'. |
+| `contentType` | string[] |  | Only these media types. |
+| `cursor` | string |  | The previous page's cursor. |
+| `favorited` | boolean |  | Only favorited files. |
+| `limit` | integer |  | How many to return. |
+| `order` | `asc` \| `desc` |  | The sort direction. |
+| `orientation` | `landscape` \| `portrait` \| `square` |  | Stock photos and videos only. Narrow the results to one shape: 'landscape', 'portrait' or 'square'. Omit it to read every shape. |
+| `origin` | `creation` \| `board` \| `look` |  | Creations only. Narrow to one kind of generation: 'creation' (normal generations), 'board' (reference boards), or 'look'. The same word an item's origin says. Omit to list all. |
+| `query` | string |  | Stock only. Describe what to find. Omit it to read the collection's featured items. |
+| `smallCopies` | boolean |  | Link each image's small copy instead of the file itself, where the library keeps one: for drawing images small, as code that shows many at once does. Never for downloading or delivering a file, or showing it large. |
+| `sort` | `createdAt` \| `fileName` \| `sizeBytes` |  | The field to sort by. |
+| `source` | `all` \| `creations` \| `uploads` \| `exports` \| `stock` |  | Which media to read: 'all' (the default, every file the account keeps), 'creations' (studio generations), 'uploads' (files the user uploaded), 'exports' (renders of their projects), or 'stock' (the stock catalog, which is not part of 'all'). |
+| `status` | `completed` |  | A listed file exists once its generation completed, so this is the only value. |
+
+**Response**
+
+| Field | Type | Required | Description |
+| --- | --- | --- | --- |
+| `media` | object[] | Yes |  |
+| `nextCursor` | string or null | Yes |  |
+
+</Accordion>
+
+<Accordion title="GET /media/{token}">
+
+**Query**
+
+| Field | Type | Required | Description |
+| --- | --- | --- | --- |
+| `source` | `creations` \| `uploads` \| `exports` \| `stock` \| `files` |  | Narrow the lookup to one library: creations (a studio output), uploads (an editor upload), stock (a used stock item), or files (any stored file the Library shows). |
+
+</Accordion>
+
+<Accordion title="PATCH /media/{token}">
+
+**Body**
+
+| Field | Type | Required | Description |
+| --- | --- | --- | --- |
+| `description` | string |  | A description of the file, in your own words. |
+| `name` | string |  | The new name for the file. |
+
+</Accordion>
+
+<Accordion title="GET /media/search">
+
+**Query**
+
+| Field | Type | Required | Description |
+| --- | --- | --- | --- |
+| `query` | string | Yes | A natural-language description of the media to find, describing its visible or audible content. |
+| `cursor` | string |  | The previous page's cursor. |
+| `kinds` | string[] |  | Restrict results to these media kinds. Omit to search all kinds. |
+| `limit` | integer |  | How many to return. |
+| `smallCopies` | boolean |  | Link each image's small copy instead of the file itself, where the library keeps one: for drawing images small, as code that shows many at once does. Never for downloading or delivering a file, or showing it large. |
+
+**Response**
+
+| Field | Type | Required | Description |
+| --- | --- | --- | --- |
+| `nextCursor` | string or null | Yes |  |
+| `results` | object[] | Yes |  |
+| `emptyReason` | object |  |  |
+
+</Accordion>
+
+<Accordion title="POST /media/batch">
+
+**Body**
+
+| Field | Type | Required | Description |
+| --- | --- | --- | --- |
+| `items` | value[] | Yes | The media to resolve. |
+
+**Response**
+
+| Field | Type | Required | Description |
+| --- | --- | --- | --- |
+| `items` | object[] | Yes |  |
+
+</Accordion>
+
+</AccordionGroup>
+
+{/* rest:end media */}
+
+## Avatars, voices and Kling elements
+
+{/* rest:begin characters */}
+
+| Method | Path | Scope | Purpose |
+| --- | --- | --- | --- |
+| `GET` | `/avatars` | None | List your avatars. |
+| `POST` | `/avatars` | `studio:generate` | Create an avatar. It runs a generation and charges credits, which is why it needs the generate scope. |
+| `GET` | `/avatars/{avatarId}` | None | One avatar in full, including its looks. |
+| `PATCH` | `/avatars/{avatarId}` | `studio:write` | Update an avatar, and add or remove its looks through `ops`. |
+| `DELETE` | `/avatars/{avatarId}` | `studio:write` | Delete an avatar (a soft delete). |
+| `POST` | `/avatars/{avatarId}/looks` | `studio:write` | File images you already own onto an avatar as looks. To generate a new look, call `POST /studio/generate` with `avatarId`. |
+| `DELETE` | `/avatars/{avatarId}/looks/{lookId}` | `studio:write` | Remove one look from an avatar. The image goes to the trash and is recoverable for 30 days. |
+| `GET` | `/voices` | None | List your saved voices, favorites first, then most recently used. |
+| `GET` | `/voices/{voiceId}` | None | One saved voice in full. |
+| `GET` | `/kling-elements` | None | List your Kling elements: named reference groups you can address in a prompt as `@name`. |
+| `POST` | `/kling-elements` | `studio:write` | Create a Kling element from a name, a description and two to four images or one video. |
+| `GET` | `/kling-elements/{id}` | None | One Kling element. |
+| `PATCH` | `/kling-elements/{id}` | `studio:write` | Change a Kling element's name, description or category. |
+| `DELETE` | `/kling-elements/{id}` | `studio:write` | Delete a Kling element. |
+
+<AccordionGroup>
+
+<Accordion title="GET /avatars">
+
+**Query**
+
+| Field | Type | Required | Description |
+| --- | --- | --- | --- |
+| `cursor` | string |  | The previous page's cursor. |
+| `limit` | integer |  | How many to return. |
+
+</Accordion>
+
+<Accordion title="POST /avatars">
+
+**Body**
+
+| Field | Type | Required | Description |
+| --- | --- | --- | --- |
+| `age` | string |  | Apparent age, e.g. '20s', '35', 'middle-aged'. Required: the prompt writer describes the character from these traits. |
+| `defaultVoiceId` | string |  | A voiceId from list_voices, used as this avatar's default voice. |
+| `description` | string |  | Free-text description of the character. The strongest single input when no reference photos are given. |
+| `ethnicity` | string |  | Optional ethnicity, for a more specific likeness. |
+| `gender` | string |  | Gender presentation. Required, same reason as age. |
+| `getCost` | boolean |  | Return the credit cost estimate instead of creating (nothing runs, nothing is charged). |
+| `lookOutputId` | string |  | A caller-minted id for the first look. |
+| `name` | string |  | Avatar name, at least 3 characters. |
+| `niche` | string[] |  | Content niches this character is for, e.g. ["fitness","nutrition"]. |
+| `referenceImageUrls` | string[] |  | Photos of a REAL PERSON to anchor identity to: each a URL or a previous output id. Only use photos of someone who has agreed to being cloned. |
+| `style` | string |  | Visual style hint for the portrait, e.g. "editorial", "cinematic". Not stored on the avatar. |
+
+</Accordion>
+
+<Accordion title="PATCH /avatars/{avatarId}">
+
+**Body**
+
+| Field | Type | Required | Description |
+| --- | --- | --- | --- |
+| `afterId` | string |  | Place it immediately after this item of the same list. |
+| `beforeId` | string |  | Place it immediately before this item of the same list. |
+| `defaultLookId` | string |  | A look id from get_avatar. Becomes the avatar's default look AND its profile photo. |
+| `defaultVoiceId` | string or null |  | A voiceId from list_voices, or null to clear it. |
+| `description` | string |  | What the avatar is, in words. An empty string clears it. |
+| `name` | string |  | New name, at least 3 characters. |
+| `ops` | value[] |  | Look changes, applied in order before the field updates. NOT a transaction: a failure part-way leaves earlier ops applied. |
+| `position` | `top` \| `bottom` |  | Place it at an end of the list instead of beside an item. Name neighbors or a position, not both. |
+
+</Accordion>
+
+<Accordion title="POST /avatars/{avatarId}/looks">
+
+**Body**
+
+| Field | Type | Required | Description |
+| --- | --- | --- | --- |
+| `imageUrl` | string |  | One image to add as a look. |
+| `imageUrls` | string[] |  | Images to add as looks. |
+| `items` | object[] |  | Looks to add, when the caller names their own ids or names. Wins over imageUrls and imageUrl. |
+
+</Accordion>
+
+<Accordion title="GET /voices">
+
+**Query**
+
+| Field | Type | Required | Description |
+| --- | --- | --- | --- |
+| `cursor` | string |  | The previous page's cursor. |
+| `favorited` | boolean |  | Only favorited voices. |
+| `limit` | integer |  | How many to return. |
+
+</Accordion>
+
+<Accordion title="GET /kling-elements">
+
+**Query**
+
+| Field | Type | Required | Description |
+| --- | --- | --- | --- |
+| `cursor` | string |  | The previous page's cursor. |
+| `limit` | integer |  | How many to return. |
+
+</Accordion>
+
+<Accordion title="POST /kling-elements">
+
+**Body**
+
+| Field | Type | Required | Description |
+| --- | --- | --- | --- |
+| `description` | string | Yes | What the Kling element represents (required). |
+| `name` | string | Yes | Referenced in the prompt as @name. |
+| `category` | `auto` \| `character` \| `location` \| `prop` |  | Kind of entity (default 'auto'). |
+| `images` | string[] |  | 2-4 image URLs or output-id tokens. |
+| `video` | string |  | A single video URL or output-id token (alternative to images). |
+
+</Accordion>
+
+<Accordion title="PATCH /kling-elements/{id}">
+
+**Body**
+
+| Field | Type | Required | Description |
+| --- | --- | --- | --- |
+| `category` | `auto` \| `character` \| `location` \| `prop` |  | What kind of Kling element this is. 'auto' lets the server classify it from the image. |
+| `description` | string |  | What this Kling element is, in words. This is what makes it findable later. |
+| `name` | string |  | Rename the Kling element. |
+
+</Accordion>
+
+</AccordionGroup>
+
+{/* rest:end characters */}
 
 See the [Generate guide](/guides/generate) for the workflow, chaining, and cost preflight.

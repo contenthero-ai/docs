@@ -3,10 +3,9 @@ title: "Command reference"
 description: "Every ContentHero CLI command, its arguments and its options."
 ---
 
-{/* GENERATED FILE. Do not edit by hand. */}
-{/* Regenerate with `npm run generate:reference` in contenthero-docs. */}
+{/* GENERATED FILE from the ContentHero CLI. Do not edit by hand. */}
 
-Every command the CLI exposes, grouped by resource. 126 commands.
+Every command the CLI exposes, grouped by resource. 119 commands.
 
 Run `contenthero schema get commands` to get this same information as JSON, which is the discovery path for agents.
 
@@ -44,7 +43,7 @@ Archive an asset, or restore it with --off (reversible; requires favorites:write
 
 | Argument | Required | Purpose |
 | --- | --- | --- |
-| `assetType` | yes | card | brand_kit | brand_kit_section | project | space | style-library | media |
+| `assetType` | yes | card \| brand_kit \| brand_kit_section \| project \| space \| style-library \| media |
 | `id` | yes | the asset id, or the media id when assetType is media (a1B2c3D4-2 for one output of several) |
 
 | Option | Purpose |
@@ -226,6 +225,7 @@ Rename an avatar, set its default look or voice, or move it among your avatars
 | Option | Purpose |
 | --- | --- |
 | `--name <name>` | new name, at least 3 characters |
+| `--description <text>` | What the avatar is, in words. An empty string clears it. |
 | `--default-look <lookId>` | look to make the default (also becomes the profile photo) |
 | `--voice <voiceId>` | default voice id, or "none" to clear it |
 | `--after <id>` | place it immediately after this item of the same list |
@@ -392,6 +392,7 @@ Create a post (requires planner:write)
 | Option | Purpose |
 | --- | --- |
 | `--platform <platform>` | primary platform: youtube, instagram, tiktok, facebook, linkedin, x, threads, general |
+| `--content-type <word>` | What kind of content the card holds, in a word. |
 | `--space <space>` | which space's board (from `contenthero space list`); default space if omitted |
 | `--stage <stage>` | stage id, slug, or name (defaults to the first stage) |
 | `--cover-url <url>` | public URL for the post cover |
@@ -439,6 +440,7 @@ Update a post's fields, including its stage and its place in its column (require
 | --- | --- |
 | `--title <text>` |  |
 | `--platform <platform>` |  |
+| `--content-type <word>` | What kind of content the card holds, in a word. An empty string clears it. |
 | `--stage <stage>` | move the post to this stage (id, slug, or name) |
 | `--space <space>` | move the card to another space (id or slug); without --stage it lands in that space's matching stage, or its first |
 | `--also <id>` | another card id to apply this to; repeatable. Fields describing ONE card (title, notes, cover) still need exactly one |
@@ -507,7 +509,7 @@ Analyze a tracked post: Break It Down, its scenes with --kind scenes, or its vid
 | --- | --- |
 | `--kind <kind>` | breakdown (default), scenes (the scene map, each scene's range, what happens and what is said, priced per minute of video), or video (every video the post holds in shared analysis copies, each with its cut list once stored, charged for what the downloads moved) |
 | `--cost` | show the credit cost instead of analyzing (nothing runs, nothing is charged) |
-| `--resolution <720p|1080p>` | Most detail for the stored copy (kind video); the best offered up to it is downloaded |
+| `--resolution <720p\|1080p>` | Most detail for the stored copy (kind video); the best offered up to it is downloaded |
 | `--no-wait` | return at once instead of waiting for a running analysis |
 | `--timeout <sec>` | how long to wait for a running analysis (default 600) |
 
@@ -551,7 +553,7 @@ List tracked content, ranked by outlier score, or by relevance when you pass --s
 | `--since <window>` | published within: week, month, 3months, 6months, year, 2years |
 | `--published-after <iso>` | published on or after this ISO timestamp (wins over --since) |
 | `--published-before <iso>` | published on or before this ISO timestamp |
-| `--search <text>` | finds posts by meaning and by keyword across title, creator, description and transcript, ranked by relevance; returns only the posts judged relevant, so no rows means nothing matched |
+| `--search <text>` | finds posts by meaning and by keyword across title, creator, description and transcript, ranked by relevance, or the one post a pasted link names; returns only the posts judged relevant, never the unranked candidates; an empty result says why |
 | `--account <id>` | limit to this tracked account, by its id or short id, its profile link, its handle, or the platform's own id for it; repeatable |
 | `--added-by-you` | only the one-off posts saved by url |
 | `--brand-kit <id>` | scope to the accounts linked to this brand kit |
@@ -572,59 +574,6 @@ Download any file of yours to disk: a generation, one of its outputs, an upload,
 | `id` | yes | a media id (a generation, -\<n\> for one of its outputs, an upload, an import, a library file) or an export id |
 | `path` | no | the file to write for one file, or the directory to write into for several (default: the current directory, under the names the server gives) |
 
-## `element`
-
-### `contenthero element create`
-
-Create a Kling element from 2-4 images (or 1 video)
-
-| Option | Purpose |
-| --- | --- |
-| `--name <name>` | referenced in the prompt as @name |
-| `--description <text>` | what the Kling element represents |
-| `--category <category>` | auto | character | location | prop Defaults to `"auto"`. |
-| `--image <urlOrId>` | image URL or output id; repeatable (2-4) |
-| `--video <urlOrId>` | a single video URL or output id (alternative to images) |
-
-### `contenthero element delete <id>`
-
-Delete a Kling element
-
-| Argument | Required | Purpose |
-| --- | --- | --- |
-| `id` | yes | Kling element id |
-
-### `contenthero element get <id>`
-
-Get one Kling element by id
-
-| Argument | Required | Purpose |
-| --- | --- | --- |
-| `id` | yes | Kling element id |
-
-### `contenthero element list`
-
-List your saved Kling elements
-
-| Option | Purpose |
-| --- | --- |
-| `--limit <n>` | how many to return |
-| `--cursor <cursor>` | the previous page's cursor |
-
-### `contenthero element update <id>`
-
-Update a Kling element's name, description, or category
-
-| Argument | Required | Purpose |
-| --- | --- | --- |
-| `id` | yes | Kling element id |
-
-| Option | Purpose |
-| --- | --- |
-| `--name <name>` |  |
-| `--description <text>` |  |
-| `--category <category>` | auto | character | location | prop |
-
 ## `export`
 
 ### `contenthero export <projectId>`
@@ -638,11 +587,11 @@ Export a project to a file: video, stills, documents, and for an editor project 
 | Option | Purpose |
 | --- | --- |
 | `--format <format>` | a format `contenthero schema get export` lists (default mp4) |
-| `--resolution <res>` | output resolution for ANY format: 480p|720p|1080p|2k|4k. Defaults 720p for an editor mp4, the project native size for a still. 1080p+ is plan-gated |
-| `--quality <q>` | mp4 quality: low|recommended|high |
+| `--resolution <res>` | output resolution for ANY format: 480p\|720p\|1080p\|2k\|4k. Defaults 720p for an editor mp4, the project native size for a still. 1080p+ is plan-gated |
+| `--quality <q>` | mp4 quality: low\|recommended\|high |
 | `--frame <n>` | editor still (png/jpg) only: timeline frame to render (default 0) |
 | `--no-watermark` | remove the watermark (plan-gated) |
-| `--loudness <lufs|off>` | video and sound only: this export's loudness, a target in LUFS or off, in place of the project's own (default the project's) |
+| `--loudness <lufs\|off>` | video and sound only: this export's loudness, a target in LUFS or off, in place of the project's own (default the project's) |
 | `--max-chars-per-line <n>` | subtitles only: longest line, 20 to 80 characters (default 42) |
 | `--max-lines-per-card <n>` | subtitles only: lines per card, 1 to 4 (default 2) |
 | `--show-speakers` | subtitles only: name who speaks, when there is more than one speaker |
@@ -679,7 +628,7 @@ Favorite an asset, or clear it with --off (requires favorites:write)
 
 | Argument | Required | Purpose |
 | --- | --- | --- |
-| `assetType` | yes | card | voice | brand_kit | project | inspiration_content | gallery | transition | space | media |
+| `assetType` | yes | card \| voice \| brand_kit \| project \| inspiration_content \| gallery \| transition \| space \| media |
 | `id` | yes | the asset id, or the media id when assetType is media (a1B2c3D4-2 for one output of several) |
 
 | Option | Purpose |
@@ -769,29 +718,14 @@ Generate audio with ElevenLabs: speech (TTS), music, or a sound effect
 | `--voice-name <name>` | for TTS: human-readable voice name (display only) |
 | `--duration <seconds>` | for music / sfx: length in seconds |
 | `--prompt-influence <0-1>` | for sfx: how literally to follow the prompt |
+| `--composition-plan <json>` | Music only, instead of prompt: the song section by section. Its length is the sum of its chunks, so durationSeconds is not sent with it. |
+| `--seed <n>` | For music with a compositionPlan: a seed, so the same plan gives a more consistent result. Not taken with a prompt. |
+| `--with-timestamps` | Music only: also return the sung words with their start and end times, and save them as the song's transcript. |
+| `--store-for-inpainting` | Music only: keep the song with the provider so a later compositionPlan can reuse stretches of it, which is how one section is edited. |
 | `--cost` | estimate the credit cost instead of generating |
 | `--project <id>` | editor project to place the result on (omit for a standalone library output) |
 | `--placement <json>` | placement intent as JSON, e.g. \{"mode":"atPlayhead"\} (omit to place at the playhead when known, else append) |
 | `--playhead <frame>` | current playhead frame, for playhead-relative placement |
-
-### `contenthero generate board [prompt]`
-
-Generate a Reference Board (dense multi-panel reference sheet, 3:4 / 4K)
-
-| Argument | Required | Purpose |
-| --- | --- | --- |
-| `prompt` | no | subject description (required when no --ref is given) |
-
-| Option | Purpose |
-| --- | --- |
-| `-t, --type <type>` | board type (`contenthero model get reference-boards` lists them) |
-| `--ref <urlOrId>` | source image (URL or output id); repeatable |
-| `-n, --num <count>` | number of board variations (1-4) |
-| `--name <name>` | optional board name |
-| `--avatar <id>` | associate the board with this avatar (see `contenthero avatar list`) |
-| `--cost` | estimate the credit cost instead of generating (nothing runs, nothing is charged) |
-| `--no-wait` | return the outputId immediately instead of waiting for the render |
-| `--timeout <seconds>` | how long to wait before handing back the outputId Defaults to `600`. |
 
 ### `contenthero generate image [prompt]`
 
@@ -806,34 +740,24 @@ Generate one or more images from a prompt (optionally image-to-image)
 | `-m, --model <id>` | image model id (see `contenthero model list --type image`) |
 | `--aspect <ratio>` | aspect ratio, e.g. 16:9, 1:1, 9:16 |
 | `--resolution <res>` | resolution, e.g. 1K, 2K, 4K (model-dependent) |
+| `--quality <quality>` | Quality mode, for models that expose it separately. Validated per model. |
+| `--output-format <format>` | Output format declared by the model, subject to its input and background restrictions. |
+| `--background <background>` | Background handling declared by the model, subject to output format compatibility. |
+| `--frame-count <count>` | GIF frame count declared by the model. Available only for GIF output. |
+| `--frame-duration-ms <milliseconds>` | GIF frame duration in milliseconds, subject to the model limits. |
+| `--frame-size <size>` | GIF frame size from the model declared presets, subject to its sprite sheet limits. |
 | `-n, --num <count>` | number of variations (1-4) |
 | `--ref <urlOrId>` | reference image (URL or output id); repeatable |
 | `--avatar <id>` | file the result onto this avatar as a new look (see `contenthero avatar list`) |
+| `--upscale-factor <factor>` | Upscale factor, for an upscale model. Validated per model. |
+| `--type <boardType>` | One of the board types listed by get_model('reference-boards'). |
+| `--name <name>` | Optional name for the board. |
 | `--cost` | estimate the credit cost instead of generating (nothing runs, nothing is charged) |
 | `--no-wait` | return the outputId immediately instead of waiting for the render |
 | `--timeout <seconds>` | how long to wait before handing back the outputId Defaults to `600`. |
 | `--project <id>` | editor project to place the result on (omit for a standalone library output) |
 | `--placement <json>` | placement intent as JSON, e.g. \{"mode":"atPlayhead"\} (omit to place at the playhead when known, else append) |
 | `--playhead <frame>` | current playhead frame, for playhead-relative placement |
-
-### `contenthero generate lip-sync`
-
-Animate a portrait so the subject speaks (image + audio or script)
-
-| Option | Purpose |
-| --- | --- |
-| `-m, --model <id>` | lip-sync model id (see `contenthero model list --type video`) |
-| `--image <urlOrId>` | portrait to animate (image URL or output id) |
-| `--audio <urlOrId>` | existing speech clip (audio URL or output id). Use this OR --script + --voice |
-| `--script <text>` | text for the subject to speak (requires --voice) |
-| `--voice <id>` | ElevenLabs voice id to speak the script |
-| `--voice-name <name>` | human-readable voice name (display only) |
-| `--motion <text>` | optional motion / expression hint |
-| `--resolution <res>` | resolution, e.g. 480p, 720p, 1080p (model-dependent) |
-| `--audio-duration <seconds>` | length of --audio in seconds (improves cost accuracy) |
-| `--cost` | estimate the credit cost instead of generating (nothing runs, nothing is charged) |
-| `--no-wait` | return the outputId immediately instead of waiting for the render |
-| `--timeout <seconds>` | how long to wait before handing back the outputId Defaults to `600`. |
 
 ### `contenthero generate video [prompt]`
 
@@ -849,20 +773,34 @@ Generate a video from a prompt (optionally with frames / references)
 | `--aspect <ratio>` | aspect ratio, e.g. 16:9, 9:16 |
 | `--resolution <res>` | resolution, e.g. 720p, 1080p, 4K (model-dependent) |
 | `--duration <seconds>` | clip length in seconds (model-dependent) |
+| `--draft` | Enable Draft on a model that declares the setting. Its declared resolution applies. |
+| `--upgrade-from-output-id <id>` | Upgrade a completed draft output owned by the caller. The model must declare draftUpgrade. Shot settings are inherited and cannot change. |
+| `--upgrade-slot <slot>` | The output slot of the source draft. Omitted selects the first output. |
+| `--output-format <format>` | Output format for a draft upgrade, validated by the server. |
+| `--return-last-frame` | Also return the last frame of a draft upgrade. |
 | `--keep-input-length` | keep the input video's full length (video edit only) |
 | `--audio` | enable generated audio (models that support it) |
 | `-n, --num <count>` | number of variations (1-4) |
 | `--negative <text>` | what to avoid (models that support it) |
 | `--start-frame <urlOrId>` | first frame (image URL or output id) |
 | `--end-frame <urlOrId>` | last frame (image URL or output id) |
+| `--keyframe <urlOrId>` | middle frame between the first and last, in order (URL or output id); repeatable; needs --start-frame |
 | `--ref <urlOrId>` | reference image (URL or output id); repeatable |
 | `--ref-video <urlOrId>` | reference video (URL or output id); repeatable |
 | `--ref-audio <urlOrId>` | reference audio (URL or output id); repeatable |
+| `--voice <name:urlOrId>` | a named voice, addressed in the prompt as @name, with the audio it speaks with (URL or output id); repeatable |
+| `--keep-original-sound` | on a model that offers it, with a reference video: keep that video's own sound in the result |
 | `--kling-element <id>` | saved Kling element id (Kling 3.0, @name in prompt); repeatable |
-| `--element <id>` | deprecated alias for --kling-element |
+| `--inline-kling-element <json>` | define a Kling element in the call: a JSON object with name and any of description, images, video, voice (each a URL or output id; model get says what the model takes); repeatable |
 | `--multi-shot` | multi-shot with the cuts planned by the model, on a model whose shots include auto (model get); to write each shot yourself, pass --shots instead |
 | `--shots <json>` | write each shot yourself, on a model whose shots include custom: JSON array of \{ prompt, duration \} objects |
 | `--input-mode <id>` | the input mode, by id from model get; omit to let the attached inputs decide |
+| `--upscale-factor <factor>` | Upscale factor, for an upscale model. Validated per model. |
+| `--source-duration <seconds>` | For an upscaling or background removal model: the length of the source video in seconds, used for pricing. Required by those models. |
+| `--script <text>` | For a lip sync model: text for the subject to speak, synthesized to speech. Requires voiceId; use this or referenceAudio. Before writing directions into the script, read the speech model's promptGuide with get_model. |
+| `--voice-id <id>` | For a lip sync model: the voice that speaks the script (list_voices names them). |
+| `--voice-name <name>` | For a lip sync model: human-readable voice name (display only). |
+| `--audio-duration <seconds>` | For a lip sync model with referenceAudio: the length of that clip in seconds, which improves cost accuracy. |
 | `--cost` | estimate the credit cost instead of generating (nothing runs, nothing is charged) |
 | `--no-wait` | return the outputId immediately instead of waiting for the render |
 | `--timeout <seconds>` | how long to wait before handing back the outputId Defaults to `600`. |
@@ -902,7 +840,7 @@ Create a Kling element from 2-4 images (or 1 video)
 | --- | --- |
 | `--name <name>` | referenced in the prompt as @name |
 | `--description <text>` | what the Kling element represents |
-| `--category <category>` | auto | character | location | prop Defaults to `"auto"`. |
+| `--category <category>` | auto \| character \| location \| prop Defaults to `"auto"`. |
 | `--image <urlOrId>` | image URL or output id; repeatable (2-4) |
 | `--video <urlOrId>` | a single video URL or output id (alternative to images) |
 
@@ -943,7 +881,7 @@ Update a Kling element's name, description, or category
 | --- | --- |
 | `--name <name>` |  |
 | `--description <text>` |  |
-| `--category <category>` | auto | character | location | prop |
+| `--category <category>` | auto \| character \| location \| prop |
 
 ## `login`
 
@@ -978,13 +916,16 @@ Get one media item by id (studio output, or an upload/stock item with --source)
 
 ### `contenthero media list`
 
-List the library's files: every file, or one part of the library with --source
+List media you can place: the account's files (every file, or one part of the library), or with --source stock the stock catalog, which comes back in its own order and does not take the library's filters or sort
 
 | Option | Purpose |
 | --- | --- |
-| `--source <source>` | which part of the library: all, creations, uploads, exports (default all) |
+| `--source <source>` | which media to read: all, creations, uploads, exports, stock (default all; stock is the stock catalog, not part of all) |
+| `--collection <collection>` | Stock only, and required with it. Which part of the stock catalog to read: 'photos', 'videos', 'gifs', 'stickers' or 'sounds'. |
+| `--query <query>` | Stock only. Describe what to find. Omit it to read the collection's featured items. |
+| `--orientation <orientation>` | Stock photos and videos only. Narrow the results to one shape: 'landscape', 'portrait' or 'square'. Omit it to read every shape. |
 | `--type <types>` | filter by media type (comma-separated): image, video, audio, doc, other |
-| `--kind <kind>` | creations only: filter by asset class: creation, board, look |
+| `--origin <origin>` | creations only: filter by what the generation is: creation, board, look |
 | `--favorite` | only favorited files |
 | `--archived` | only archived files |
 | `--limit <n>` | how many to return |
@@ -1008,18 +949,18 @@ Semantically search your library (creations, uploads, stock, brand) by describin
 | `--cursor <cursor>` | the previous page's cursor |
 | `--small-copies` | give each image its small copy, where the library keeps one: for drawing images small, never for downloading, delivering or showing large |
 
-### `contenthero media upload <file>`
+### `contenthero media update <id>`
 
-Upload a local file as first-class media (requires library:write)
+Rename a stored file or give it a description. Pass --name, --description or both; an empty --description clears it. Only library files can be changed, never a generated output or a stock item
 
 | Argument | Required | Purpose |
 | --- | --- | --- |
-| `file` | yes | path to the local file |
+| `id` | yes | media id, as `media list` prints it |
 
 | Option | Purpose |
 | --- | --- |
-| `--content-type <mime>` | MIME type override (else inferred from the extension) |
-| `--name <name>` | file name override (else the basename) |
+| `--name <name>` | the new name for the file |
+| `--description <text>` | a description of the file |
 
 ### `contenthero media zoom <idOrUrl> <region>`
 
@@ -1070,7 +1011,7 @@ Publish a card's posts NOW (requires publish:write; pushes to live socials)
 
 ### `contenthero project apply <projectId>`
 
-Apply a batch of ops to a project composition. Ops both CREATE (create_clip, insert_track, insert_prebuilt_track, add_transition) and EDIT (move_clip, trim_clip, update_clip, delete_clip, remove_background, disable_ranges, update_transition, remove_transition, ...) and KEYFRAME ops (add_keyframe, update_keyframe, remove_keyframe, apply_combo). One-shot cleanups: remove_silence, remove_filler_words, extract_audio. Templates: insert_template places one from `template list`, branded with the project's brand kit (see `schema get timeline` for shapes). Build each item from its type's `example`, read with `schema get timeline --name \<type\>` or `schema get layer --name \<type\>`; run `project get` first for the current revision and pass it as --expected-revision for safe concurrent edits. Requires editor:write.
+Edit a video timeline with a batch of operations, the same ones every ContentHero agent uses, applied by the server and shown in the open editor at once. Each operation is an object with an `op` name and its fields. get_schema kind 'timeline' lists every operation with its shape and the rules they all follow; read an operation in full by its name before using one you have not read, and build a clip from its type's example there. A code clip imports project modules, which an operation sets or copies from another of your projects. Read clip, track and transition ids from get_project. A batch is ordered and atomic: when any operation is refused, nothing is stored, and the result says which and why. The result reports each operation, with what the compiler found in any code an operation wrote, and what the edit left in the project that may not render as intended, clip by clip. Prefer an edit the person can review and turn back over one that cannot be reversed, and make a destructive one only when they asked for it. A clip's length on the timeline follows its source and its speed: change its speed, not its length. Project settings change with update_project. expectedRevision is the project revision you last read, and it means the same on update_project, update_timeline and update_canvas. An edit built on an older revision still applies when no change since touched what it touches. When one did, nothing is written and the answer is a conflict naming the current revision and what overlapped: read the project again and redo the edit. Omit it to apply to the project as it is. Every edit can be undone, and each returns the new revision. A retry that repeats the same operation id returns the revision already committed and never applies the batch twice. Requires the editor:write scope.
 
 | Argument | Required | Purpose |
 | --- | --- | --- |
@@ -1081,7 +1022,7 @@ Apply a batch of ops to a project composition. Ops both CREATE (create_clip, ins
 | `--ops <json>` | the ops as a JSON array string |
 | `--ops-file <path>` | read the ops JSON array from a file |
 | `--intent <text>` | a short description of the edit (for attribution) |
-| `--expected-revision <n>` | revision for optimistic concurrency (from `project get`) |
+| `--expected-revision <n>` | The project revision you last read, from get_project or the last edit. An older one still applies when nothing since touched what the edit touches; otherwise nothing is written and the conflict names the current revision and what overlapped. Omit to apply to the project as it is. |
 
 ### `contenthero project create`
 
@@ -1089,8 +1030,7 @@ Create a project (requires editor:write)
 
 | Option | Purpose |
 | --- | --- |
-| `--type <type>` | editor | canvas (default: editor) |
-| `--surface <type>` | deprecated alias for --type |
+| `--type <type>` | editor \| canvas (default: editor) |
 | `--title <text>` | project title (default: Untitled) |
 | `--orientation <ratio>` | e.g. 16:9, 9:16, 1:1 (default: 16:9) |
 | `--width <n>` | pixel width (default: from orientation) |
@@ -1164,6 +1104,7 @@ Read a project's composition + revision (summary by default; requires editor:rea
 | `--modules <names>` | read these project modules' code (separated by commas) |
 | `--source-asset <id>` | with --at-sec: the recording whose moments to place on the timeline, by the assetId a clip's source names |
 | `--at-sec <list>` | with --source-asset: the seconds of that recording to place (separated by commas) |
+| `--modules-index` | read the index of the project's modules: each one's name, how many clips draw it, whether none does, and its size, without code (read alone, like the other parts) |
 
 ### `contenthero project list`
 
@@ -1171,25 +1112,27 @@ List projects, both editor + canvas (requires editor:read)
 
 | Option | Purpose |
 | --- | --- |
-| `--filter <state>` | archived | favorited (omitted = active) |
-| `--type <type>` | editor | canvas (omitted = both) |
-| `--surface <type>` | deprecated alias for --type |
+| `--filter <state>` | archived \| favorited (omitted = active) |
+| `--type <type>` | editor \| canvas (omitted = both) |
 | `--search <text>` | case-insensitive title search |
 | `--limit <n>` | how many to return |
 | `--cursor <cursor>` | the previous page's cursor |
 | `--sort <field>` | the field to sort by |
 | `--order <order>` | the sort direction |
 
-### `contenthero project transcript get <projectId>`
+### `contenthero project transcript get [projectId]`
 
-Read a project's transcript mapped to its timeline clips (requires editor:read)
+Read the words of a project's timeline or of one recording (requires editor:read)
 
 | Argument | Required | Purpose |
 | --- | --- | --- |
-| `projectId` | yes | the editor project id |
+| `projectId` | no | the editor project id (the words as the timeline plays them); or pass --media instead |
 
 | Option | Purpose |
 | --- | --- |
+| `--media <mediaId>` | the recording whose words to read, instead of a project; its times are in the recording's own clock |
+| `--start-seconds <s>` | with --media: where in the recording the window begins, in the recording's seconds (inclusive) |
+| `--end-seconds <s>` | with --media: where the window ends (exclusive) |
 | `--search <text>` | only clip segments whose text contains this substring |
 | `--start <ms>` | source-media start time in ms (with --end, filters to this window; word mode also clips words to it) |
 | `--end <ms>` | source-media end time in ms |
@@ -1215,7 +1158,7 @@ Change a project: its title, brand kit and cover, and its settings, which are th
 | `--width <n>` | a pixel width, given with --height |
 | `--height <n>` | a pixel height, given with --width |
 | `--fps <n>` | a video project's frame rate; every frame number converts with it, so clips keep their timing |
-| `--loudness <lufs|off>` | a video project's delivery loudness, a target in LUFS or off; every export follows it |
+| `--loudness <lufs\|off>` | a video project's delivery loudness, a target in LUFS or off; every export follows it |
 | `--magnetic-track` | turn a video project's magnetic main track on; it closes the main track's gaps |
 | `--no-magnetic-track` | turn a video project's magnetic main track off |
 | `--linkage` | turn a video project's linkage on: other tracks follow the main track's ripple and delete |
@@ -1224,6 +1167,7 @@ Change a project: its title, brand kit and cover, and its settings, which are th
 | `--brand-kit <id>` | the brand kit to associate, or none to clear it |
 | `--cover <choice>` | the cover: auto (follows the composition), frame:\<n\> (a chosen frame or slide index), or media:\<id\> (a library image) |
 | `--cover-position <x,y>` | where the cover is framed, as percentages of its width and height, or none for the default framing |
+| `--expected-revision <n>` | The project revision you last read, from get_project or the last edit. An older one still applies when nothing since touched what the edit touches; otherwise nothing is written and the conflict names the current revision and what overlapped. Omit to apply to the project as it is. On update_project it guards the settings in the document; the title, brand kit and cover are not versioned. |
 
 ### `contenthero project version create <projectId>`
 
@@ -1308,7 +1252,7 @@ Make an item's public link, or stop sharing it with --off; a stopped link never 
 
 | Argument | Required | Purpose |
 | --- | --- | --- |
-| `assetType` | yes | media | project |
+| `assetType` | yes | media \| project |
 | `ids` | no | for media, one or more media ids as the media commands print them (with --off, one); otherwise the item id |
 
 | Option | Purpose |
@@ -1576,10 +1520,10 @@ Save a template of your own: from a placed code clip, code layer or shape, as a 
 | `--props <json>` | its props as placed, as a JSON object |
 | `--props-schema <json>` | each prop's control, as a JSON object (as `template get --json` shows them) |
 | `--duration-frames <n>` | how long it lasts when placed, in frames |
-| `--coverage <coverage>` | full (the whole frame) | partial (a box of --width-fraction by --height-fraction) |
+| `--coverage <coverage>` | full (the whole frame) \| partial (a box of --width-fraction by --height-fraction) |
 | `--width-fraction <n>` | its default width, a fraction of the canvas's |
 | `--height-fraction <n>` | its default height, a fraction of the canvas's |
-| `--resize <resize>` | scale (keeps its proportions) | reflow (lays out again in its box) |
+| `--resize <resize>` | scale (keeps its proportions) \| reflow (lays out again in its box) |
 | `--aspect <n>` | its own width over height, for --resize scale |
 | `--after <id>` | place it immediately after this item of the same list |
 | `--before <id>` | place it immediately before this item of the same list |
@@ -1607,10 +1551,10 @@ List ContentHero's templates and your own, without their code
 
 | Option | Purpose |
 | --- | --- |
-| `--scope <scope>` | system | user | all (default all) |
-| `--kind <kind>` | code | shape | emoji |
+| `--scope <scope>` | system \| user \| all (default all) |
+| `--kind <kind>` | code \| shape \| emoji \| logo (logos are listed only with this) |
 | `--category <category>` | only this category; repeatable |
-| `--search <text>` | every word, in any order, in the name or the tags |
+| `--search <text>` | every word, in any order, in the name or the tags; for logos, also in a logo's other names, best match first |
 | `--archived` | only archived templates, to restore one |
 | `--limit <n>` | how many to return |
 | `--cursor <cursor>` | the previous page's cursor |
@@ -1638,10 +1582,10 @@ Change one of your own templates, or move it among them: only the flags given
 | `--props <json>` | its props as placed, as a JSON object |
 | `--props-schema <json>` | each prop's control, as a JSON object (as `template get --json` shows them) |
 | `--duration-frames <n>` | how long it lasts when placed, in frames |
-| `--coverage <coverage>` | full (the whole frame) | partial (a box of --width-fraction by --height-fraction) |
+| `--coverage <coverage>` | full (the whole frame) \| partial (a box of --width-fraction by --height-fraction) |
 | `--width-fraction <n>` | its default width, a fraction of the canvas's |
 | `--height-fraction <n>` | its default height, a fraction of the canvas's |
-| `--resize <resize>` | scale (keeps its proportions) | reflow (lays out again in its box) |
+| `--resize <resize>` | scale (keeps its proportions) \| reflow (lays out again in its box) |
 | `--aspect <n>` | its own width over height, for --resize scale |
 | `--after <id>` | place it immediately after this item of the same list |
 | `--before <id>` | place it immediately before this item of the same list |
@@ -1707,14 +1651,15 @@ Move a tracked account within its list (requires inspiration:write)
 
 ### `contenthero transcribe [audioUrl]`
 
-Transcribe speech to text: an audio URL, or a tracked post's downloaded video with --content-id (spends credits; price it first with --cost)
+Transcribe speech to text: an audio URL, a public video page with --video-url, or a tracked post's downloaded video with --content-id (spends credits; price it first with --cost)
 
 | Argument | Required | Purpose |
 | --- | --- | --- |
-| `audioUrl` | no | public URL of the audio to transcribe (or name a post with --content-id) |
+| `audioUrl` | no | public URL of the audio to transcribe (or name a video page with --video-url, or a post with --content-id) |
 
 | Option | Purpose |
 | --- | --- |
+| `--video-url <url>` | link to a public video page (YouTube, Instagram, TikTok, X) whose spoken words to transcribe |
 | `--content-id <id>` | the tracked post whose video to transcribe: its id or short id, its link, or the platform's own id for it, once content analyze --kind video has downloaded it |
 | `--slide <n>` | which video of a carousel post, by the 0-based slide content analyze reports (with --content-id) |
 | `--cost` | show what transcribing costs instead of transcribing (nothing runs, nothing is charged) |
@@ -1723,24 +1668,21 @@ Transcribe speech to text: an audio URL, or a tracked post's downloaded video wi
 | `--no-wait` | return at once while a post's transcription is still running |
 | `--timeout <sec>` | how long to follow a post's transcription (default 600) |
 
-## `upscale`
+## `upload`
 
-### `contenthero upscale <source>`
+### `contenthero upload <files>...`
 
-Upscale an existing image or video to a higher resolution
+Upload local files into your library as media (requires library:write)
 
 | Argument | Required | Purpose |
 | --- | --- | --- |
-| `source` | yes | source media (URL or output id) to upscale |
+| `files` | yes | paths of the local files |
 
 | Option | Purpose |
 | --- | --- |
-| `-m, --model <id>` | upscale model id (see `contenthero model list`) |
-| `--factor <factor>` | upscale factor, e.g. 2x, 4x (model-dependent) |
-| `--duration <seconds>` | source video length in seconds (required for video upscalers) |
-| `--cost` | estimate the credit cost instead of upscaling |
-| `--no-wait` | return the outputId immediately instead of waiting |
-| `--timeout <seconds>` | how long to wait before handing back the outputId Defaults to `600`. |
+| `--content-type <mime>` | MIME type override, for one file (else inferred from the extension) |
+| `--resume <outputId>` | finish an upload that stopped midway, for one file: the same file, sending only the parts the store does not hold |
+| `--name <name>` | file name override, for one file (else the basename) |
 
 ## `view`
 
@@ -1754,7 +1696,7 @@ See what the user is looking at, and see or hear your own work (requires context
 | `--capture` | also capture a fresh screenshot of the live viewport (the user's screen; slower) |
 | `--render` | also render your work (images); ephemeral. Name several frames with --frames, --per-second or --count. Frames across a range are how you judge motion, timing and pacing: the closer together they are, the finer the motion they show. |
 | `--frame <n>` | image: which single timeline frame (omit for the current playhead) |
-| `--slide <id|n>` | image (canvas): which slide id (omit for the focused slide). With --content-id: which video of a carousel post, by the slide content analyze reports for it |
+| `--slide <id\|n>` | image (canvas): which slide id (omit for the focused slide). With --content-id: which video of a carousel post, by the slide content analyze reports for it |
 | `--slide-index <n>` | image (canvas): 1-based slide index (alternative to --slide) |
 | `--frames <list>` | image (editor): exactly these timeline frames, in this order, separated by commas |
 | `--from-frame <n>` | start timeline frame of the range (several frames, sound or video) |

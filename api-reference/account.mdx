@@ -1,21 +1,114 @@
 ---
 title: "Account"
-description: "Balance and account endpoints."
+description: "Balance, status, view and link-format endpoints."
 ---
 
-Base URL `https://app.contenthero.ai/api/v1`. All endpoints take a bearer API key.
+Base URL `https://app.contenthero.ai/api/v1`. All endpoints take a bearer API key. The tables on this page are generated from the route contract: the Scope column is the scope the key needs, and `None` means any valid key.
 
 ## Your account
 
-| Method | Path | Purpose |
-| --- | --- | --- |
-| `GET` | `/account` | Your credit balance, what is available to spend, credits reserved for work in progress, what was spent this month, the monthly spend cap, the plan and auto top-up. |
-| `PATCH` | `/account` | Update your account. Only the fields you pass change. `spendCap` sets the monthly spend cap in credits, or `null` removes it; it needs the `billing:write` scope and the account's owner. |
+`PATCH /account` sets `spendCap`, the monthly spend cap in credits (`null` removes it). That field needs the `billing:write` scope and the account's owner.
+
+{/* rest:begin account */}
+
+| Method | Path | Scope | Purpose |
+| --- | --- | --- | --- |
+| `GET` | `/account` | None | Your balance, what is available, credits reserved for work in progress, this month's spend, the spend cap, the plan and auto top-up. |
+| `PATCH` | `/account` | Varies: each field names its own scope; `spendCap` needs `billing:write` | Update your account. Only the fields you pass change. `spendCap` sets the monthly cap in credits, or `null` for none. |
+
+<AccordionGroup>
+
+<Accordion title="PATCH /account">
+
+**Body**
+
+| Field | Type | Required | Description |
+| --- | --- | --- | --- |
+| `spendCap` | integer or null |  | The monthly spend cap in credits, or null for no cap. |
+
+</Accordion>
+
+</AccordionGroup>
+
+{/* rest:end account */}
 
 ```bash
 curl https://app.contenthero.ai/api/v1/account \
   -H "Authorization: Bearer $CONTENTHERO_API_KEY"
 ```
+
+## Status, view and link formats
+
+`GET /status/{id}` is the one place to follow any background job: pass the id the starting call returned.
+
+{/* rest:begin utilities */}
+
+| Method | Path | Scope | Purpose |
+| --- | --- | --- | --- |
+| `GET` | `/status/{id}` | Varies: decided by what the id names: a generation or edit needs `studio:generate`, an export needs `editor:read`, the other kinds need none | The status of any background job in one shape: a generation or edit, an export, a brand kit read, an avatar, a post's analysis or scene map, a transcript, an import. |
+| `GET` | `/view` | `context:read` | What you are looking at in the open app (surface, focus, selection, and with `capture` a picture of the screen), and your own work rendered from the saved project. |
+| `GET` | `/link-formats` | None | The link contract: the grammar of app addresses and every linkable noun, so a caller can build a link from a noun and an id. |
+
+<AccordionGroup>
+
+<Accordion title="GET /status/{id}">
+
+**Query**
+
+| Field | Type | Required | Description |
+| --- | --- | --- | --- |
+| `kind` | `output` \| `export` \| `brand_kit` \| `avatar` \| `content` \| `scenes` \| `transcript` |  | Which kind of job the ids name. Only for a full UUID, scenes, a transcript, or an id the answer says is ambiguous. |
+
+</Accordion>
+
+<Accordion title="GET /view">
+
+**Query**
+
+| Field | Type | Required | Description |
+| --- | --- | --- | --- |
+| `assetId` | string |  | A clip of the user's to see and hear, by its asset id: the id get_project reports in a clip's source. Or pass mediaUrl or contentId. |
+| `atSec` | number[] |  | Frames at exactly these seconds of a source, instead of spread across a window. |
+| `capture` | boolean |  | Also return a picture of the user's screen as shown now, including unsaved and transient state. Use it only when the task depends on what the screen shows; to see your work, render it instead. |
+| `clipIds` | string[] |  | Render only these clips, picture and sound, on the timeline's own frame numbers. The project is untouched. |
+| `contentId` | string |  | A tracked post's video to see and hear, by its id or short id, its link, or the platform's own id for it, once analyze_content kind video has downloaded it. Or pass assetId or mediaUrl. |
+| `count` | integer |  | How many frames to spread from the first frame of the range, or of a source's window, to its last, both included. Omit for one frame at the focus point, or about one a second of a range. |
+| `cursor` | string |  | Read the next page of every list of find, where or picture: pass the answer's nextCursor, with the same other inputs. |
+| `detector` | `pointer` \| `face` |  | The class of thing where answers from the file's own analysis instead of a phrase: a screen recording's pointer, or faces (where, never who). Leave find out. With track, a box you give is followed as that class. |
+| `find` | string |  | Describe what to look for in the picture. Returns the moments of the source or project window that show it, best first, as times (and timeline frames for a project), matching what is pictured, the text on screen and the words spoken over it, each naming which of the three found it. The moments are candidates: confirm the ones that matter by viewing frames at their times, or ask where. |
+| `frame` | integer |  | Editor: which single timeline frame to render. Omit to render the current playhead frame. |
+| `frames` | integer[] |  | Editor: exactly these timeline frames, in this order. |
+| `fromFrame` | integer |  | Start timeline frame of the range, for several frames, sound or video. Omit to start at the beginning. |
+| `fromSec` | number |  | Start of a source's window, in its own seconds. Omit to start at its beginning. |
+| `layout` | `frames` \| `sheets` |  | 'frames' returns each frame as its own image; 'sheets' tiles them into contact sheets, an edit's frames numbered and a source's labeled with its second under each tile. Omit to choose by how many fit one result. |
+| `limit` | integer |  | How many items of each list a page of find, where or picture holds. Omit for the default. |
+| `live` | boolean |  | Also return what the user is looking at beside a render. |
+| `mediaUrl` | string |  | A clip of the user's to see and hear, by its media URL, rather than your edit. Or pass assetId or contentId. |
+| `page` | integer |  | Which page of the render, or of a source's frames, to read, starting at 1. |
+| `perSecond` | number |  | How many frames to take per second of the range, or of a source's window, stepping from its first frame; never more than the footage has. |
+| `picture` | boolean |  | The window's picture analysis: its cuts, fades, black, camera movement, the text on screen and where faces are (never who), each with its times and position. For a project it reads each clip's source and maps it to the timeline, and adds the edit's own cuts in editCuts: where a clip starts where the one before it ends without playing on from it. It does not see what covers a clip or what has no source, and names each clip it does not see with why; a render of the range shows those. Where a screen recording's pointer is, and its shape. To follow it to the exact frame, ask where with detector pointer and track the candidate. |
+| `projectId` | string |  | The project to view or render. Omit for the surface the user is on now. Needed to render when no one is viewing. |
+| `region` | object |  | Render only this rectangle, \{ x, y, width, height \} in composition units (get_project's compositionSpace), to inspect detail. Without width it comes back at native pixels. For a source, the rectangle is in its own pixels. |
+| `render` | boolean |  | Render your work from the saved project: one composed frame or slide, the one in focus unless frame, slideId or slideIndex names another, or the frames that frames, count or perSecond name. Frames across a range show motion, timing and pacing, finer the closer together they are. |
+| `renderId` | string |  | Read a render already started, by its renderId, as a pending answer's readWith names it. Pass only page with it. |
+| `slide` | integer |  | Which slide of a carousel post, by the position get_content reports for it: an image slide returns its image, a video slide its frames. Only with contentId. |
+| `slideId` | string |  | Canvas: the id of the slide to render. Omit to render the focused slide. |
+| `slideIndex` | integer |  | Canvas: the 1-based slide index to render (alternative to slideId). |
+| `sound` | boolean |  | Hear and measure sound: your edit's range mixed as an export mixes it, instead of its picture, by fromFrame and toFrame; or a source's window as it is, by fromSec and toSec, beside any frames asked for. |
+| `toFrame` | integer |  | End timeline frame of the range. Omit to run to the end. |
+| `toSec` | number |  | End of a source's window, in its own seconds. Omit to run to its end. |
+| `track` | string or object |  | Follow one thing on every frame of the window: a candidate's id from a where answer, or a time of the source and a box on its frame that you found yourself. Returns one track per stretch it is seen, its box on each frame as keyframes, and its edges where it appears and leaves. An edge is not always on the exact frame: view the frames either side before cutting on it. A thing without a firm outline is followed with a loose box, and very fast motion can end a track early or split it. Slower the first time a seed is asked, and a read after that. |
+| `trackIds` | string[] |  | Render only these tracks, every clip on them, picture and sound, on the timeline's own frame numbers. The project is untouched. |
+| `video` | boolean |  | Watch the range play with its sound, to judge motion, timing, transitions and pacing. Takes fromFrame and toFrame, or a source's window. |
+| `wait` | number |  | Seconds to wait for a render started by this call before answering pending. Only the route takes it: an in-app turn waits as long as the turn allows. |
+| `where` | boolean |  | Also where on the frame each thing find describes may be: candidates, best first, each with an id, a confidence, its time span, its box normalized to the frame, what found it, and a time and box to check it on. View that frame to confirm the one you mean, then pass its id as track. When none is the thing, view the window's frames yourself, find it, and pass its time and box as track. Small things are found less often: check their candidates before trusting the first. Slower the first time a phrase is asked of a file, and a read after that. |
+| `width` | integer |  | The width in pixels of each image returned, the crop's when a region is named, to check legibility at the size it will be seen. Height follows the aspect ratio. Anything the server changed is listed in adjusted. |
+
+</Accordion>
+
+</AccordionGroup>
+
+{/* rest:end utilities */}
 
 ## Cost preflight
 

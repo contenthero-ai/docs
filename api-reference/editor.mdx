@@ -1,0 +1,537 @@
+---
+title: "Editor"
+description: "Projects, versions, exports, edits, templates and style libraries endpoints."
+---
+
+Base URL `https://app.contenthero.ai/api/v1`. All endpoints take a bearer API key. The tables on this page are generated from the route contract: the Scope column is the scope the key needs, and a route that lists two scopes needs both.
+
+## Projects
+
+A project is an editor timeline or a canvas. `GET /projects/{projectId}` answers its composition `state` and its `revision`; pass the revision back as `expectedRevision` when you edit, so a write over a newer edit is refused instead of overwriting it. Project settings (canvas size, frame rate, loudness, linkage) change through `PATCH /projects/{projectId}`, never through the edit path.
+
+{/* rest:begin projects */}
+
+| Method | Path | Scope | Purpose |
+| --- | --- | --- | --- |
+| `GET` | `/projects` | `editor:read` | List your editor and canvas projects, filtered and sorted, a page at a time. |
+| `POST` | `/projects` | `editor:write` and `planner:write` | Create an editor or canvas project, and a card for it. |
+| `POST` | `/projects/import` | `editor:write` and `planner:write` | Import a PowerPoint or Google Slides file (by URL) or a Canva design (by id) into a new canvas project with editable layers. |
+| `GET` | `/projects/{projectId}` | `editor:read` | One project in full: metadata, composition `state`, `revision` and `type`. Pass `revision` back as `expectedRevision` when editing. |
+| `PATCH` | `/projects/{projectId}` | `editor:write` | Change a project's name, brand kit, cover and settings (canvas size, fps, loudness, linkage). Settings change through the edit path, so they are undoable and versioned. |
+| `DELETE` | `/projects/{projectId}` | `editor:write` | Permanently delete a project. Irreversible, so it needs `confirm=true`; archive is the reversible alternative. |
+| `POST` | `/projects/{projectId}/duplicate` | `editor:write` | Copy a project, optionally from one of its saved versions (`versionId`, a premium feature). |
+| `POST` | `/projects/{projectId}/undo` | `editor:write` | Reverse the project's most recent edit, or the one named by `revision`. Answers the new revision. |
+| `POST` | `/projects/{projectId}/redo` | `editor:write` | Re-apply the edit most recently undone. Answers the new revision. |
+
+<AccordionGroup>
+
+<Accordion title="GET /projects">
+
+**Query**
+
+| Field | Type | Required | Description |
+| --- | --- | --- | --- |
+| `cursor` | string |  | The previous page's cursor. |
+| `filter` | `archived` \| `favorited` |  | archived -\> only archived; favorited -\> favorited and not archived; omitted -\> active (not archived). |
+| `limit` | integer |  | How many to return. |
+| `order` | `asc` \| `desc` |  | The sort direction. |
+| `search` | string |  | Case-insensitive title search. |
+| `sort` | `updatedAt` \| `createdAt` \| `title` |  | The field to sort by. |
+| `type` | `editor` \| `canvas` |  | Restrict to one project type; omitted returns both. |
+
+</Accordion>
+
+<Accordion title="POST /projects">
+
+**Body**
+
+| Field | Type | Required | Description |
+| --- | --- | --- | --- |
+| `brandKitId` | string |  | Optional brand kit to associate. |
+| `cardId` | string |  | The card this project is for: the new project is linked to it in the same call (it shows among the card's assets), so the card opens the edit from the moment it exists. Also needs the planner:write scope. |
+| `fps` | number or number or number or number or number |  | Frames per second for an editor project: 24, 25, 30, 50 or 60. Defaults to 30. |
+| `height` | number |  | Pixel height. Defaults from the orientation. |
+| `orientation` | string |  | Aspect ratio, e.g. '16:9', '9:16', '1:1'. Defaults to '16:9'. |
+| `title` | string |  | Project title. Defaults to 'Untitled'. |
+| `type` | `editor` \| `canvas` |  | The project type. Defaults to 'editor'. |
+| `width` | number |  | Pixel width. Defaults from the orientation. |
+
+</Accordion>
+
+<Accordion title="POST /projects/import">
+
+**Body**
+
+| Field | Type | Required | Description |
+| --- | --- | --- | --- |
+| `source` | object or object | Yes | What to import: a PowerPoint or Google Slides file by address, or a Canva design by id. |
+| `cardId` | string |  | The card this project is for: the new project is linked to it in the same call (it shows among the card's assets), so the card opens the edit from the moment it exists. Also needs the planner:write scope. |
+| `pageCount` | number |  | The slide count, for an early check against the import limit. |
+| `title` | string |  | The new project's title. |
+
+</Accordion>
+
+<Accordion title="GET /projects/{projectId}">
+
+**Query**
+
+| Field | Type | Required | Description |
+| --- | --- | --- | --- |
+| `atSec` | number[] |  | With sourceAssetId: the seconds of that recording to place. |
+| `clipIds` | string[] |  | Read only these clips: each one's summary line, or whole with its code and the modules it imports with detail 'full'; nothing else of the project. |
+| `detail` | `summary` \| `full` |  | 'summary' (default) returns the lightweight per-clip/per-layer structure; 'full' returns the complete composition with every property. |
+| `fromFrame` | integer |  | Timeline only: start of a frame window; returns clips overlapping [fromFrame, toFrame]. |
+| `moduleNames` | string[] |  | Read these project modules' code. |
+| `modulesIndex` | boolean |  | Read the index of the project's modules: each one's name, how many clips draw it, whether none does, and its size, without code. Read alone, like the other parts. |
+| `slideId` | string |  | Canvas only: scope the read to a single slide by id. Applies to detail:'full' as well. An id matching no slide returns every slide rather than nothing. |
+| `sourceAssetId` | string |  | With atSec: the recording whose moments to place on the timeline, by the assetId a clip's source names. |
+| `toFrame` | integer |  | Timeline only: end of the frame window (see fromFrame). |
+| `trackId` | string |  | Timeline only: scope the read to a single track by id. |
+
+</Accordion>
+
+<Accordion title="PATCH /projects/{projectId}">
+
+**Body**
+
+| Field | Type | Required | Description |
+| --- | --- | --- | --- |
+| `brandKitId` | string or null |  | A brand kit id from list_brand_kits, or null to clear it. |
+| `cover` | string or object or object |  | How the cover is chosen: 'auto' follows the composition, \{ frame \} is a chosen moment (for a canvas, a slide's index among its visible slides), \{ mediaId \} is an image from the library. |
+| `coverPosition` | object or null |  | Where the cover is framed, as percentages of its width and height, or null for the default framing. |
+| `expectedRevision` | integer |  | The project revision you last read, from get_project or the last edit. An older one still applies when nothing since touched what the edit touches; otherwise nothing is written and the conflict names the current revision and what overlapped. Omit to apply to the project as it is. On update_project it guards the settings in the document; the title, brand kit and cover are not versioned. |
+| `fps` | number or number or number or number or number |  | Video projects only: the frame rate. Every frame number in the timeline converts with it, so clips keep their timing. |
+| `height` | integer |  | A pixel height, given with width. |
+| `linkage` | boolean |  | Video projects only: whether clips on other tracks follow the main track's ripple and are deleted with the main clip they sit on. |
+| `linkedTracks` | object |  | Video projects only: which kinds of track linkage reaches; a kind you omit is left alone. |
+| `loudness` | number or string |  | Video projects only: the delivery loudness. Every export follows it. |
+| `magneticTrack` | boolean |  | Video projects only: the magnetic main track. On, moving, trimming or deleting a clip on the main track closes the gap it leaves, and turning it on closes the gaps already there. |
+| `orientation` | string |  | An aspect from the editor's list, or custom. Alone, it sets the size the editor gives that aspect. |
+| `title` | string |  | A new title. |
+| `width` | integer |  | A pixel width, given with height. |
+
+</Accordion>
+
+<Accordion title="DELETE /projects/{projectId}">
+
+**Query**
+
+| Field | Type | Required | Description |
+| --- | --- | --- | --- |
+| `confirm` | boolean | Yes | Must be true to confirm the irreversible permanent delete. |
+
+</Accordion>
+
+<Accordion title="POST /projects/{projectId}/duplicate">
+
+**Body**
+
+| Field | Type | Required | Description |
+| --- | --- | --- | --- |
+| `versionId` | string |  | A saved version to copy from, by its id from list_project_versions. Omit to copy the project as it is now. |
+
+</Accordion>
+
+<Accordion title="POST /projects/{projectId}/undo">
+
+**Body**
+
+| Field | Type | Required | Description |
+| --- | --- | --- | --- |
+| `expectedRevision` | integer |  | The revision from get_project; rejects with a conflict if a concurrent edit landed. |
+| `revision` | integer |  | A specific revision to reverse. Omit for the most recent edit. |
+
+</Accordion>
+
+<Accordion title="POST /projects/{projectId}/redo">
+
+**Body**
+
+| Field | Type | Required | Description |
+| --- | --- | --- | --- |
+| `expectedRevision` | integer |  | The revision from get_project; rejects with a conflict if a concurrent edit landed. |
+| `revision` | integer |  | A specific revision to reverse. Omit for the most recent edit. |
+
+</Accordion>
+
+</AccordionGroup>
+
+{/* rest:end projects */}
+
+## Versions
+
+{/* rest:begin versions */}
+
+| Method | Path | Scope | Purpose |
+| --- | --- | --- | --- |
+| `GET` | `/projects/{projectId}/versions` | `editor:read` | The project's saved versions, newest first, a page at a time. Premium, as in the editor. |
+| `POST` | `/projects/{projectId}/versions` | `editor:write` | Save the project's current state as a version, optionally labeled. |
+| `POST` | `/projects/{projectId}/versions/{versionId}` | `editor:write` | Restore a version into the project. The current state is saved first, so the restore can itself be restored. |
+| `PATCH` | `/projects/{projectId}/versions/{versionId}` | `editor:write` | Name a version with `label`; an empty label clears it. |
+| `DELETE` | `/projects/{projectId}/versions/{versionId}` | `editor:write` | Remove a version. |
+
+<AccordionGroup>
+
+<Accordion title="GET /projects/{projectId}/versions">
+
+**Query**
+
+| Field | Type | Required | Description |
+| --- | --- | --- | --- |
+| `cursor` | string |  | The previous page's cursor. |
+| `limit` | integer |  | How many to return. |
+
+</Accordion>
+
+<Accordion title="POST /projects/{projectId}/versions">
+
+**Body**
+
+| Field | Type | Required | Description |
+| --- | --- | --- | --- |
+| `label` | string |  | A name for the version. |
+
+</Accordion>
+
+<Accordion title="PATCH /projects/{projectId}/versions/{versionId}">
+
+**Body**
+
+| Field | Type | Required | Description |
+| --- | --- | --- | --- |
+| `label` | string | Yes | The new name; empty clears it. |
+
+</Accordion>
+
+</AccordionGroup>
+
+{/* rest:end versions */}
+
+## Exports
+
+An export renders the project's saved composition in the background: start it, then poll `GET /exports/{exportId}` or `GET /status/{id}` until it finishes, then fetch the file with `GET /download/{id}`.
+
+{/* rest:begin exports */}
+
+| Method | Path | Scope | Purpose |
+| --- | --- | --- | --- |
+| `GET` | `/export-formats` | `editor:read` | The export formats and their options, by project kind: what `POST /projects/{projectId}/export` accepts. |
+| `POST` | `/projects/{projectId}/export` | `editor:write` | Start an export (a render) of the project's saved composition. Asynchronous: answers `{ exportId, status }`. |
+| `GET` | `/projects/{projectId}/exports` | `editor:read` | The project's exports, newest first, finished and running, a page at a time. |
+| `GET` | `/exports/{exportId}` | `editor:read` | Poll one export: its status, progress and, once finished, its output URL. |
+
+<AccordionGroup>
+
+<Accordion title="POST /projects/{projectId}/export">
+
+**Body**
+
+| Field | Type | Required | Description |
+| --- | --- | --- | --- |
+| `format` | string |  | Output format, one get_schema kind 'export' lists. Defaults to 'mp4'. |
+| `frame` | integer |  | Editor still (png/jpg) only: which timeline frame to render. Clamped to the composition length. Defaults 0. Use the playhead frame from view to render exactly the frame the user is viewing. |
+| `loudness` | number or string |  | Rendered exports (video and sound) only: this export's loudness, in place of the project's own (get_project reads it). Omitted, the project's. |
+| `maxCharsPerLine` | integer |  | Subtitles (srt, vtt) only: the longest a line may be, 20 to 80 characters. Defaults 42. |
+| `maxLinesPerCard` | integer |  | Subtitles (srt, vtt) only: lines per subtitle card, 1 to 4. Defaults 2. |
+| `quality` | `low` \| `recommended` \| `high` |  | mp4 ONLY: video bitrate. Meaningless for a still, which has no duration to spread bits over. Defaults recommended. |
+| `resolution` | `480p` \| `720p` \| `1080p` \| `2k` \| `4k` |  | Output resolution, for EVERY format including stills. Defaults '720p' for an editor mp4 and the project's NATIVE size for a still or canvas mp4, in both cases clamped to your plan. 1080p and above are plan-gated: NAMING one above your plan is a 403, omitting one clamps instead. |
+| `showSpeakers` | boolean |  | Subtitles (srt, vtt) only: name who speaks, when the captions hold more than one speaker. Defaults false. |
+| `timecodes` | boolean |  | Transcripts (txt, docx, rtf, md, html) only: start each paragraph with its timecode. |
+| `watermark` | boolean |  | Keep the watermark. Defaults true; removing it is plan-gated. |
+
+</Accordion>
+
+<Accordion title="GET /projects/{projectId}/exports">
+
+**Query**
+
+| Field | Type | Required | Description |
+| --- | --- | --- | --- |
+| `cursor` | string |  | The previous page's cursor. |
+| `limit` | integer |  | How many to return. |
+
+</Accordion>
+
+</AccordionGroup>
+
+{/* rest:end exports */}
+
+## Edits and schemas
+
+`POST /editor/ops` applies a batch of ops to a project and saves it atomically. The schema routes list what an op, a layer, a clip, a track and an effect can be, so a call can be built from the real shapes.
+
+{/* rest:begin editor */}
+
+| Method | Path | Scope | Purpose |
+| --- | --- | --- | --- |
+| `POST` | `/editor/ops` | `editor:write` | Apply a batch of ops to a project's composition (canvas slides or editor timeline) and save atomically, with optimistic concurrency and an op log. |
+| `GET` | `/editor/transcript` | `editor:read` | A project's transcript mapped to timeline clips, in timeline order, so edits can target exact clip ids. |
+| `GET` | `/editor/layer-types` | `editor:read` | The canvas schema: every `update_canvas` op and layer type with its shape. With `name`, one entry in full. |
+| `GET` | `/editor/timeline-types` | `editor:read` | The editor timeline schema: every `update_timeline` op, clip type and track type. With `name`, one entry in full. |
+| `GET` | `/editor/effects` | `editor:read` | Every effect a clip can carry, with its group and what it does. With `name`, one effect and its parameters in full. |
+| `GET` | `/editor/code-guide` | `editor:read` | The authoring guide for a clip's code: what the sandbox provides, the composition's units, the brand props and the size limit. |
+
+<AccordionGroup>
+
+<Accordion title="POST /editor/ops">
+
+**Body**
+
+| Field | Type | Required | Description |
+| --- | --- | --- | --- |
+| `ops` | object[] | Yes | The operations to apply, in order. Their shapes come from get_schema; they are not declared here. |
+| `projectId` | string | Yes | The project to edit. |
+| `expectedRevision` | integer |  | The project revision you last read, from get_project or the last edit. An older one still applies when nothing since touched what the edit touches; otherwise nothing is written and the conflict names the current revision and what overlapped. Omit to apply to the project as it is. |
+| `userIntent` | string |  | A short description of what this edit does (for attribution). |
+
+</Accordion>
+
+<Accordion title="GET /editor/transcript">
+
+**Query**
+
+| Field | Type | Required | Description |
+| --- | --- | --- | --- |
+| `cursor` | string |  | The answer's nextCursor, to read the next page of segments with the same other inputs. |
+| `endMs` | integer |  | Source-media end time in ms; companion to startMs. |
+| `endSeconds` | number |  | With mediaId: where the window ends. |
+| `granularity` | `clip` \| `word` |  | 'clip' (default) returns text per clip; 'word' adds word timing + absolute timeline frames + confidence + speaker, derived silences, and audio events. |
+| `limit` | integer |  | How many clip segments a page holds. Omit for the default. |
+| `mediaId` | string |  | The recording whose words to read. Use instead of projectId. |
+| `paceThresholdMs` | integer |  | Word mode: minimum pause (ms) to report as a silence / dead-air region ("Pace"). Defaults to the project's saved pace, else 500. |
+| `paddingEndMs` | integer |  | Word mode: breathing room (ms) kept before speech at a silence end edge (negative tightens). Defaults to the saved padding, else 200. |
+| `paddingStartMs` | integer |  | Word mode: breathing room (ms) kept after speech at a silence start edge (negative tightens). Defaults to the saved padding, else 200. |
+| `projectId` | string |  | The project whose timeline words to read. Use instead of mediaId. |
+| `search` | string |  | Case-insensitive substring; returns only clip segments whose text contains it. |
+| `startMs` | integer |  | Source-media start time in ms; with endMs, returns only segments overlapping this window (and, in word mode, clips the returned words to it). |
+| `startSeconds` | number |  | With mediaId: where in the recording the window begins, in the recording's seconds. |
+
+</Accordion>
+
+<Accordion title="GET /editor/layer-types">
+
+**Query**
+
+| Field | Type | Required | Description |
+| --- | --- | --- | --- |
+| `detail` | string |  | full adds the complete reference to an entry read by name. |
+| `include` | string[] |  | Parts to add to each entry: jsonSchema adds the JSON Schema of its props. |
+| `name` | string |  | Read one entry by name. |
+
+</Accordion>
+
+<Accordion title="GET /editor/timeline-types">
+
+**Query**
+
+| Field | Type | Required | Description |
+| --- | --- | --- | --- |
+| `detail` | string |  | full adds the complete reference to an entry read by name. |
+| `include` | string[] |  | Parts to add to each entry: jsonSchema adds the JSON Schema of its props. |
+| `name` | string |  | Read one entry by name. |
+
+</Accordion>
+
+<Accordion title="GET /editor/effects">
+
+**Query**
+
+| Field | Type | Required | Description |
+| --- | --- | --- | --- |
+| `name` | string |  | Read one effect by name. |
+
+</Accordion>
+
+</AccordionGroup>
+
+{/* rest:end editor */}
+
+## Templates
+
+{/* rest:begin templates */}
+
+| Method | Path | Scope | Purpose |
+| --- | --- | --- | --- |
+| `GET` | `/templates` | `editor:read` | The templates you can see, ContentHero's and your own, without their code, a page at a time. |
+| `POST` | `/templates` | `editor:write` | Save a template of your own from exactly one source: the fields, a placed item (`fromItem`), or a copy (`fromTemplateId`). |
+| `GET` | `/templates/categories` | `editor:read` | The categories in use among the templates you can see, with how many each holds. |
+| `GET` | `/templates/{id}` | `editor:read` | One template you can see, with its code. |
+| `PATCH` | `/templates/{id}` | `editor:write` | Change one of your templates. `expectedVersion` refuses a write over content that changed since it was read. |
+| `DELETE` | `/templates/{id}` | `editor:write` | Delete one of your templates. Placed copies are snapshots and keep everything. |
+
+<AccordionGroup>
+
+<Accordion title="GET /templates">
+
+**Query**
+
+| Field | Type | Required | Description |
+| --- | --- | --- | --- |
+| `archived` | string |  | only lists archived templates, to restore one with archive; they are left out otherwise. |
+| `category` | string[] |  | Only templates in these categories. |
+| `cursor` | string |  | The previous page's cursor. |
+| `kind` | `code` \| `shape` \| `emoji` \| `logo` |  | Only templates that draw this. |
+| `limit` | integer |  | How many to return. |
+| `scope` | `system` \| `user` \| `all` |  | system is ContentHero's, user is the user's own; all (the default) is both. |
+| `search` | string |  | Every word, in any order, in the name or the tags. For logos, also in a logo's other names, best match first. |
+
+</Accordion>
+
+<Accordion title="POST /templates">
+
+**Body**
+
+| Field | Type | Required | Description |
+| --- | --- | --- | --- |
+| `afterId` | string |  | Place it immediately after this item of the same list. |
+| `artboard` | object or null |  | The artboard it was drawn on and where its content sits in it. |
+| `aspect` | number or null |  | Its own width over height, for resize scale. |
+| `beforeId` | string |  | Place it immediately before this item of the same list. |
+| `category` | string |  | Its category: one list_templates shows, or a new one. |
+| `code` | string |  | The code: a React component, as get_schema (kind 'code') teaches. |
+| `coverage` | `full` \| `partial` |  | full: the whole frame; partial: a box of widthFraction by heightFraction. |
+| `description` | string or null |  | What it is for. |
+| `durationFrames` | integer |  | How long it lasts when placed, in frames. |
+| `emoji` | string |  | An animated emoji's name, as the animated emoji list names it. |
+| `fps` | number |  | The frame rate its duration counts at. |
+| `fromItem` | object |  | A placed code clip, code layer or shape to save: the project id and the clip or layer id. |
+| `fromTemplateId` | string |  | A template to copy, from list_templates. |
+| `heightFraction` | number or null |  | Its default height, a fraction of the canvas's. |
+| `lottie` | object |  | A Lottie file of ours, and the colors in it that props recolor (each role names a prop). |
+| `name` | string |  | Its name in the Elements panel. |
+| `position` | `top` \| `bottom` |  | Place it at an end of the list instead of beside an item. Name neighbors or a position, not both. |
+| `previewUrl` | string or null |  | Its preview. |
+| `props` | object |  | Its props as placed. Media in them is a MediaRef (\{ assetId, role \}), never a stored URL. |
+| `propsSchema` | object or null |  | Each prop's control, as get_template shows them; brand names the brand value a prop takes when placed. |
+| `resize` | `scale` \| `reflow` |  | scale keeps its proportions in any box; reflow lays out again in the box it is given. |
+| `shape` | string |  | A shape's name, as the shape layer type lists them in get_schema kind 'layer'. |
+| `sourceTemplateId` | string or null |  | The template it was copied from. |
+| `sourceTemplateVersion` | integer or null |  | The version of that template it was copied at. |
+| `tags` | string[] |  | Words it is found by. |
+| `thumbnailUrl` | string or null |  | Its thumbnail. |
+| `widthFraction` | number or null |  | Its default width, a fraction of the canvas's. |
+
+</Accordion>
+
+<Accordion title="GET /templates/categories">
+
+**Query**
+
+| Field | Type | Required | Description |
+| --- | --- | --- | --- |
+| `cursor` | string |  | The previous page's cursor. |
+| `limit` | integer |  | How many to return. |
+| `scope` | `system` \| `user` \| `all` |  | system is ContentHero's, user is the user's own; all (the default) is both. |
+
+</Accordion>
+
+<Accordion title="PATCH /templates/{id}">
+
+**Body**
+
+| Field | Type | Required | Description |
+| --- | --- | --- | --- |
+| `afterId` | string |  | Place it immediately after this item of the same list. |
+| `artboard` | object or null |  | The artboard it was drawn on and where its content sits in it. |
+| `aspect` | number or null |  | Its own width over height, for resize scale. |
+| `beforeId` | string |  | Place it immediately before this item of the same list. |
+| `category` | string |  | Its category: one list_templates shows, or a new one. |
+| `code` | string |  | The code: a React component, as get_schema (kind 'code') teaches. |
+| `coverage` | `full` \| `partial` |  | full: the whole frame; partial: a box of widthFraction by heightFraction. |
+| `description` | string or null |  | What it is for. |
+| `durationFrames` | integer |  | How long it lasts when placed, in frames. |
+| `emoji` | string |  | An animated emoji's name, as the animated emoji list names it. |
+| `expectedVersion` | integer |  | The version you read; the write is refused if the template changed since. |
+| `fps` | number |  | The frame rate its duration counts at. |
+| `heightFraction` | number or null |  | Its default height, a fraction of the canvas's. |
+| `lottie` | object |  | A Lottie file of ours, and the colors in it that props recolor (each role names a prop). |
+| `name` | string |  | Its name in the Elements panel. |
+| `position` | `top` \| `bottom` |  | Place it at an end of the list instead of beside an item. Name neighbors or a position, not both. |
+| `previewUrl` | string or null |  | Its preview. |
+| `props` | object |  | Its props as placed. Media in them is a MediaRef (\{ assetId, role \}), never a stored URL. |
+| `propsSchema` | object or null |  | Each prop's control, as get_template shows them; brand names the brand value a prop takes when placed. |
+| `resize` | `scale` \| `reflow` |  | scale keeps its proportions in any box; reflow lays out again in the box it is given. |
+| `shape` | string |  | A shape's name, as the shape layer type lists them in get_schema kind 'layer'. |
+| `sourceTemplateId` | string or null |  | The template it was copied from. |
+| `sourceTemplateVersion` | integer or null |  | The version of that template it was copied at. |
+| `tags` | string[] |  | Words it is found by. |
+| `thumbnailUrl` | string or null |  | Its thumbnail. |
+| `widthFraction` | number or null |  | Its default width, a fraction of the canvas's. |
+
+</Accordion>
+
+</AccordionGroup>
+
+{/* rest:end templates */}
+
+## Style libraries
+
+{/* rest:begin style-libraries */}
+
+| Method | Path | Scope | Purpose |
+| --- | --- | --- | --- |
+| `GET` | `/style-libraries` | `editor:read` | List your style libraries, filtered and sorted, a page at a time. |
+| `POST` | `/style-libraries` | `editor:write` | Create a style library. |
+| `GET` | `/style-libraries/{id}` | `editor:read` | One style library by id or name: its versions and the projects pinning it. With `version`, that one version with its code. |
+| `PATCH` | `/style-libraries/{id}` | `editor:write` | Change a style library, or publish a new version of it. |
+
+<AccordionGroup>
+
+<Accordion title="GET /style-libraries">
+
+**Query**
+
+| Field | Type | Required | Description |
+| --- | --- | --- | --- |
+| `archived` | boolean |  | Only archived style libraries. |
+| `cursor` | string |  | The previous page's cursor. |
+| `limit` | integer |  | How many to return. |
+| `order` | `asc` \| `desc` |  | The sort direction. |
+| `search` | string |  | Search style library names. |
+| `sort` | `updatedAt` \| `name` |  | The field to sort by. |
+
+</Accordion>
+
+<Accordion title="POST /style-libraries">
+
+**Body**
+
+| Field | Type | Required | Description |
+| --- | --- | --- | --- |
+| `name` | string | Yes | The style library name. |
+| `description` | string or null |  | What the style library is for. |
+| `fromProject` | object |  | Modules of one project: \{ projectId, modules, revision \}. The revision guards against a project that changed. |
+| `modules` | object |  | Modules by name: \{ code \}, \{ edits \} against baseVersion, or null to drop one. |
+| `notes` | string or null |  | What this version changes. |
+
+</Accordion>
+
+<Accordion title="GET /style-libraries/{id}">
+
+**Query**
+
+| Field | Type | Required | Description |
+| --- | --- | --- | --- |
+| `cursor` | string |  | The previous page's cursor. |
+| `limit` | integer |  | How many to return. |
+| `version` | integer |  | The version to read, with each module's code. |
+
+</Accordion>
+
+<Accordion title="PATCH /style-libraries/{id}">
+
+**Body**
+
+| Field | Type | Required | Description |
+| --- | --- | --- | --- |
+| `baseVersion` | integer or null |  | The version the change builds on. |
+| `description` | string or null |  | What the style library is for. |
+| `fromProject` | object |  | Modules of one project: \{ projectId, modules, revision \}. The revision guards against a project that changed. |
+| `modules` | object |  | Modules by name: \{ code \}, \{ edits \} against baseVersion, or null to drop one. |
+| `notes` | string or null |  | What this version changes. |
+
+</Accordion>
+
+</AccordionGroup>
+
+{/* rest:end style-libraries */}
