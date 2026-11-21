@@ -1,6 +1,6 @@
 ---
 title: "Generate"
-description: "Generation, status, boards, transcription, models, media, avatars, voices and Kling elements endpoints."
+description: "Generation, status, reference sheets, transcription, models, media, avatars, voices and Kling elements endpoints."
 ---
 
 Base URL `https://app.contenthero.ai/api/v1`. All endpoints take a bearer API key. The tables on this page are generated from the route contract: the Scope column is the scope the key needs (`None` means any valid key), and the fields under a route are its query, body and, where declared, its answer.
@@ -17,7 +17,7 @@ A generation reference (start frame, image input, audio) accepts a raw URL or a 
 | --- | --- | --- | --- |
 | `POST` | `/studio/generate` | `studio:generate` | Generate an image, a video or audio (speech, music, sound effects), or run an upscale, background removal, layer separation or lip-sync. `contentType` picks the family and the model registry entry for `modelId` decides what else is accepted. Waits for a short job and answers a pending `outputId` for a long one. |
 | `GET` | `/studio/generate/{outputId}` | `studio:generate` | Poll one generation by its `outputId`: its status, and its files once it has finished. Reading never starts or finishes work. |
-| `POST` | `/studio/reference-board` | `studio:generate` | Generate a reference board: a typed panel layout drawn from a source image. |
+| `POST` | `/studio/reference-sheet` | `studio:generate` | Generate a reference sheet: a typed panel layout drawn from a source image. |
 | `POST` | `/studio/audio/edit` | `studio:generate` | Edit existing audio: isolate a voice, enhance speech or split stems. The registry names the model that performs the operation. |
 | `POST` | `/studio/transcribe` | `studio:generate` | Transcribe speech to text from an audio file (`audioUrl`), a public video page (`videoUrl`) or a tracked post (`contentId`). Not free: pass `getCost` first to price it. |
 
@@ -71,20 +71,22 @@ A generation reference (start frame, image input, audio) accepts a raw URL or a 
 
 </Accordion>
 
-<Accordion title="POST /studio/reference-board">
+<Accordion title="POST /studio/reference-sheet">
 
 **Body**
 
 | Field | Type | Required | Description |
 | --- | --- | --- | --- |
-| `boardType` | string | Yes | One of the board types listed by get_model('reference-boards'). |
-| `avatarId` | string |  | Optional avatar id from list_avatars. Associate the board with that avatar, so a character sheet built for an avatar stays filed against it. |
-| `boardName` | string |  | Optional name for the board. |
+| `sheetType` | string | Yes | One of the sheet types listed by get_model('reference-sheets'). |
+| `aspectRatio` | string |  | The sheet's aspect ratio, one the sheet's image model offers (get_model lists them). Omitted uses the sheet type's default. |
+| `avatarId` | string |  | Optional avatar id from list_avatars. Associate the sheet with that avatar, so a character sheet built for an avatar stays filed against it. |
 | `getCost` | boolean |  | Return the credit cost estimate instead of generating (nothing runs, nothing is charged). |
-| `numImages` | integer |  | Number of board variations (1-4). Defaults to 1. |
+| `numImages` | integer |  | Number of sheet variations (1-4). Defaults to 1. |
 | `outputId` | string |  | The caller's own id for this run, a UUID. A retry with the same id returns the job already started. |
-| `prompt` | string |  | Describe the subject or how you will use the board. Required when no referenceImages are given (text-only boards); otherwise optional context (the source image leads). |
-| `referenceImages` | string[] |  | Source images the board is built from: each a URL or a previous output id (e.g. "\<id\>" or "\<id\>-2") to chain from an earlier generation. |
+| `panelCount` | integer |  | How many panels the sheet holds, a whole number within the range get_model('reference-sheets') reports. Omitted uses the sheet type's default. |
+| `prompt` | string |  | Describe the subject or how you will use the sheet. Required when no referenceImages are given (text-only sheets); otherwise optional context (the source image leads). |
+| `referenceImages` | string[] |  | Source images the sheet is built from: each a URL or a previous output id (e.g. "\<id\>" or "\<id\>-2") to chain from an earlier generation. |
+| `sheetName` | string |  | Optional name for the sheet. |
 
 </Accordion>
 
@@ -184,7 +186,7 @@ A generation reference (start frame, image input, audio) accepts a raw URL or a 
 | `limit` | integer |  | How many to return. |
 | `order` | `asc` \| `desc` |  | The sort direction. |
 | `orientation` | `landscape` \| `portrait` \| `square` |  | Stock photos and videos only. Narrow the results to one shape: 'landscape', 'portrait' or 'square'. Omit it to read every shape. |
-| `origin` | `creation` \| `board` \| `look` |  | Creations only. Narrow to one kind of generation: 'creation' (normal generations), 'board' (reference boards), or 'look'. The same word an item's origin says. Omit to list all. |
+| `origin` | `creation` \| `sheet` \| `look` |  | Creations only. Narrow to one kind of generation: 'creation' (normal generations), 'sheet' (reference sheets), or 'look'. The same word an item's origin says. Omit to list all. |
 | `query` | string |  | Stock only. Describe what to find. Omit it to read the collection's featured items. |
 | `smallCopies` | boolean |  | Link each image's small copy instead of the file itself, where the library keeps one: for drawing images small, as code that shows many at once does. Never for downloading or delivering a file, or showing it large. |
 | `sort` | `createdAt` \| `fileName` \| `sizeBytes` |  | The field to sort by. |

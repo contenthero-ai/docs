@@ -18,9 +18,9 @@ The roster is live, resolved from the registry. It is exposed as the `modelId` e
 | Audio (TTS) | `generate_audio` | `contenthero generate audio` |
 | Transcribe | `transcribe` | `contenthero transcribe` |
 
-There is one generate tool per medium. The model you pick decides the operation: `generate_image` also runs upscaling, background removal, layer separation and reference boards, and `generate_video` also runs lip-sync models. `get_model` names a model's operation and the inputs it takes.
+There is one generate tool per medium. The model you pick decides the operation: `generate_image` also runs upscaling, background removal, layer separation and reference sheets, and `generate_video` also runs lip-sync models. `get_model` names a model's operation and the inputs it takes.
 
-Reads: `list_media` / `get_media` (spanning creations, boards, and looks via the `kind` filter), `list_avatars` / `get_avatar`, `list_voices` / `get_voice`.
+Reads: `list_media` / `get_media` (spanning creations, reference sheets, and looks via the `kind` filter), `list_avatars` / `get_avatar`, `list_voices` / `get_voice`.
 
 Avatar writes: `create_avatar` / `update_avatar` / `delete_avatar` (CLI `contenthero avatar create|update|delete`). Voices stay read-only.
 
@@ -51,7 +51,7 @@ Preview any cost for free with `getCost: true` (MCP) or `--cost` (CLI). The prev
 
 ## Identity and references
 
-For consistent characters across generations, ContentHero supports avatars and reference boards as reusable identity. Browse them with `list_avatars` and the board media reads, and pass them as typed references. The [pipeline](/guides/pipeline) and the [ContentHero skill](/skills/overview) cover the full reference model.
+For consistent characters across generations, ContentHero supports avatars and reference sheets as reusable identity. Browse them with `list_avatars` and the reference sheet media reads, and pass them as typed references. The [pipeline](/guides/pipeline) and the [ContentHero skill](/skills/overview) cover the full reference model.
 
 ### Generating into a look
 
@@ -62,7 +62,7 @@ contenthero generate image "on a rooftop at golden hour" \
   --model nano-banana-2 --avatar <avatarId> --ref <avatarLookUrlOrId>
 ```
 
-The MCP takes the same field: `generate_image` with `avatarId`, including with a reference board model to file a character sheet against the avatar it was built for. Pass a reference image of the avatar alongside it to keep the subject on-model; `avatarId` decides where the result is filed, not what it looks like.
+The MCP takes the same field: `generate_image` with `avatarId`, including with a reference sheet model to file a character sheet against the avatar it was built for. Pass a reference image of the avatar alongside it to keep the subject on-model; `avatarId` decides where the result is filed, not what it looks like.
 
 The avatar must be one you own. An id you do not own is rejected rather than ignored.
 

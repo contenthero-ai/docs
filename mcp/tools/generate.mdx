@@ -1,11 +1,11 @@
 ---
 title: "Generate"
-description: "Create images, video and audio, run every operation a model offers (upscale, background removal, lip-sync, layers, boards), and check what any background job is doing."
+description: "Create images, video and audio, run every operation a model offers (upscale, background removal, lip-sync, layers, reference sheets), and check what any background job is doing."
 ---
 
 {/* GENERATED FILE from the ContentHero tool contract. Do not edit by hand. */}
 
-Create images, video and audio, run every operation a model offers (upscale, background removal, lip-sync, layers, boards), and check what any background job is doing. 8 tools.
+Create images, video and audio, run every operation a model offers (upscale, background removal, lip-sync, layers, reference sheets), and check what any background job is doing. 8 tools.
 
 Every tool below is exposed by the hosted MCP server at `https://mcp.contenthero.ai` and by the `@contenthero/mcp` npm package. A <Badge>write</Badge> tool changes your account; a <Badge>read</Badge> tool does not.
 
@@ -13,30 +13,22 @@ Every tool below is exposed by the hosted MCP server at `https://mcp.contenthero
 
 <Badge>write</Badge>
 
-Run any image model of the Studio picker. The model's operation decides the work: generation from a prompt (optionally image-to-image with reference images), upscaling, background removal, layer separation, or a reference board. get_model names the operation and the inputs the model takes; a field the model's operation does not take is refused, never ignored. Sources for upscaling, background removal and layer separation go in referenceImages. Generation, upscaling and background removal return at once with an outputId; get_status waits for the render. A reference board waits for its result and, when it is still rendering, returns an outputId to read with get_status. A layer separation result carries every output (the base and each layer) with its position. Optionally pass projectId to place the generated image onto that project in the same call, controlled by an optional placement: a VIDEO timeline places a clip on a track, a CANVAS design places a layer on a slide (defaulting to the slide the user is focused on). Omit projectId to save a standalone library output. The result LINKS each output so the user sees it inline; to SEE it yourself (judge a face, check legibility, pick between variations) call get_media with the outputId. SPENDS CREDITS: pass getCost to preview the price first, which runs nothing and charges nothing. A retry that repeats the same operation id or output id returns the work already started and never charges twice. The reply names the id to read its progress.
+Run any image model of the Studio picker. The model's operation decides the work: generation from a prompt (optionally image-to-image with reference images), upscaling, background removal, layer separation, or a reference sheet. get_model names the operation and the inputs the model takes; a field the model's operation does not take is refused, never ignored. Sources for upscaling, background removal and layer separation go in referenceImages. Generation, upscaling and background removal return at once with an outputId; get_status waits for the render. A reference sheet waits for its result and, when it is still rendering, returns an outputId to read with get_status. A layer separation result carries every output (the base and each layer) with its position. Optionally pass projectId to place the generated image onto that project in the same call, controlled by an optional placement: a VIDEO timeline places a clip on a track, a CANVAS design places a layer on a slide (defaulting to the slide the user is focused on). Omit projectId to save a standalone library output. The result LINKS each output so the user sees it inline; to SEE it yourself (judge a face, check legibility, pick between variations) call get_media with the outputId. SPENDS CREDITS: pass getCost to preview the price first, which runs nothing and charges nothing. A retry that repeats the same operation id or output id returns the work already started and never charges twice. The reply names the id to read its progress.
 
 <ParamField body name="modelId" type="string" required>
 The model id. list_models (contentType image) names every image model, its operation and what it is for; get_model gives one model's options, inputs and prompt guide.
 </ParamField>
 
 <ParamField body name="aspectRatio" type="string">
-e.g. 16:9, 1:1, 9:16. Validated per model.
+e.g. 16:9, 1:1, 9:16. Validated per model; on a reference sheet model, one of the ratios get_model lists for it.
 </ParamField>
 
 <ParamField body name="avatarId" type="string">
-Optional avatar id from list_avatars. File the result onto that avatar as a new LOOK (one appearance of a reusable character: same person, different outfit, setting or framing) instead of saving a standalone library output. Combine with a referenceImage of the avatar to keep the subject on-model. Either its short id or its UUID. On a reference board model it associates the board with that avatar instead.
+Optional avatar id from list_avatars. File the result onto that avatar as a new LOOK (one appearance of a reusable character: same person, different outfit, setting or framing) instead of saving a standalone library output. Combine with a referenceImage of the avatar to keep the subject on-model. Either its short id or its UUID. On a reference sheet model it associates the sheet with that avatar instead.
 </ParamField>
 
 <ParamField body name="background" type="string">
 Background handling declared by the model, subject to output format compatibility.
-</ParamField>
-
-<ParamField body name="boardName" type="string">
-Optional name for the board.
-</ParamField>
-
-<ParamField body name="boardType" type="string">
-One of the board types listed by get_model('reference-boards').
 </ParamField>
 
 <ParamField body name="frameCount" type="integer or string">
@@ -63,6 +55,10 @@ Number of variations (1-4).
 Output format declared by the model, subject to its input and background restrictions.
 </ParamField>
 
+<ParamField body name="panelCount" type="integer">
+How many panels the sheet holds, a whole number within the range get_model('reference-sheets') reports. Omitted uses the sheet type's default.
+</ParamField>
+
 <ParamField body name="placement" type="object or object">
 Where the asset lands, interpreted against the project's type. VIDEO TIMELINE: append to the end, at a time, at the playhead, replacing an existing clip, or filling a time range (omitted places it at the playhead when known, else appends). CANVAS DESIGN: a layer on a slide (slideId / slideIndex, default the focused slide; fit contain|cover|none; a nine-point anchor; and design-pixel x/y/width/height).
 </ParamField>
@@ -84,11 +80,19 @@ Quality mode, for models that expose it separately. Validated per model.
 </ParamField>
 
 <ParamField body name="referenceImages" type="string[]">
-References for image-to-image or editing, and the source image of an upscaling, background removal, layer separation or reference board model. Each may be a URL or a previous output id (e.g. "\<id\>" or "\<id\>-2") to chain from an earlier generation.
+References for image-to-image or editing, and the source image of an upscaling, background removal, layer separation or reference sheet model. Each may be a URL or a previous output id (e.g. "\<id\>" or "\<id\>-2") to chain from an earlier generation.
 </ParamField>
 
 <ParamField body name="resolution" type="string">
 e.g. 1K, 2K, 4K. get_model lists the resolutions a model takes; validated per model.
+</ParamField>
+
+<ParamField body name="sheetName" type="string">
+Optional name for the sheet.
+</ParamField>
+
+<ParamField body name="sheetType" type="string">
+One of the sheet types listed by get_model('reference-sheets').
 </ParamField>
 
 <ParamField body name="upscaleFactor" type="string">

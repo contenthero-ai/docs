@@ -750,8 +750,9 @@ Generate one or more images from a prompt (optionally image-to-image)
 | `--ref <urlOrId>` | reference image (URL or output id); repeatable |
 | `--avatar <id>` | file the result onto this avatar as a new look (see `contenthero avatar list`) |
 | `--upscale-factor <factor>` | Upscale factor, for an upscale model. Validated per model. |
-| `--type <boardType>` | One of the board types listed by get_model('reference-boards'). |
-| `--name <name>` | Optional name for the board. |
+| `--type <sheetType>` | One of the sheet types listed by get_model('reference-sheets'). |
+| `--panel-count <count>` | How many panels the sheet holds, a whole number within the range get_model('reference-sheets') reports. Omitted uses the sheet type's default. |
+| `--name <name>` | Optional name for the sheet. |
 | `--cost` | estimate the credit cost instead of generating (nothing runs, nothing is charged) |
 | `--no-wait` | return the outputId immediately instead of waiting for the render |
 | `--timeout <seconds>` | how long to wait before handing back the outputId Defaults to `600`. |
@@ -925,7 +926,7 @@ List media you can place: the account's files (every file, or one part of the li
 | `--query <query>` | Stock only. Describe what to find. Omit it to read the collection's featured items. |
 | `--orientation <orientation>` | Stock photos and videos only. Narrow the results to one shape: 'landscape', 'portrait' or 'square'. Omit it to read every shape. |
 | `--type <types>` | filter by media type (comma-separated): image, video, audio, doc, other |
-| `--origin <origin>` | creations only: filter by what the generation is: creation, board, look |
+| `--origin <origin>` | creations only: filter by what the generation is: creation, sheet, look |
 | `--favorite` | only favorited files |
 | `--archived` | only archived files |
 | `--limit <n>` | how many to return |
