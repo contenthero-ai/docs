@@ -277,6 +277,7 @@ A generation reference (start frame, image input, audio) accepts a raw URL or a 
 | `PATCH` | `/avatars/{avatarId}` | `studio:write` | Update an avatar, and add or remove its looks through `ops`. |
 | `DELETE` | `/avatars/{avatarId}` | `studio:write` | Delete an avatar (a soft delete). |
 | `POST` | `/avatars/{avatarId}/looks` | `studio:write` | File images you already own onto an avatar as looks. To generate a new look, call `POST /studio/generate` with `avatarId`. |
+| `POST` | `/avatars/{avatarId}/sheets` | `studio:write` | Attach images you already own to an avatar as sheets. Each answer carries the sheet as the sheets list returns it. |
 | `DELETE` | `/avatars/{avatarId}/looks/{lookId}` | `studio:write` | Remove one look from an avatar. The image goes to the trash and is recoverable for 30 days. |
 | `GET` | `/voices` | None | List your saved voices, favorites first, then most recently used. |
 | `GET` | `/voices/{voiceId}` | None | One saved voice in full. |
@@ -331,7 +332,7 @@ A generation reference (start frame, image input, audio) accepts a raw URL or a 
 | `defaultVoiceId` | string or null |  | A voiceId from list_voices, or null to clear it. |
 | `description` | string |  | What the avatar is, in words. An empty string clears it. |
 | `name` | string |  | New name, at least 3 characters. |
-| `ops` | value[] |  | Look changes, applied in order before the field updates. NOT a transaction: a failure part-way leaves earlier ops applied. |
+| `ops` | value[] |  | Look and sheet changes, applied in order before the field updates. NOT a transaction: a failure part-way leaves earlier ops applied. |
 | `position` | `top` \| `bottom` |  | Place it at an end of the list instead of beside an item. Name neighbors or a position, not both. |
 
 </Accordion>
@@ -345,6 +346,18 @@ A generation reference (start frame, image input, audio) accepts a raw URL or a 
 | `imageUrl` | string |  | One image to add as a look. |
 | `imageUrls` | string[] |  | Images to add as looks. |
 | `items` | object[] |  | Looks to add, when the caller names their own ids or names. Wins over imageUrls and imageUrl. |
+
+</Accordion>
+
+<Accordion title="POST /avatars/{avatarId}/sheets">
+
+**Body**
+
+| Field | Type | Required | Description |
+| --- | --- | --- | --- |
+| `imageUrl` | string |  | One image to attach as a sheet. |
+| `imageUrls` | string[] |  | Images to attach as sheets. |
+| `items` | object[] |  | Sheets to add. Wins over imageUrls and imageUrl. |
 
 </Accordion>
 

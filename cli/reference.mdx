@@ -5,7 +5,7 @@ description: "Every ContentHero CLI command, its arguments and its options."
 
 {/* GENERATED FILE from the ContentHero CLI. Do not edit by hand. */}
 
-Every command the CLI exposes, grouped by resource. 119 commands.
+Every command the CLI exposes, grouped by resource. 120 commands.
 
 Run `contenthero schema get commands` to get this same information as JSON, which is the discovery path for agents.
 
@@ -213,6 +213,18 @@ Remove a look (trashed, recoverable for 30 days)
 | --- | --- | --- |
 | `avatarId` | yes | the avatar id |
 | `lookId` | yes | the look id (see `contenthero avatar get`) |
+
+### `contenthero avatar sheet add <avatarId>`
+
+Attach images you already own to an avatar as sheets (costs nothing)
+
+| Argument | Required | Purpose |
+| --- | --- | --- |
+| `avatarId` | yes | the avatar id |
+
+| Option | Purpose |
+| --- | --- |
+| `--image <urlOrId>` | image to attach; repeatable |
 
 ### `contenthero avatar update <id>`
 

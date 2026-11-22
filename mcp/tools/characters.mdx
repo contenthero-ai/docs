@@ -83,7 +83,7 @@ Visual style hint for the portrait, e.g. "editorial", "cinematic". Not stored on
 
 <Badge>write</Badge>
 
-Update an avatar and/or change its looks. Fields: name, description, defaultLookId (also becomes the avatar's profile photo), defaultVoiceId. Looks are changed through ops, the same shape update_timeline and update_canvas use: add_look files images the account ALREADY OWNS onto the avatar, remove_look trashes one (recoverable for 30 days). Ops run before the fields, so one call can add a look and make it the default. To GENERATE a new look instead of filing an existing image, call generate_image with avatarId.
+Update an avatar and/or change its looks. Fields: name, description, defaultLookId (also becomes the avatar's profile photo), defaultVoiceId. Looks are changed through ops, the same shape update_timeline and update_canvas use: add_look files images the account ALREADY OWNS onto the avatar, remove_look trashes one (recoverable for 30 days), and add_sheet attaches images the account ALREADY OWNS to the avatar as sheets (a sheet is a reference image of the character; nothing is copied). Ops run before the fields, so one call can add a look and make it the default. To GENERATE a new look instead of filing an existing image, call generate_image with avatarId.
 
 <ParamField body name="avatarId" type="string" required>
 The avatar id from list_avatars. Either its short id or its UUID.
@@ -114,7 +114,7 @@ New name, at least 3 characters.
 </ParamField>
 
 <ParamField body name="ops" type="value[]">
-Look changes, applied in order before the field updates. NOT a transaction: a failure part-way leaves earlier ops applied.
+Look and sheet changes, applied in order before the field updates. NOT a transaction: a failure part-way leaves earlier ops applied.
 </ParamField>
 
 <ParamField body name="position" type="`top` \| `bottom`">
