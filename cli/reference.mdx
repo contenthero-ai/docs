@@ -463,6 +463,7 @@ Update a post's fields, including its stage and its place in its column (require
 | `--cover-output-id <id>` | media token (short id, output id or first 8 characters, optionally with "-N") for the cover |
 | `--tags <list>` | comma-separated tag names (replaces the set; must exist) |
 | `--schedule <when>` | ISO-8601 publish time for the card AND its posts, or "clear" |
+| `--blog-slug <slug>` | the slug the card's blog post publishes under, or "clear" |
 | `--posts <json>` | the card's posts as JSON. REPLACES the set, keyed by platform; [] detaches all |
 | `--assets <json>` | the card's assets as JSON, IN ORDER: [\{"id":...\}] keeps one; add one with exactly one of \{"outputId"\} (media: generated, uploaded or imported), \{"assetUrl"\} (a link), \{"contentId"\} (an inspiration post) or \{"projectId"\} (an editor or canvas project). REPLACES the list; [] clears it |
 | `--after <id>` | place it immediately after this item of the same list |

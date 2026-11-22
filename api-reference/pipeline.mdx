@@ -207,6 +207,7 @@ A card is the unit of work: its title, notes and cover, the posts that publish i
 | `afterId` | string |  | Place it immediately after this item of the same list. |
 | `assets` | object[] |  | The post's assets IN ORDER, each \{ id \} to keep an existing one or ONE of \{ outputId \} \| \{ assetUrl, assetType? \} \| \{ contentId \} \| \{ projectId \} to add. REPLACES the list; [] clears it. |
 | `beforeId` | string |  | Place it immediately before this item of the same list. |
+| `blogSlug` | string or null |  | The slug the card's blog post publishes under, when the address is already chosen. Lowercase words joined by single hyphens, at most 60 characters. When set, it is used instead of one written for the post. null clears it. |
 | `cardIds` | string[] |  | Update several cards at once. Fields that describe ONE card (title, notes, cover) still require exactly one. |
 | `contentType` | string or null |  | What kind of content the card holds, in a word. An empty string clears it. |
 | `coverOutputId` | string or null |  | A media token (short id, output id or first 8 characters, optionally with "-N") for the cover, resolved to its URL. |

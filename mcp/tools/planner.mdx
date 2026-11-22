@@ -331,6 +331,10 @@ The post's assets IN ORDER, each \{ id \} to keep an existing one or ONE of \{ o
 Place it immediately before this item of the same list.
 </ParamField>
 
+<ParamField body name="blogSlug" type="string or null">
+The slug the card's blog post publishes under, when the address is already chosen. Lowercase words joined by single hyphens, at most 60 characters. When set, it is used instead of one written for the post. null clears it.
+</ParamField>
+
 <ParamField body name="cardIds" type="string[]">
 Update several cards at once. Fields that describe ONE card (title, notes, cover) still require exactly one.
 </ParamField>
