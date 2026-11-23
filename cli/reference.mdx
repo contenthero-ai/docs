@@ -731,6 +731,7 @@ Generate audio with ElevenLabs: speech (TTS), music, or a sound effect
 | `--voice-name <name>` | for TTS: human-readable voice name (display only) |
 | `--duration <seconds>` | for music / sfx: length in seconds |
 | `--prompt-influence <0-1>` | for sfx: how literally to follow the prompt |
+| `--voice-settings <json>` | for TTS: delivery dials as JSON, as get_model lists them for the voice |
 | `--composition-plan <json>` | Music only, instead of prompt: the song section by section. Its length is the sum of its chunks, so durationSeconds is not sent with it. |
 | `--seed <n>` | For music with a compositionPlan: a seed, so the same plan gives a more consistent result. Not taken with a prompt. |
 | `--with-timestamps` | Music only: also return the sung words with their start and end times, and save them as the song's transcript. |
