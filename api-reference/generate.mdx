@@ -97,7 +97,7 @@ A generation reference (start frame, image input, audio) accepts a raw URL or a 
 | Field | Type | Required | Description |
 | --- | --- | --- | --- |
 | `clipIds` | string[] |  | IN-PLACE mode: enhance or split the audio of these clips on projectId. Omit with inPlace:true to edit every audible clip on the timeline. |
-| `durationSeconds` | number |  | Source audio length in seconds. Required for getCost, and for enhancement pricing when the source is not a stored ContentHero asset. |
+| `durationSeconds` | number |  | File mode: the source audio length in seconds, required for getCost and for enhancement pricing when the source is not a stored ContentHero asset. In-place mode ignores it: the cost comes from the clips. |
 | `getCost` | boolean |  | Return the credit cost estimate instead of running (nothing runs, nothing is charged). |
 | `inPlace` | boolean |  | IN-PLACE mode for the whole timeline, without naming clips. Implied when clipIds is given. |
 | `modelId` | string |  | Instead of operation: an audio model that takes one audio file and returns audio (it resolves to the operation it performs). list_models (contentType audio) names them; get_model gives one model's inputs and whether it finishes at once or is polled with get_status. |

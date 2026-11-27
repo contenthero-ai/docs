@@ -330,7 +330,7 @@ IN-PLACE mode: enhance or split the audio of these clips on projectId. Omit with
 </ParamField>
 
 <ParamField body name="durationSeconds" type="number">
-Source audio length in seconds. Required for getCost, and for enhancement pricing when the source is not a stored ContentHero asset.
+File mode: the source audio length in seconds, required for getCost and for enhancement pricing when the source is not a stored ContentHero asset. In-place mode ignores it: the cost comes from the clips.
 </ParamField>
 
 <ParamField body name="getCost" type="boolean">
